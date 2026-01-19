@@ -1,0 +1,28 @@
+<RCC>
+    <qresource prefix="/">
+        <file>icons/arrow-11610_128.gif</file>
+        <file>icons/eye.svg</file>
+        <file>icons/eye-slash.svg</file>
+        <file>icons/chart-line.svg</file>
+        <file>icons/question.svg</file>
+        <file>icons/chat-text.svg</file>
+        <file>icons/gear.svg</file>
+        <file>icons/arrow-counter-clockwise.svg</file>
+        <file>icons/sign-out.svg</file>
+        <file>icons/file-plus.svg</file>
+        <file>icons/desktop.svg</file>
+        <file>SVG-cards/Default/Default.svg</file>
+        <file>icons/speaker-high-duotone.svg</file>
+        <file>icons/speaker-slash-duotone.svg</file>
+        <file>icons/chat-duotone.svg</file>
+        <file>icons/chat-slash-duotone.svg</file>
+        <file>icons/escalator-down-duotone.svg</file>
+        <file>icons/plus-circle-duotone.svg</file>
+        <file>icons/sign-out-duotone.svg</file>
+        <file>icons/table-duotone.svg</file>
+        <file>icons/persongeneric.svg</file>
+        <file>icons/computer-icon.png</file>
+        <file>icons/calculator.svg</file>
+        <file>icons/calculator-slash.svg</file>
+    </qresource>
+</RCC>
