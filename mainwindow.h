@@ -85,7 +85,7 @@ private:
                                       int startDelay,
                                       int perCardStagger);
 private slots:
-    void onCardClicked(QGraphicsItem *item);  // New wrapper
+    void onCardClicked(QGraphicsItem *item);
     void onBackgroundPreviewClicked();
     void onDeckChanged(int deckId);
     void onArrowClicked();
@@ -96,17 +96,19 @@ private slots:
 
 private:
 /*
-    QSize lastViewSize = QSize(0, 0);  // pour détecter un vrai resize
-    ScoreAnchorSide scoreAnchorSideX = LeftSide;   // côté horizontal choisi (gauche ou droit)
-    ScoreAnchorSide scoreAnchorSideY = BottomSide; // côté vertical choisi (haut ou bas)
-    qreal scoreAnchorDistX = 20.0;                 // distance fixe au côté X choisi
+    QSize lastViewSize = QSize(0, 0);
+    ScoreAnchorSide scoreAnchorSideX = LeftSide;
+    ScoreAnchorSide scoreAnchorSideY = BottomSide;
+    qreal scoreAnchorDistX = 20.0;
     qreal scoreAnchorDistY = 80.0;
-    QPointF savedScorePos = QPointF(20, 100);  // position absolue au dernier drop
-    bool scorePositionSaved = false;           // vrai après un vrai drag
-    bool isDragging = false;  // dans MainWindow.h
+    QPointF savedScorePos = QPointF(20, 100);
+    bool scorePositionSaved = false;
 */
 
     enum class PlayerIcon { Human, Bot, Remote, None };
+
+    QSize lastBoardViewSize = QSize(0, 0);
+    bool windowWasResizedWhileAway = false;
     PlayerIcon icons[4] = {PlayerIcon::Human, PlayerIcon::Bot, PlayerIcon::Bot, PlayerIcon::Bot};
     DraggableScoreGroup *m_scoreGroup = nullptr;
     QGraphicsTextItem *m_scoreText = nullptr;
@@ -140,7 +142,7 @@ private:
 
     bool forced_new_deck = false;
     bool start_engine_dalayed = false;
-    int currentTrickZ = Z_TRICKS_BASE;               // Z for trick cards
+    int currentTrickZ = Z_TRICKS_BASE;
     int m_animationLockCount = 0;
 
     void saveCurrentTrickState();

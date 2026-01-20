@@ -78,6 +78,8 @@ void Engine::init_variables()
 
   hearts_broken = false;
 
+  jack_diamond = false;
+
   best_hand = 0;
 
   trick_value = 0;
@@ -296,17 +298,7 @@ int Engine::get_player_card(PLAYER player, int handIndex)
   return playerHandsById[player].at(handIndex);
 }
 
-int Engine::find_card_owner(int cardId)
-{
-  for (int p = 0; p < 4; p++) {
-    if (playerHandsById[p].contains(cardId))
-     return p;
-  }
-
-  return PLAYER_NOBODY;
-}
-
-int Engine::player_hand_size(PLAYER player)
+int Engine::handSize(PLAYER player)
 {
   if (!isValid(player))
     return 0;
@@ -327,6 +319,66 @@ int Engine::countCardsInSuit(PLAYER player, SUIT suit) const
     if (cardSuit == suit) {
       count++;
     }
+  }
+
+  return count;
+}
+
+int Engine::highestCardInSuitForPlayer(PLAYER player, SUIT suit) const
+{
+  if (!isValid(player) || !isValid(suit))
+    return INVALID_CARD;
+
+  int highest = -1;
+
+  const QList<int> &hand = playerHandsById[player];
+
+  for (int cardId : hand) {
+    int cardSuit = cardId / 13;
+    if ((cardSuit == suit) && cardId > highest) {
+      highest = cardId;
+    }
+  }
+
+  if (highest == -1) {
+    return INVALID_CARD;
+  }
+
+  return highest;
+}
+
+int Engine::lowestCardInSuitForPlayer(PLAYER player, SUIT suit) const
+{
+  if (!isValid(player) || !isValid(suit))
+    return INVALID_CARD;
+
+  int lowest = 52;
+
+  const QList<int> &hand = playerHandsById[player];
+
+  for (int cardId : hand) {
+    int cardSuit = cardId / 13;
+    if ((cardSuit == suit) && cardId < lowest) {
+      lowest = cardId;
+    }
+  }
+
+  if (lowest == 52) {
+    return INVALID_CARD;
+  }
+
+  return lowest;
+}
+
+int Engine::leftInSuit(SUIT suit) const
+{
+  if (!isValid(suit)) {
+    return 0;
+  }
+
+  int count = 0;
+  for (int p = 0; p < 4; p++) {
+    count += countCardsInSuit((PLAYER)p, suit);
   }
 
   return count;
@@ -354,7 +406,6 @@ void Engine::Loop()
                            break;
     case DEAL_CARDS:       qDebug() << "DEAL_CARDS";
                            emit sig_deal_cards();
-                       //    game_status = SELECT_CARDS;
                            break;
     case SELECT_CARDS:     qDebug() << "SELECT_CARDS direction " << direction;
                            sort_players_hand();          // sort after animated deal
@@ -395,10 +446,6 @@ void Engine::Loop()
 
                              qDebug() << "Player: " << turn << "ValidHand: " << validHandsById[turn] << "cardId: " << cardId << "Full hand: " << playerHandsById[turn];
                              Play(cardId, turn);
-                   //          playerHandsById[turn].removeAll(cardId);
-                  //           cards_left--;
-                  //           check_for_best_hand(turn, cardId);
-                  //          emit sig_play_card(cardId, turn);
                              qDebug() << "Remove from: " << turn << "CardId: " << cardId;
                            } else
                               if (turn == PLAYER_SOUTH) {
@@ -406,7 +453,6 @@ void Engine::Loop()
                                 emit sig_your_turn();
                               }
                               qDebug() << "Refresh";
-                   //        emit sig_refresh_deck();
                            qDebug() << "Card LEFT: " << cards_left;
                            break;
      case END_TURN:        currentSuit = SUIT_ALL;
@@ -416,7 +462,7 @@ void Engine::Loop()
                              trick_value = 0;
                              emit sig_update_scores_board(playersName, hand_score, total_score);
                            }
-                           emit sig_collect_tricks(turn, is_it_TRAM());
+                           emit sig_collect_tricks(turn, is_it_TRAM(turn));
                            qDebug() << "END_TURN";
                            break;
      case LOOP_TURN:   qDebug() << "Status: " << game_status << "turn : " << turn << "cards_left: " << cards_left << "cpt_played: " << cpt_played;
@@ -436,20 +482,18 @@ void Engine::Loop()
                          }
                          break;
      case END_ROUND:     update_total_scores();
-                           qDebug() << "END_ROUND " << game_score;
-                           if (game_score < 100) {
-                         //    turn = PLAYER_NORTH;
-                        //     cpt_played = 1;
-                        //     cards_left = DECK_SIZE;
-                             game_status = NEW_ROUND;
-                             qDebug() << "CALLING NEW ROUND";
-                             QTimer::singleShot(0, this, &Engine::Loop);
-                           } else {
-                               game_status = GAME_OVER;
-                               QTimer::singleShot(0, this, &Engine::Loop);
-                           }
+                         qDebug() << "END_ROUND " << game_score;
+                         if (!is_game_over()) {
+                           game_status = NEW_ROUND;
+                           qDebug() << "CALLING NEW ROUND";
+                           QTimer::singleShot(0, this, &Engine::Loop);
+                          } else {
+                              game_status = GAME_OVER;
+                              QTimer::singleShot(0, this, &Engine::Loop);
+                         }
                          break;
      case GAME_OVER:     qDebug() << "GAME_OVER";
+                         emit sig_game_over();
                          break;
   }
 }
@@ -521,6 +565,8 @@ void Engine::Play(int cardId, PLAYER player)
   if (cardId == SPADES_QUEEN) {
     trick_value += 13;
     emit sig_queen_spade();
+  } if (cardId == DIAMONDS_JACK) {
+      jack_diamond = true;
   }
 
   emit sig_refresh_deck();
@@ -653,7 +699,6 @@ void Engine::check_for_best_hand(PLAYER player, int cardId)
     best_hand = cardId;
     best_hand_owner = player;
     currentSuit = cardSuit;
-qDebug() << "New suit: " << currentSuit;
   } else {
       if ((cardSuit == currentSuit) && (cardId > best_hand)) {
         best_hand = cardId;
@@ -662,10 +707,87 @@ qDebug() << "New suit: " << currentSuit;
   }
 }
 
-
-bool Engine::is_it_TRAM()
+bool Engine::is_it_TRAM(PLAYER player)
 {
-  return false;
+  if (!settings_tram) {
+    return false;
+  }
+
+  // tram if there ain't any penality or (bonus jack diamond / omnibus) left.
+  if (!Owner(SPADES_QUEEN) && !leftInSuit(HEARTS)) {
+    if (!variant_omnibus || !Owner(DIAMONDS_JACK)) {
+      return true;
+    }
+  }
+
+  int cardId, best_card[4] = {-1, -1, -1, -1};
+
+  for (int p = 0; p < 4; p++) {
+    if (p != player) {
+
+      cardId = highestCardInSuitForPlayer((PLAYER)p, CLUBS);
+      if ((cardId != INVALID_CARD) && (cardId > best_card[CLUBS])) {
+        best_card[CLUBS] = cardId;
+      }
+
+      cardId = highestCardInSuitForPlayer((PLAYER)p, SPADES);
+      if ((cardId != INVALID_CARD) && (cardId > best_card[SPADES])) {
+        best_card[SPADES] = cardId;
+      }
+
+      cardId = highestCardInSuitForPlayer((PLAYER)p, DIAMONDS);
+      if ((cardId != INVALID_CARD) && (cardId > best_card[DIAMONDS])) {
+        best_card[DIAMONDS] = cardId;
+      }
+
+      cardId = highestCardInSuitForPlayer((PLAYER)p, HEARTS);
+      if ((cardId != INVALID_CARD) && (cardId > best_card[HEARTS])) {
+        best_card[HEARTS] = cardId;
+      }
+    }
+  }
+
+  if (countCardsInSuit(player, CLUBS) && (best_card[CLUBS] > lowestCardInSuitForPlayer(player, CLUBS))) return false;
+  if (countCardsInSuit(player, SPADES) && (best_card[SPADES] > lowestCardInSuitForPlayer(player, SPADES))) return false;
+  if (countCardsInSuit(player, DIAMONDS) && (best_card[DIAMONDS] > lowestCardInSuitForPlayer(player, DIAMONDS))) return false;
+  if (countCardsInSuit(player, HEARTS) && (best_card[HEARTS] > lowestCardInSuitForPlayer(player, HEARTS))) return false;
+
+  cards_left = 0;
+
+  // update scores ??
+  return true;
+}
+
+bool Engine::is_game_over()
+{
+  if (game_score < GAME_OVER_SCORE) {
+    return false;
+  }
+
+  if (variant_no_draw && is_it_draw()) {
+    return false;
+  }
+
+  return true;
+}
+
+bool Engine::is_it_draw()
+{
+  int lowest = total_score[PLAYER_SOUTH];
+
+  int cpt = 0;
+  for (int i = 1; i < 4; i++) {
+     if (total_score[i] < lowest) {
+       lowest = total_score[i];
+       cpt = 0;
+     }
+     else {
+       if (total_score[i] == lowest)
+         cpt++;
+     }
+  }
+
+  return cpt;
 }
 
 QString Engine::errorMessage(GAME_ERROR err) const

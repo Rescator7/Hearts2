@@ -1,4 +1,5 @@
 #include "deck.h"
+#include "define.h"
 
 #include <QDebug>
 #include <QDir>
@@ -269,7 +270,7 @@ bool Deck::set_deck(int style) {
   } else {
       path = "/usr/local/Hearts/";
       if (!check_file(path))
-        path = QDir::homePath() + QString("/DEV/Hearts/");
+        path = QDir::homePath() + FOLDER;
 
         fullpath = path + QString(image_format[format]) + QString("-cards/") + folder_name;
       }

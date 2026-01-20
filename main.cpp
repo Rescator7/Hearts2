@@ -11,6 +11,13 @@ int main(int argc, char *argv[])
 
     QApplication a(argc, argv);
 
+/*  Not working QT 6.5 to stop flicking on resize
+    QApplication::setAttribute(Qt::AA_UseSoftwareOpenGL);
+    QApplication::setAttribute(Qt::AA_DontUseNativeMenuBar);  // parfois aide
+    QApplication::setAttribute(Qt::AA_ForceRasterWidgets);    // force raster (logiciel)
+*/
+  //  QApplication::setAttribute(Qt::AA_DisableHighDpiScaling);  // à tester, parfois réduit le flickering
+
     QFont font("Noto Sans", 11);
     font.setStyleName("Regular");
 

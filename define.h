@@ -5,7 +5,7 @@
 
 constexpr const char VERSION[] = "Hearts 2.0";
 constexpr const char INSTALL_PATH[] = "/usr/local/Hearts";
-//constexpr const char BACKGROUND_PATH[] = "/background";
+constexpr const char FOLDER[] = "/DEV/Hearts2/";
 
 constexpr int MIN_APPL_WIDTH = 500;
 constexpr int MIN_APPL_HEIGHT = 460;

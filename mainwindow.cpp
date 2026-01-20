@@ -153,13 +153,26 @@ MainWindow::MainWindow(QWidget *parent)
     });
 
     connect(ui->tabWidget, &QTabWidget::currentChanged, this, [this](int index) {
-     if (index == 0) {  // Switched TO Board tab
-        // Use singleShot to let layout settle first
+      if (index == 0) {  // Switched TO Board tab
         QTimer::singleShot(0, this, [this]() {
-            updateSceneRect();
+          QSize currentSize = ui->graphicsView->size();
+
+          bool sizeChanged = (currentSize != lastBoardViewSize);
+          bool needsFullReposition = sizeChanged && windowWasResizedWhileAway;
+
+          updateSceneRect();
+          if (needsFullReposition) {
             repositionAllCardsAndElements();
+            lastBoardViewSize = currentSize;
+          }
+          else {
+            refresh_deck();
+            updateTrickPile();
+          }
+
+          windowWasResizedWhileAway = false;
         });
-     }
+      }
     });
 
     connect(background, &Background::backgroundChanged, this, [this](const QString &path) {
@@ -184,6 +197,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(engine, &Engine::sig_shuffle_deck, this, [this]() {
       sounds->play(SOUND_SHUFFLING_CARDS);
+    });
+
+    connect(engine, &Engine::sig_game_over, this, [this]() {
+      sounds->play(SOUND_GAME_OVER);
     });
 
  //   connect(engine, &Engine::sig_setCurrentSuit, this, &MainWindow::setCurrentSuit);
@@ -474,12 +491,6 @@ void MainWindow::resizeEvent(QResizeEvent *event)
 {
     QMainWindow::resizeEvent(event);
 
-/*
-qDebug() << "Lock count:" << m_sizeLockCount << "Fixed:" << (m_sizeLockCount > 0);
-qDebug() << "graphicsView width:" << ui->graphicsView->width();
-qDebug() << "graphicsView height:" << ui->graphicsView->height();
-*/
-
     if (ui->graphicsView->scene()) {
         ui->graphicsView->scene()->invalidate(QRectF(), QGraphicsScene::AllLayers); // ← invalide TOUT
         ui->graphicsView->scene()->update();           // scène globale
@@ -489,46 +500,14 @@ qDebug() << "graphicsView height:" << ui->graphicsView->height();
 
     // Only update if Board tab is visible (avoids unnecessary work)
     if (ui->tabWidget->currentIndex() == 0) {  // 0 = Board tab
-        updateSceneRect();
-        repositionAllCardsAndElements();
-        ui->graphicsView->scene()->update();
-    }
-
-    // Option 1 : repaint simple et rapide (souvent suffisant)
-
-/*
-    // Option 2 : force un invalidate global (efface les caches)
-    scene->invalidate(scene->sceneRect(), QGraphicsScene::AllLayers);
-    scene->update();
-
-    // Option 3 : repaint la vue entière (viewport)
-    ui->graphicsView->update();               // repaint la vue
-    ui->graphicsView->viewport()->update();   // repaint le widget viewport (très efficace contre artefacts)
-
-    // Option 4 : encore plus agressif (si les traînées persistent)
-    ui->graphicsView->invalidateScene();      // invalide toute la scène vue
-    ui->graphicsView->updateViewport();
-*/
+      updateSceneRect();
+      repositionAllCardsAndElements();
+      ui->graphicsView->scene()->update();
+      lastBoardViewSize = ui->graphicsView->size();
+    }  else {
+         windowWasResizedWhileAway = true;
+       }
 }
-
-
-// NOTE: if green glitch reappear try the 2 scene lines.
-//       deactive effets is more complicated, because i don't have a reapplyCardEffects.
-
-/*
-       // Désactive temporairement tous les effets
-    for (QGraphicsItem *item : scene->items()) {
-        if (QGraphicsSvgItem *svg = qgraphicsitem_cast<QGraphicsSvgItem*>(item)) {
-            svg->setGraphicsEffect(nullptr);
-        }
-    }
-
-    scene->invalidate(scene->sceneRect(), QGraphicsScene::AllLayers);
-    scene->update();
-
-    // Réapplique après 100 ms (assez pour que le resize finisse)
-    QTimer::singleShot(100, this, &MainWindow::reapplyCardEffects);
-*/
 
 bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 {
@@ -598,7 +577,7 @@ void MainWindow::onBackgroundPreviewClicked()
 {
     QString fileName = QFileDialog::getOpenFileName(this,
         tr("Choose Background Image"),
-        QDir::homePath() + QString("/DEV/Hearts/backgrounds"),
+        QDir::homePath() + FOLDER + QString("/backgrounds"),
         tr("Images (*.png *.jpg *.jpeg *.bmp *.gif)"));
 
     if (fileName.isEmpty()) return;
@@ -626,7 +605,7 @@ void MainWindow::onCardClicked(QGraphicsItem *item)
     int cardId = idVar.toInt();
     if (cardId < 0 || cardId >= DECK_SIZE) return;
 
-    int player = engine->find_card_owner(cardId);
+    int player = engine->Owner(cardId);
     if (player != PLAYER_SOUTH)
       return;
 
@@ -831,7 +810,7 @@ void MainWindow::refresh_deck()
       revealed = ui->pushButton_reveal->isChecked() || (player == PLAYER_SOUTH);
 
 //qDebug() << "Player: " << player << "Hand: " << engine->Hand(player) << "Size: " << engine->Hand(player).size();
-      int handSize = engine->player_hand_size((PLAYER)player);
+      int handSize = engine->handSize((PLAYER)player);
       for (int handIndex = 0; handIndex < handSize; handIndex++) {
          int cardId = engine->get_player_card((PLAYER)player, handIndex);
          if (cardId == INVALID_CARD) continue;
@@ -1846,7 +1825,7 @@ void MainWindow::revealPlayer(int player)
   int cardId;
   QGraphicsItem *frontCard, *backCard;
 
-  for (int handIndex = 0; handIndex < engine->player_hand_size((PLAYER)player); handIndex++) {
+  for (int handIndex = 0; handIndex < engine->handSize((PLAYER)player); handIndex++) {
     cardId = engine->get_player_card((PLAYER)player, handIndex);
     if (cardId == INVALID_CARD) continue;
 
@@ -2147,7 +2126,7 @@ int MainWindow::cardX(int cardId, int player, int handIndex, bool frontCard)
 
   int x,
       c = 0,
-      hand_size = engine->player_hand_size((PLAYER)player);
+      hand_size = engine->handSize((PLAYER)player);
 
   switch (player) {
     case PLAYER_WEST: // Left player (rotated +90°)
@@ -2190,7 +2169,7 @@ int MainWindow::cardY(int cardId, int player, int handIndex, bool frontCard)
 
   int y,
       c = 0,
-      hand_size = engine->player_hand_size((PLAYER)player);
+      hand_size = engine->handSize((PLAYER)player);
 
   switch (player) {
     case PLAYER_WEST: // Left player (rotated +90°)
@@ -2289,27 +2268,6 @@ QPointF MainWindow::calculatePlayerNamePos(int player) const
     }
     return QPointF();
 }
-
-/*
-QPointF MainWindow::calculatePlayerNamePos(int player) const
-{
-    QSizeF viewSize = ui->graphicsView->mapToScene(ui->graphicsView->viewport()->rect()).boundingRect().size();
-    QPointF pos;
-
-    switch (player) {
-    case PLAYER_SOUTH: pos = QPointF(viewSize.width() / 2, viewSize.height() * 0.92);
-                       break; // Bas centre
-    case PLAYER_NORTH: pos = QPointF(viewSize.width() / 2, viewSize.height() * 0.08);
-                       break; // Haut centre
-    case PLAYER_WEST:  pos = QPointF(viewSize.width() * 0.08, viewSize.height() / 2);
-                       break; // Gauche centre
-    case PLAYER_EAST:  pos = QPointF(viewSize.width() * 0.92, viewSize.height() / 2);
-                       break; // Droite centre
-    }
-    return pos;
-}
-*/
-
 // ************************************************************************************************
 
 

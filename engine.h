@@ -14,6 +14,11 @@ constexpr int VARIANT_NO_TRICKS   = 3;
 constexpr int VARIANT_NEW_MOON    = 4;
 constexpr int VARIANT_NO_DRAW     = 5;
 
+constexpr int PERFECT_100_VALUE   = 50;      // the hand score will be set to this number.
+constexpr int NO_TRICK_VALUE      = 5;       // the no trick bonus will substract this number to the hand score.
+constexpr int OMNIBUS_VALUE       = 10;      // the bonus for winning the jack of diamond.
+constexpr int GAME_OVER_SCORE     = 100;     // reach this score to make the game over.
+
 enum DIRECTION {
     PASS_LEFT     = 0,
     PASS_RIGHT    = 1,
@@ -58,14 +63,22 @@ private:
     QList<int> passedCards[4];
     QString playersName[4] = {"South", "West", "North", "East"};
     DIRECTION direction = PASS_LEFT;
+    PLAYER best_hand_owner;
+    PLAYER turn;
+    GAME_STATUS game_status = SELECT_CARDS;
+    SUIT currentSuit = SUIT::CLUBS;
+
     bool variant_queen_spade = false;
     bool variant_perfect_100 = false;
     bool variant_omnibus = false;
     bool variant_no_draw = false;
     bool variant_no_tricks = false;
     bool variant_new_moon = false;
-    GAME_STATUS game_status = SELECT_CARDS;
-    SUIT currentSuit = SUIT::CLUBS;
+    bool settings_tram = true;
+
+    bool hearts_broken = false;
+    bool jack_diamond = false;
+
     int AI_players[3];
     int cpt_played = 0;
     int cards_left;
@@ -74,9 +87,6 @@ private:
     int trick_value = 0;
     int hand_score[4] = {};
     int total_score[4] = {};
-    PLAYER best_hand_owner;
-    bool hearts_broken = false;
-    PLAYER turn;
 
     void init_variables();
     void shuffle_deck();
@@ -94,12 +104,17 @@ private:
     bool AI_select_Hearts(PLAYER player);
     bool AI_select_Randoms(PLAYER player);
     bool can_play_qs_first_hand(PLAYER player);
+    bool is_it_draw();
+    bool is_game_over();
+    bool is_it_TRAM(PLAYER player);
 
+    int highestCardInSuitForPlayer(PLAYER player, SUIT suit) const;
+    int lowestCardInSuitForPlayer(PLAYER player, SUIT suit) const;
     int countCardsInSuit(PLAYER player, SUIT suit) const;
+    int leftInSuit(SUIT suit) const;
     int getRandomNameIndex();
     bool load_saved_game();
     void sort_players_hand();
-    bool is_it_TRAM();
     void check_for_best_hand(PLAYER player, int cardId);
     void update_total_scores();
     void Loop();
@@ -124,6 +139,7 @@ signals:
     void sig_collect_tricks(PLAYER winner, bool TRAM);
     void sig_new_players(const QString names[4]);
     void sig_update_scores_board(const QString names[4], const int hand[4], const int total[4]);
+    void sig_game_over();
 
 public:
     void set_variant(int variant, bool enabled);
@@ -138,10 +154,9 @@ public:
                               (game_status == PLAY_TWO_CLUBS); };
     bool can_break_hearts(PLAYER player);
     int get_player_card(PLAYER player, int handIndex);
-    int player_hand_size(PLAYER player);
-    int find_card_owner(int cardId);
-    GAME_ERROR validate_move(PLAYER player, int cardId);
+    int handSize(PLAYER player);
 
+    GAME_ERROR validate_move(PLAYER player, int cardId);
     PLAYER Owner(int cardId) const;
     PLAYER Turn() { return turn; };
     GAME_STATUS Status() { return game_status; };

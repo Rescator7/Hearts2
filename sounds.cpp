@@ -1,4 +1,5 @@
 #include "sounds.h"
+#include "define.h"
 #include <QDir>
 #include <QFile>
 #include <QUrl>
@@ -43,7 +44,7 @@ void Sounds::play(int soundId)
 
     QString basePath = "/usr/local/Hearts2/sounds/";
     if (!QFile::exists(basePath + sounds_files[0])) {
-        basePath = QDir::homePath() + "/Hearts2/sounds/";
+        basePath = QDir::homePath() + FOLDER + "sounds/";
     }
 
     QString filename = basePath + QString(sounds_files[soundId]);
