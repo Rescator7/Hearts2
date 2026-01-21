@@ -22,10 +22,11 @@ enum SOUNDS {
      SOUND_CONNECTED        = 11,
      SOUND_DISCONNECTED     = 12,
      SOUND_ANNOUCEMENT      = 13,
-     SOUND_UNDO             = 14
+     SOUND_UNDO             = 14,
+     SOUND_TRAM             = 15
 };
 
-constexpr int  LAST_SOUND          = 14;
+constexpr int  LAST_SOUND          = 15;
 
 class Sounds : public QObject
 {

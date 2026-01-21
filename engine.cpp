@@ -4,15 +4,23 @@
 #include <random>
 #include <QRandomGenerator>
 #include <QTimer>
+#include <QMessageBox>
+
+#include <QThread> // temporaire
+#include <QTime>
 
 #include "define.h"
 #include "cpus.h"
 #include "deck.h"
+#include "qpushbutton.h"
 
 std::random_device rd;
 std::mt19937 gen(rd());
 
-Engine::Engine(QObject *parent) : QObject(parent) {
+
+Engine::Engine(QWidget* mainWin, QObject* parent)
+    : QObject(parent), mainWindow(mainWin)
+{
 }
 
 void Engine::Start()
@@ -78,17 +86,31 @@ void Engine::init_variables()
 
   hearts_broken = false;
 
-  jack_diamond = false;
+  jack_diamond_in_trick = false;
+
+  jack_diamond_owner = PLAYER_NOBODY;
 
   best_hand = 0;
 
   trick_value = 0;
-
-  direction = PASS_LEFT;
 }
 
-void Engine::start_new_game()
+GAME_ERROR Engine::start_new_game()
 {
+
+   qDebug() << "startNewGame() appelé depuis :" << Q_FUNC_INFO << QThread::currentThread();
+    // ou juste :
+   qDebug() << "Pourquoi new game ? currentStatus =" << game_status << "cpt_played =" << cpt_played;
+   qDebug() << "Locked: " << locked;
+
+  if (locked) {
+  //  emit sig_error(errorMessage(ERRLOCKED));
+    return ERRLOCKED;
+  }
+
+  qDebug() << "New game";
+
+  direction = PASS_LEFT;
   game_status = NEW_ROUND;   // Init vars will be called in Loop() for the NEW_ROUND
   game_score = 0;
 
@@ -101,6 +123,8 @@ void Engine::start_new_game()
   emit sig_new_players(playersName);
   emit sig_update_scores_board(playersName, hand_score, total_score);
   Loop();
+
+  return NOERROR;
 }
 
 bool Engine::load_saved_game()
@@ -280,109 +304,7 @@ void Engine::cpus_select_cards()
   }
 }
 
-void Engine::set_passedFromSouth(QList<int> &cards)
-{
-  passedCards[PLAYER_SOUTH] = cards;
 
-  qDebug() << "selection size: " << passedCards[PLAYER_SOUTH].size();
-}
-
-int Engine::get_player_card(PLAYER player, int handIndex)
-{
-  if (!isValid(player))
-    return INVALID_CARD;
-
-  if ((handIndex < 0) || (handIndex >= playerHandsById[player].size()))
-    return INVALID_CARD;
-
-  return playerHandsById[player].at(handIndex);
-}
-
-int Engine::handSize(PLAYER player)
-{
-  if (!isValid(player))
-    return 0;
-
-  return playerHandsById[player].size();
-}
-
-int Engine::countCardsInSuit(PLAYER player, SUIT suit) const
-{
-  if (!isValid(player) || !isValid(suit))
-    return 0;
-
-  const QList<int> &hand = playerHandsById[player];
-  int count = 0;
-
-  for (int cardId : hand) {
-    int cardSuit = cardId / 13;  // 0=club, 1=spade, 2=diamond, 3=heart
-    if (cardSuit == suit) {
-      count++;
-    }
-  }
-
-  return count;
-}
-
-int Engine::highestCardInSuitForPlayer(PLAYER player, SUIT suit) const
-{
-  if (!isValid(player) || !isValid(suit))
-    return INVALID_CARD;
-
-  int highest = -1;
-
-  const QList<int> &hand = playerHandsById[player];
-
-  for (int cardId : hand) {
-    int cardSuit = cardId / 13;
-    if ((cardSuit == suit) && cardId > highest) {
-      highest = cardId;
-    }
-  }
-
-  if (highest == -1) {
-    return INVALID_CARD;
-  }
-
-  return highest;
-}
-
-int Engine::lowestCardInSuitForPlayer(PLAYER player, SUIT suit) const
-{
-  if (!isValid(player) || !isValid(suit))
-    return INVALID_CARD;
-
-  int lowest = 52;
-
-  const QList<int> &hand = playerHandsById[player];
-
-  for (int cardId : hand) {
-    int cardSuit = cardId / 13;
-    if ((cardSuit == suit) && cardId < lowest) {
-      lowest = cardId;
-    }
-  }
-
-  if (lowest == 52) {
-    return INVALID_CARD;
-  }
-
-  return lowest;
-}
-
-int Engine::leftInSuit(SUIT suit) const
-{
-  if (!isValid(suit)) {
-    return 0;
-  }
-
-  int count = 0;
-  for (int p = 0; p < 4; p++) {
-    count += countCardsInSuit((PLAYER)p, suit);
-  }
-
-  return count;
-}
 
 void Engine::Loop()
 {
@@ -390,8 +312,11 @@ void Engine::Loop()
   PLAYER owner;
   int cardId;
 
+  bool yesNo = false; // for testing to be removed
+
   switch (game_status) {
      case NEW_ROUND:       qDebug() << "NEW ROUND";
+                           locked = true;
                            init_variables();
                            shuffle_deck();
                            emit sig_enableAllCards();
@@ -402,7 +327,7 @@ void Engine::Loop()
                            } else {
                              game_status = DEAL_CARDS;
                            }
-                           QTimer::singleShot(0, this, &Engine::Loop);
+                           LockedLoop();
                            break;
     case DEAL_CARDS:       qDebug() << "DEAL_CARDS";
                            emit sig_deal_cards();
@@ -410,9 +335,20 @@ void Engine::Loop()
     case SELECT_CARDS:     qDebug() << "SELECT_CARDS direction " << direction;
                            sort_players_hand();          // sort after animated deal
                            emit sig_refresh_deck();
-                           emit sig_pass_to(direction);
+
+                           // testing
+                           // yesNo = getNewMoonChoice();
+                           // qDebug() << yesNo;
+
+                           if (direction == PASS_HOLD) {
+                             game_status = PLAY_TWO_CLUBS;
+                             LockedLoop();
+                           } else
+                               emit sig_pass_to(direction);
+                           locked = false;
                            break;
     case TRADE_CARDS:      qDebug() << "TRADE CARDS";
+                           locked = true;
                            cpus_select_cards();
                            completePassCards();
                            emit sig_passed();
@@ -433,13 +369,16 @@ void Engine::Loop()
                              emit sig_play_card(CLUBS_TWO, owner);
                            }
                            if (owner == PLAYER_SOUTH) {
+                             locked = false;
                              emit sig_your_turn();
                            }
                            break;
      case PLAY_A_CARD_1 :
      case PLAY_A_CARD_2 :
      case PLAY_A_CARD_3 :
-     case PLAY_A_CARD_4 : qDebug() << "current_suit: " << currentSuit;
+     case PLAY_A_CARD_4 : qDebug() << "Play a card: " << game_status;
+                          locked = true;
+                          qDebug() << "current_suit: " << currentSuit;
                           filterValidMoves(turn);
                           if ((turn != PLAYER_SOUTH) && (turn != PLAYER_NOBODY)) {
                              cardId = validHandsById[turn].at(0);
@@ -450,6 +389,7 @@ void Engine::Loop()
                            } else
                               if (turn == PLAYER_SOUTH) {
                                 qDebug() << "Your turn, cards left: " << cards_left;
+                                locked = false;
                                 emit sig_your_turn();
                               }
                               qDebug() << "Refresh";
@@ -461,6 +401,9 @@ void Engine::Loop()
                              hand_score[best_hand_owner] += trick_value;
                              trick_value = 0;
                              emit sig_update_scores_board(playersName, hand_score, total_score);
+                           }
+                           if (jack_diamond_in_trick) {
+                             jack_diamond_owner = best_hand_owner;
                            }
                            emit sig_collect_tricks(turn, is_it_TRAM(turn));
                            qDebug() << "END_TURN";
@@ -474,40 +417,36 @@ void Engine::Loop()
 
                         cpt_played = 1;
                         if (cards_left > 0) {
-                          game_status = PLAY_A_CARD_1;
-                          QTimer::singleShot(0, this, &Engine::Loop);
+                          game_status = PLAY_A_CARD_1;                       
                          } else {
                              game_status = END_ROUND;
-                             QTimer::singleShot(0, this, &Engine::Loop); // TO REMOVED if ROUND signal CALL STEP() eventually
                          }
+
+                         LockedLoop();
                          break;
      case END_ROUND:     update_total_scores();
                          qDebug() << "END_ROUND " << game_score;
                          if (!is_game_over()) {
                            game_status = NEW_ROUND;
-                           qDebug() << "CALLING NEW ROUND";
-                           QTimer::singleShot(0, this, &Engine::Loop);
+                           advance_direction();
                           } else {
                               game_status = GAME_OVER;
-                              QTimer::singleShot(0, this, &Engine::Loop);
                          }
+                         LockedLoop();
                          break;
      case GAME_OVER:     qDebug() << "GAME_OVER";
+                         locked = false;
                          emit sig_game_over();
                          break;
   }
 }
 
-void Engine::update_total_scores()
+void Engine::LockedLoop()
 {
-  for (int p = 0; p < 4; p++) {
-    total_score[p] += hand_score[p];
-    if (total_score[p] > game_score) {
-      game_score = total_score[p];
-    }
-    hand_score[p] = 0;
-  }
-  emit sig_update_scores_board(playersName, hand_score, total_score);
+  QTimer::singleShot(0, this, [this]() {
+                            locked = true;   // lock on to avoid race condition
+                            Loop();
+                     });
 }
 
 void Engine::Step()
@@ -515,22 +454,16 @@ void Engine::Step()
   if (game_status == GAME_OVER)
     return;
 
-qDebug() << "game_status: " << game_status << " cpt_played " << cpt_played;
-qDebug() << "Isplay: " << isPlaying();
-
   if (isPlaying())
     advance_turn();
 
   game_status = static_cast<GAME_STATUS>(static_cast<int>(game_status) + 1);
 
-  qDebug() << "New step: " << game_status;
-
-  Loop();
+  LockedLoop();
 }
 
 void Engine::advance_turn()
 {
-qDebug() << "turn before: " << turn;
   switch(turn) {
     case PLAYER_SOUTH : turn = PLAYER_WEST; break;
     case PLAYER_WEST :  turn = PLAYER_NORTH; break;
@@ -539,9 +472,17 @@ qDebug() << "turn before: " << turn;
     case PLAYER_COUNT :
     case PLAYER_NOBODY : qCritical() << "advance_turn invalid turn !";
   }
-qDebug() << "turn after: " << turn;
   cpt_played++;
-  qDebug() << "cpt played: " << cpt_played;
+}
+
+void Engine::advance_direction()
+{
+  switch(direction) {
+    case PASS_LEFT:   direction = PASS_RIGHT; break;
+    case PASS_RIGHT:  direction = PASS_ACROSS; break;
+    case PASS_ACROSS: direction = PASS_HOLD; break;
+    case PASS_HOLD:   direction = PASS_LEFT; break;
+  }
 }
 
 void Engine::Play(int cardId, PLAYER player)
@@ -564,12 +505,88 @@ void Engine::Play(int cardId, PLAYER player)
   } else
   if (cardId == SPADES_QUEEN) {
     trick_value += 13;
+    if (variant_queen_spade) {
+      hearts_broken = true;
+      emit sig_hearts_broken();
+    }
     emit sig_queen_spade();
   } if (cardId == DIAMONDS_JACK) {
-      jack_diamond = true;
+      jack_diamond_in_trick = true;
   }
 
   emit sig_refresh_deck();
+}
+
+bool Engine::getNewMoonChoice()
+{
+    QMessageBox msgBox(mainWindow);
+
+    msgBox.setIcon(QMessageBox::Question);
+    msgBox.setWindowTitle("🌕 Shoot the Moon ! 🌕");
+
+    msgBox.setText("<font size='+2' color='#FFD700'><b>Congratulations!</b></font><br>"
+                   "<font color='#FF69B4'>You have taken all the hearts!</font>");
+
+    msgBox.setInformativeText("What would you like to do?");
+
+    QPushButton *addButton = msgBox.addButton("➕ 26 to opponents", QMessageBox::AcceptRole);
+    QPushButton *subButton = msgBox.addButton("➖ 26 to myself", QMessageBox::RejectRole);
+
+    addButton->setStyleSheet("QPushButton { background-color: #FF4444; color: white; padding: 12px 18px; border-radius: 8px; font-weight: bold; }");
+    subButton->setStyleSheet("QPushButton { background-color: #44AA44; color: white; padding: 12px 18px; border-radius: 8px; font-weight: bold; }");
+
+    msgBox.exec();
+
+    return (msgBox.clickedButton() == addButton);
+}
+
+void Engine::shoot_moon(int player)
+{
+  int yesNo = true;
+  if ((player == PLAYER_SOUTH) && variant_new_moon) {
+    yesNo = getNewMoonChoice();
+  }
+
+  if (yesNo == false) {
+    total_score[player] = std::max(0, total_score[player] - 26);
+  } else {
+      for (int p = 0; p < 4; p++) {
+        if (p == player) continue;
+        total_score[p] += 26;
+      }
+  }
+}
+
+void Engine::update_total_scores()
+{
+  int bonus = 0;
+
+  for (int p = 0; p < 4; p++) {
+    if ((hand_score[p] == 26) && ((jack_diamond_owner == p) || !variant_omnibus)) {
+      shoot_moon(p);
+    } else {  // those bonus don't apply if someone shoot the moon
+       if (variant_no_tricks && hand_score[p] == 0) {
+         bonus += NO_TRICK_VALUE;
+       }
+
+       if (variant_omnibus && (jack_diamond_owner == p)) {
+         bonus += OMNIBUS_VALUE;
+       }
+
+       total_score[p] = std::max(0, total_score[p] + hand_score[p]);
+      }
+
+    if (variant_perfect_100 && (total_score[p] == GAME_OVER_SCORE)) {
+      total_score[p] = PERFECT_100_VALUE;
+      emit sig_perfect_100((PLAYER)p);
+    }
+
+    if (total_score[p] > game_score) {
+      game_score = total_score[p];
+    }
+    hand_score[p] = 0;
+  }
+  emit sig_update_scores_board(playersName, hand_score, total_score);
 }
 
 PLAYER Engine::Owner(int cardId) const
@@ -709,7 +726,7 @@ void Engine::check_for_best_hand(PLAYER player, int cardId)
 
 bool Engine::is_it_TRAM(PLAYER player)
 {
-  if (!settings_tram) {
+  if (!settings_tram || (cards_left < 5)) {
     return false;
   }
 
@@ -755,6 +772,8 @@ bool Engine::is_it_TRAM(PLAYER player)
   cards_left = 0;
 
   // update scores ??
+  emit sig_tram();
+
   return true;
 }
 
@@ -790,6 +809,111 @@ bool Engine::is_it_draw()
   return cpt;
 }
 
+int Engine::lowestCardInSuitForPlayer(PLAYER player, SUIT suit) const
+{
+  if (!isValid(player) || !isValid(suit))
+    return INVALID_CARD;
+
+  int lowest = 52;
+
+  const QList<int> &hand = playerHandsById[player];
+
+  for (int cardId : hand) {
+    int cardSuit = cardId / 13;
+    if ((cardSuit == suit) && cardId < lowest) {
+      lowest = cardId;
+    }
+  }
+
+  if (lowest == 52) {
+    return INVALID_CARD;
+  }
+
+  return lowest;
+}
+
+int Engine::leftInSuit(SUIT suit) const
+{
+  if (!isValid(suit)) {
+    return 0;
+  }
+
+  int count = 0;
+  for (int p = 0; p < 4; p++) {
+    count += countCardsInSuit((PLAYER)p, suit);
+  }
+
+  return count;
+}
+
+int Engine::highestCardInSuitForPlayer(PLAYER player, SUIT suit) const
+{
+  if (!isValid(player) || !isValid(suit))
+    return INVALID_CARD;
+
+  int highest = -1;
+
+  const QList<int> &hand = playerHandsById[player];
+
+  for (int cardId : hand) {
+    int cardSuit = cardId / 13;
+    if ((cardSuit == suit) && cardId > highest) {
+      highest = cardId;
+    }
+  }
+
+  if (highest == -1) {
+    return INVALID_CARD;
+  }
+
+  return highest;
+}
+
+void Engine::set_passedFromSouth(QList<int> &cards)
+{
+  locked = true;
+  passedCards[PLAYER_SOUTH] = cards;
+
+  qDebug() << "selection size: " << passedCards[PLAYER_SOUTH].size();
+}
+
+int Engine::get_player_card(PLAYER player, int handIndex)
+{
+  if (!isValid(player))
+    return INVALID_CARD;
+
+  if ((handIndex < 0) || (handIndex >= playerHandsById[player].size()))
+    return INVALID_CARD;
+
+  return playerHandsById[player].at(handIndex);
+}
+
+int Engine::handSize(PLAYER player)
+{
+  if (!isValid(player))
+    return 0;
+
+  return playerHandsById[player].size();
+}
+
+int Engine::countCardsInSuit(PLAYER player, SUIT suit) const
+{
+  if (!isValid(player) || !isValid(suit))
+    return 0;
+
+  const QList<int> &hand = playerHandsById[player];
+  int count = 0;
+
+  for (int cardId : hand) {
+    int cardSuit = cardId / 13;  // 0=club, 1=spade, 2=diamond, 3=heart
+    if (cardSuit == suit) {
+      count++;
+    }
+  }
+
+  return count;
+}
+
 QString Engine::errorMessage(GAME_ERROR err) const
 {
     switch (err) {
@@ -799,6 +923,7 @@ QString Engine::errorMessage(GAME_ERROR err) const
         case ERRQUEEN:    return tr("The Queen of Spades is not allowed on the first trick!");
         case ERRSUIT:     return tr("You must follow the suit led!");
         case ERRINVALID:  return tr("Invalid card or not in your hand.");
+        case ERRLOCKED:   return tr("The game engine is busy, please try again when it's your turn to play.");
         default:          return tr("Unknown error.");
     }
 }

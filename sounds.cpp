@@ -30,7 +30,8 @@ void Sounds::play(int soundId)
         "322897__rhodesmas__connected-01.wav",
         "322895__rhodesmas__disconnected-01.wav",
         "493696__stib__bingbong.wav",
-        "403013__inspectorj__ui-confirmation-alert-b5.wav"
+        "403013__inspectorj__ui-confirmation-alert-b5.wav",
+        "404553__inspectorj__clap-single-7_modified.wav"
     };
 
     if (soundId < 0 || (soundId > LAST_SOUND) || !enabled) return;

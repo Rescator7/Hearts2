@@ -15,8 +15,8 @@ constexpr int VARIANT_NEW_MOON    = 4;
 constexpr int VARIANT_NO_DRAW     = 5;
 
 constexpr int PERFECT_100_VALUE   = 50;      // the hand score will be set to this number.
-constexpr int NO_TRICK_VALUE      = 5;       // the no trick bonus will substract this number to the hand score.
-constexpr int OMNIBUS_VALUE       = 10;      // the bonus for winning the jack of diamond.
+constexpr int NO_TRICK_VALUE      = -5;      // the no trick bonus will substract this number to the hand score.
+constexpr int OMNIBUS_VALUE       = -10;     // the bonus for winning the jack of diamond.
 constexpr int GAME_OVER_SCORE     = 100;     // reach this score to make the game over.
 
 enum DIRECTION {
@@ -48,7 +48,8 @@ enum GAME_ERROR {
    ERRHEARTS        = 2,
    ERRQUEEN         = 3,
    ERRSUIT          = 4,
-   ERRINVALID       = 5
+   ERRINVALID       = 5,
+   ERRLOCKED        = 6
 };
 
 class Engine : public QObject
@@ -56,6 +57,7 @@ class Engine : public QObject
     Q_OBJECT
 
 private:
+    QWidget* mainWindow;
     QList<int> currentTrick;
     QList<int> playerHandsById[4];
     QList<int> validHandsById[4];
@@ -64,6 +66,7 @@ private:
     QString playersName[4] = {"South", "West", "North", "East"};
     DIRECTION direction = PASS_LEFT;
     PLAYER best_hand_owner;
+    PLAYER jack_diamond_owner;
     PLAYER turn;
     GAME_STATUS game_status = SELECT_CARDS;
     SUIT currentSuit = SUIT::CLUBS;
@@ -76,8 +79,9 @@ private:
     bool variant_new_moon = false;
     bool settings_tram = true;
 
+    bool locked = false;
     bool hearts_broken = false;
-    bool jack_diamond = false;
+    bool jack_diamond_in_trick = false;
 
     int AI_players[3];
     int cpt_played = 0;
@@ -95,6 +99,7 @@ private:
     void completePassCards(const QList<int> passedCards[4], DIRECTION direction);
     void cpus_select_cards();
     void advance_turn();
+    void advance_direction();
     void countSuits(PLAYER player, int &clubs, int &spades, int &diamonds, int &hearts) const;
 
     bool AI_select_To_Moon(PLAYER player);
@@ -107,6 +112,7 @@ private:
     bool is_it_draw();
     bool is_game_over();
     bool is_it_TRAM(PLAYER player);
+    bool getNewMoonChoice();
 
     int highestCardInSuitForPlayer(PLAYER player, SUIT suit) const;
     int lowestCardInSuitForPlayer(PLAYER player, SUIT suit) const;
@@ -117,10 +123,11 @@ private:
     void sort_players_hand();
     void check_for_best_hand(PLAYER player, int cardId);
     void update_total_scores();
+    void shoot_moon(int player);
     void Loop();
 
 public:
-    Engine(QObject *parent);
+    explicit Engine(QWidget* mainWin, QObject* parent = nullptr);
     void Start();
 
 signals:
@@ -139,15 +146,19 @@ signals:
     void sig_collect_tricks(PLAYER winner, bool TRAM);
     void sig_new_players(const QString names[4]);
     void sig_update_scores_board(const QString names[4], const int hand[4], const int total[4]);
+    void sig_perfect_100(PLAYER player);
+    void sig_tram();
     void sig_game_over();
+ //   void sig_error(QString err);
 
 public:
     void set_variant(int variant, bool enabled);
-    void start_new_game();
+    GAME_ERROR start_new_game();
     void set_passedFromSouth(QList<int> &cards);
     void filterValidMoves(PLAYER player);
     void Step();
     void Play(int cardId, PLAYER player = PLAYER_SOUTH);
+    void LockedLoop();
     bool undo();
     bool isPlaying() { return (game_status == PLAY_A_CARD_1) || (game_status == PLAY_A_CARD_2) ||
                               (game_status == PLAY_A_CARD_3) || (game_status == PLAY_A_CARD_4) ||

@@ -44,7 +44,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     deck = new Deck(this);
 
-    engine = new Engine(this);
+    engine = new Engine(this, this);
 
     ui->graphicsView->setScene(scene);
 
@@ -144,7 +144,25 @@ MainWindow::MainWindow(QWidget *parent)
       selectedCards.clear();
       deck->reset_selections();
 
-      engine->start_new_game();
+        // Anti-spam
+      if (newGameDebounceTimer && newGameDebounceTimer->isActive()) {
+        qDebug() << "New game ignoré (debounce)";
+        return;
+      }
+
+      if (!newGameDebounceTimer) {
+        newGameDebounceTimer = new QTimer(this);
+        newGameDebounceTimer->setSingleShot(true);
+      }
+      newGameDebounceTimer->start(1000);
+
+      qDebug() << "new game";
+      GAME_ERROR err = engine->start_new_game();
+      if (err) {
+      qDebug() << "pushButton_new";
+        sounds->play(SOUND_ERROR);
+        message(engine->errorMessage(err));
+      }
       // Note: engine will emit sig_clear_deck() --> scene->clear() + clearTricks() + yourTurnIndicator->hide() = arrowLabel->hide()
     });
 
@@ -202,6 +220,20 @@ MainWindow::MainWindow(QWidget *parent)
     connect(engine, &Engine::sig_game_over, this, [this]() {
       sounds->play(SOUND_GAME_OVER);
     });
+
+    connect(engine, &Engine::sig_perfect_100, this, [this](PLAYER player) {
+      sounds->play(SOUND_PERFECT_100);
+    });
+
+    connect(engine, &Engine::sig_tram, this, [this]() {
+      sounds->play(SOUND_TRAM);
+    });
+/*
+    connect(engine, &Engine::sig_error, this, [this](QString err) {
+      sounds->play(SOUND_ERROR);
+      message(err);
+    });
+*/
 
  //   connect(engine, &Engine::sig_setCurrentSuit, this, &MainWindow::setCurrentSuit);
     connect(engine, &Engine::sig_enableAllCards, this, &MainWindow::enableAllCards);
@@ -1394,17 +1426,11 @@ void MainWindow::setAnimationLock()
         // Disable undo
         ui->pushButton_undo->setDisabled(true);
 
-qDebug() << "Visual cute";
         // Visual feedback
-      //  ui->graphicsView->setCursor(Qt::WaitCursor);
-       QApplication::setOverrideCursor(Qt::WaitCursor);
-
-
-qDebug() << "Cursor: " << ui->graphicsView->cursor();
+        //  ui->graphicsView->setCursor(Qt::WaitCursor);
+        QApplication::setOverrideCursor(Qt::WaitCursor);
     }
 }
-
-
 
 void MainWindow::setAnimationUnlock()
 {
@@ -2452,15 +2478,6 @@ void MainWindow::enableAllDecksButOne(int id)
 void MainWindow::on_pushButton_clicked()
 {
   scene->clear();
-}
-
-void MainWindow::on_pushButton_2_clicked()
-{
-  static int s = 0;
-  qDebug() << "Sounds: " << s;
-
-  sounds->play(s);
-  if (++s == 15) s = 0;
 }
 
 void MainWindow::on_pushButton_3_clicked()

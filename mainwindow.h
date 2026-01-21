@@ -70,7 +70,6 @@ protected:
 
 private slots:
     void on_pushButton_clicked();
-    void on_pushButton_2_clicked();
     void on_pushButton_3_clicked();
     void on_pushButton_4_clicked();
     void on_pushButton_5_clicked();
@@ -107,6 +106,7 @@ private:
 
     enum class PlayerIcon { Human, Bot, Remote, None };
 
+    QTimer* newGameDebounceTimer = nullptr;
     QSize lastBoardViewSize = QSize(0, 0);
     bool windowWasResizedWhileAway = false;
     PlayerIcon icons[4] = {PlayerIcon::Human, PlayerIcon::Bot, PlayerIcon::Bot, PlayerIcon::Bot};
