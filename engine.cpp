@@ -309,6 +309,7 @@ void Engine::cpus_select_cards()
 void Engine::Loop()
 {
   static bool firstTime = true;
+  bool tram;
   PLAYER owner;
   int cardId;
 
@@ -397,6 +398,10 @@ void Engine::Loop()
                            break;
      case END_TURN:        currentSuit = SUIT_ALL;
                            turn = best_hand_owner;
+                           tram = is_it_TRAM(turn);
+                           if (tram) {
+                             trick_value += calculate_tricks_from_tram();
+                           };
                            if (trick_value) {
                              hand_score[best_hand_owner] += trick_value;
                              trick_value = 0;
@@ -404,8 +409,9 @@ void Engine::Loop()
                            }
                            if (jack_diamond_in_trick) {
                              jack_diamond_owner = best_hand_owner;
+                             jack_diamond_in_trick = false;
                            }
-                           emit sig_collect_tricks(turn, is_it_TRAM(turn));
+                           emit sig_collect_tricks(turn, tram);
                            qDebug() << "END_TURN";
                            break;
      case LOOP_TURN:   qDebug() << "Status: " << game_status << "turn : " << turn << "cards_left: " << cards_left << "cpt_played: " << cpt_played;
@@ -485,6 +491,21 @@ void Engine::advance_direction()
   }
 }
 
+void Engine::check_for_best_hand(PLAYER player, int cardId)
+{
+  SUIT cardSuit = (SUIT)(cardId / 13);
+  if (currentSuit == SUIT_ALL) {
+    best_hand = cardId;
+    best_hand_owner = player;
+    currentSuit = cardSuit;
+  } else {
+      if ((cardSuit == currentSuit) && (cardId > best_hand)) {
+        best_hand = cardId;
+        best_hand_owner = player;
+      }
+  }
+}
+
 void Engine::Play(int cardId, PLAYER player)
 {
   playerHandsById[player].removeAll(cardId);
@@ -517,6 +538,28 @@ void Engine::Play(int cardId, PLAYER player)
   emit sig_refresh_deck();
 }
 
+int Engine::calculate_tricks_from_tram()
+{
+  int tricks = 0;
+  for (int p = 0; p < 4; p++) {
+    const QList<int> &hand = playerHandsById[p];
+    for (int cardId : hand) {
+       if (cardId == SPADES_QUEEN) {
+         tricks += 13;
+       } else {
+           if (cardId == DIAMONDS_JACK) {
+             jack_diamond_in_trick = true;
+           }  else {
+                if ((cardId / 13) == HEARTS) {
+                  tricks++;
+                }
+           }
+       }
+    }
+  }
+  return tricks;
+}
+
 bool Engine::getNewMoonChoice()
 {
     QMessageBox msgBox(mainWindow);
@@ -543,7 +586,7 @@ bool Engine::getNewMoonChoice()
 void Engine::shoot_moon(int player)
 {
   int yesNo = true;
-  if ((player == PLAYER_SOUTH) && variant_new_moon) {
+  if ((player == PLAYER_SOUTH) && variant_new_moon && (total_score[player] >= 26)) {
     yesNo = getNewMoonChoice();
   }
 
@@ -559,21 +602,25 @@ void Engine::shoot_moon(int player)
 
 void Engine::update_total_scores()
 {
-  int bonus = 0;
+  int bonus;
 
   for (int p = 0; p < 4; p++) {
+    bonus = 0;
     if ((hand_score[p] == 26) && ((jack_diamond_owner == p) || !variant_omnibus)) {
       shoot_moon(p);
     } else {  // those bonus don't apply if someone shoot the moon
-       if (variant_no_tricks && hand_score[p] == 0) {
+       if (variant_no_tricks && (hand_score[p] == 0)) {
+         qDebug() << "No tricks bonus to: " << p;
          bonus += NO_TRICK_VALUE;
        }
 
        if (variant_omnibus && (jack_diamond_owner == p)) {
+         qDebug() << "Omnibus bonus to " << jack_diamond_owner;
          bonus += OMNIBUS_VALUE;
        }
 
-       total_score[p] = std::max(0, total_score[p] + hand_score[p]);
+       qDebug() << "Bonus " << bonus << "Player " << p;
+       total_score[p] = std::max(0, total_score[p] + hand_score[p] + bonus);
       }
 
     if (variant_perfect_100 && (total_score[p] == GAME_OVER_SCORE)) {
@@ -709,21 +756,6 @@ void Engine::filterValidMoves(PLAYER player)
   }
 }
 
-void Engine::check_for_best_hand(PLAYER player, int cardId)
-{
-  SUIT cardSuit = (SUIT)(cardId / 13);
-  if (currentSuit == SUIT_ALL) {
-    best_hand = cardId;
-    best_hand_owner = player;
-    currentSuit = cardSuit;
-  } else {
-      if ((cardSuit == currentSuit) && (cardId > best_hand)) {
-        best_hand = cardId;
-        best_hand_owner = player;
-      }
-  }
-}
-
 bool Engine::is_it_TRAM(PLAYER player)
 {
   if (!settings_tram || (cards_left < 5)) {
@@ -771,7 +803,6 @@ bool Engine::is_it_TRAM(PLAYER player)
 
   cards_left = 0;
 
-  // update scores ??
   emit sig_tram();
 
   return true;

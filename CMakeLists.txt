@@ -41,6 +41,9 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         engine.h engine.cpp
         cpus.h
         draggablescoregroup.h draggablescoregroup.cpp
+        statistics.cpp
+        statistics.h
+        statistics.ui
 
     )
 # Define target properties for Android with Qt 6 as:

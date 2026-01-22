@@ -31,6 +31,7 @@
 #include "engine.h"
 #include "config.h"
 #include "draggablescoregroup.h"
+#include "statistics.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -68,15 +69,6 @@ protected:
     void showEvent(QShowEvent *event) override;
     bool eventFilter(QObject *obj, QEvent *event) override;
 
-private slots:
-    void on_pushButton_clicked();
-    void on_pushButton_3_clicked();
-    void on_pushButton_4_clicked();
-    void on_pushButton_5_clicked();
-    void on_pushButton_6_clicked();
-    void on_pushButton_8_clicked();
-    void on_pushButton_9_clicked();
-
 private:
     QParallelAnimationGroup *animateCardsOffBoard(const QList<int>& cardsId, int winner);
     void animateCardsToCenter(const QList<int> &cardsId,
@@ -88,7 +80,6 @@ private slots:
     void onBackgroundPreviewClicked();
     void onDeckChanged(int deckId);
     void onArrowClicked();
-    void on_pushButton_10_clicked();
     void aboutToQuit();
     void on_opt_animations_clicked();
     void on_pushButton_score_clicked();
@@ -106,6 +97,7 @@ private:
 
     enum class PlayerIcon { Human, Bot, Remote, None };
 
+    Statistics* statistics = nullptr;
     QTimer* newGameDebounceTimer = nullptr;
     QSize lastBoardViewSize = QSize(0, 0);
     bool windowWasResizedWhileAway = false;

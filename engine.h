@@ -123,6 +123,7 @@ private:
     void sort_players_hand();
     void check_for_best_hand(PLAYER player, int cardId);
     void update_total_scores();
+    int calculate_tricks_from_tram();
     void shoot_moon(int player);
     void Loop();
 

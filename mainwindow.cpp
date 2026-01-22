@@ -36,6 +36,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     config = new Config();
 
+    statistics = new Statistics(this);
+    ui->statisticsLayout->addWidget(statistics);
+
     sounds = new Sounds(this);
 
     scene = new CardScene(this);
@@ -2472,105 +2475,6 @@ void MainWindow::enableAllDecksButOne(int id)
         }
         disableDeck(id);
    });
-}
-
-// Clear button
-void MainWindow::on_pushButton_clicked()
-{
-  scene->clear();
-}
-
-void MainWindow::on_pushButton_3_clicked()
-{
-  refresh_deck();
-}
-
-void MainWindow::on_pushButton_4_clicked()
-{
-  animateDeal();
-//  sortPlayerHand();
-//  update_cards_pos(false);
-}
-
-
-void MainWindow::on_pushButton_5_clicked()
-{
-  static int p = 0;
-
-  showTurnArrow(p);
-  if (++p > 4) p = 0;
-}
-
-void MainWindow::on_pushButton_6_clicked()
-{
-  static int trick = 0;
-  animateCollectTrick(trick, true);
-
-  if (++trick > 3) trick = 0;
-}
-
-void MainWindow::on_pushButton_8_clicked()
-{
-  showTurnIndicator();
-}
-
-void MainWindow::on_pushButton_9_clicked()
-{
-  static int pass = 0;
-
-  static QList<int> passedCards[4];
-
-qDebug() << "Direction: " << pass;
-
-  passedCards[PLAYER_SOUTH].append(engine->Hand(PLAYER_SOUTH).at(0));
-  passedCards[PLAYER_SOUTH].append(engine->Hand(PLAYER_SOUTH).at(1));
-  passedCards[PLAYER_SOUTH].append(engine->Hand(PLAYER_SOUTH).at(2));
-
-  passedCards[PLAYER_WEST].append(engine->Hand(PLAYER_WEST).at(0));
-  passedCards[PLAYER_WEST].append(engine->Hand(PLAYER_WEST).at(1));
-  passedCards[PLAYER_WEST].append(engine->Hand(PLAYER_WEST).at(2));
-
-  passedCards[PLAYER_NORTH].append(engine->Hand(PLAYER_NORTH).at(0));
-  passedCards[PLAYER_NORTH].append(engine->Hand(PLAYER_NORTH).at(1));
-  passedCards[PLAYER_NORTH].append(engine->Hand(PLAYER_NORTH).at(2));
-
-  passedCards[PLAYER_EAST].append(engine->Hand(PLAYER_EAST).at(0));
-  passedCards[PLAYER_EAST].append(engine->Hand(PLAYER_EAST).at(1));
-  passedCards[PLAYER_EAST].append(engine->Hand(PLAYER_EAST).at(2));
-
-qDebug() << "Hand South: " << engine->Hand(PLAYER_SOUTH);
-qDebug() << "Hand West: " << engine->Hand(PLAYER_WEST);
-qDebug() << "Hand North: " << engine->Hand(PLAYER_NORTH);
-qDebug() << "Hand East: " << engine->Hand(PLAYER_EAST);
-
-qDebug() << "South passing: " << passedCards[PLAYER_SOUTH];
-qDebug() << "West passing: " << passedCards[PLAYER_WEST];
-qDebug() << "North passing: " << passedCards[PLAYER_NORTH];
-qDebug() << "East passing: " << passedCards[PLAYER_EAST];
-
-
-  animatePassCards(passedCards, pass);
-
-  for (int p=0; p<4; p++)
-    passedCards[p].clear();
-
-  //completePassCards(passedCards, pass);
-
-  if (++pass > 2) pass = 0;
-}
-
-void MainWindow::on_pushButton_10_clicked()
-{
-  static int ledSuit = 0;
-
-  // Example calls
-  //setCurrentSuit(ledSuit);  // Light icy blue
- //(ledSuit, QColor(255, 100, 50, 180));  // Warm orange-red
-// disableIllegalCards(ledSuit, QColor(100, 150, 100, 180));  // Muted green
-// disableIllegalCards(ledSuit, QColor(128, 128, 128, 180));  // Classic gray
-
- if (++ledSuit > 3)
-   ledSuit = 0;
 }
 
 void MainWindow::setAnimationButtons(bool enabled)
