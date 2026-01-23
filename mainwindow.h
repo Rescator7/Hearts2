@@ -180,6 +180,7 @@ public:
     void applyAllSettings();
     void createButtonsGroups();
     void createCreditsLabel();
+    void loadHelpFile();
 
     // Setters (publics)
     /*

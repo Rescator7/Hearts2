@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+
+<style>
+    body { font-family: Noto, sans-regular; line-height: 1.15; }
+    p, li { line-height: 1.1; }
+    .aere { line-height: 1.3; }
+    h1, h2 { line-height: 1.1; margin: 1em 0 0.5em 0; }
+    a { color: #B0E0E6; text-decoration: underline; }
+    a:hover { color: #FFFFFF; background: rgba(255,255,255,0.15); }
+    a:visited { color: #A0D0D8; }
+</style
+</style>
+</head>
+<body>
+<h1>Aide - Hearts 2.0</h1>
+
+<h2 id="regles">1. Règles de base du jeu</h2>
+<p>Hearts est un jeu de plis à 4 joueurs. Le but est d'avoir le <b>moins de points possible</b> à la fin de la partie.</p>
+<ul>
+  <li>Chaque cœur = 1 point</li>
+  <li>La Dame de Pique = 13 points</li>
+  <li>La partie se joue généralement jusqu'à 100 points (le premier à atteindre ou dépasser 100 perd)</li>
+</ul>
+
+<h2 id="points">2. Comptage des points</h2>
+<p>À la fin de chaque donne :</p>
+<ul>
+  <li>Si un joueur n'a pris aucun cœur ni la Dame de Pique → 0 point</li>
+  <li>Sinon : +1 par cœur, +13 pour la Dame de Pique</li>
+</ul>
+<p>Exception : <b>Shoot the Moon</b> (voir section suivante).</p>
+
+<h2 id="shoot">3. Shoot the Moon</h2>
+<p>Si un joueur prend <b>tous les cœurs + la Dame de Pique</b> dans une donne :</p>
+<p>Il a deux choix :</p>
+<ul>
+  <li><b>Add</b> : +26 points à chaque adversaire (les autres joueurs)</li>
+  <li><b>Subtract</b> : -26 points à lui-même (rien aux autres)</li>
+</ul>
+<p>C'est un risque/récompense majeur !</p>
+
+<h2 id="passing">4. Passage des trois cartes</h2>
+<p>Au début de chaque donne (sauf la première) :</p>
+<ul>
+  <li>Chaque joueur choisit 3 cartes à passer à un autre joueur</li>
+  <li>Direction : gauche → droite → face → aucune (varie selon les options)</li>
+  <li>Le passage se fait simultanément</li>
+</ul>
+
+<h2 id="variantes">5. Variantes et options</h2>
+<p>Dans les réglages, tu peux activer :</p>
+<ul>
+  <li>Queen of Spades break hearts</li>
+  <li>Perfect 100</li>
+  <li>Omnibus bonus</li>
+  <li>No tricks bonus</li>
+  <li>New Moon (Shoot the Moon inversé)</li>
+  <li>No draw</li>
+</ul>
+
+<h2 id="astuces">6. Astuces et stratégies</h2>
+<p>Quelques conseils :</p>
+<ul>
+  <li>Garde tes cœurs bas si possible</li>
+  <li>Évite de prendre la Dame de Pique sauf si tu peux shoot</li>
+  <li>Surveille les cartes jouées pour savoir où sont les cœurs</li>
+  <li>Shoot the Moon seulement si tu as de très bonnes cartes</li>
+</ul>
+
+<h2 id="faq">7. Foire aux questions (FAQ)</h2>
+<p><b>Pourquoi je n’ai pas de points alors que j’ai pris des cœurs ?</b><br>
+Tu as shoot: the moon et choisi Subtract.</p>
+
+<p><b>Le passage des cartes change de direction ?</b><br>
+Oui, c’est une règle standard : gauche → droite → face → aucune.</p>
+
+<h2 id="credits">8. Credits</h2>
+<p>Software author: Bob <a href="mailto:castillo7@hotmail.com">castillo7@hotmail.com</a><br><br>
+Version 2.0 Qt6 Dev / Unstable<br>
+Source Code: <a href="https://github.com/Rescator7/Hearts2">https://github.com/Rescator7/Hearts2</a></p>
+<h2 id="icons">8.1 Icons</h2>
+Icons set: <a href="https://phosphoricons.com/">Phosphor icons</a><br>
+License: <a href="https://raw.githubusercontent.com/phosphor-icons/homepage/master/LICENSE">Mit</a><br>
+<p><span style="background-color: #b0b0b0; padding: 4px 6px; border-radius: 4px; display: inline-block;">
+<img src="qrc:/icons/arrow-counter-clockwise.svg" alt="arrow-counter-clockwisea" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/calculator-slash.svg" alt="calculator-slash" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/calculator.svg" alt="calculator" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/chart-line.svg" alt="chat-line" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/chat-duotone.svg" alt="chat-duotone" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/chat-slash-duotone.svg" alt="chat-slash=duotone" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/chat-text.svg" alt="chat-text" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/desktop.svg" alt="desktop" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/escalator-down-duotone.svg" alt="escalator-down-duotone" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/eye-slash.svg" alt="eye-slsh" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/eye.svg" alt="eye" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/file-plus.svg" alt="file-plus" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/gear.svg" alt="gear" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/plus-circle-duotone.svg" alt="plus-circle-duotone" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/question.svg" alt="question" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/sign-out-duotone.svg" alt="sign-out-duotone" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/sign-out.svg" alt="sign-out" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/speaker-high-duotone.svg" alt="speaker-high-duotone" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/speaker-slash-duotone.svg" alt="speaker-slash-duotone" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/table-duotone.svg" alt="table-duotone" style="width: 20px; height: 20px;"></img></p><br>
+</span>
+Person icon by: <a href="https://openclipart.org/detail/275133/person-generic">Cheeseness</a><br>
+Computer icon by: <a href="https://openclipart.org/detail/89275/computer-icon">kuba</a><br>
+License: <a href="https://creativecommons.org/publicdomain/zero/1.0/">Creative Commons Zero 1.0 License</a><br><br>
+<img src="qrc:/icons/persongeneric.svg" alt="persongeneric" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/computer-icon.png" alt="computer-icon" style="width: 20px; height: 20px;"></img><br>
+Animated Arrow: <a href="https://pixabay.com/gifs/arrow-green-upload-11610/">u_d9e9zl5kpt</a><br>
+License: <a href="https://pixabay.com/service/license-summary/">Pixabay</a><br>
+<h2 id="backgrounds">8.2 Backgrounds Images</h2>
+<p>Universe: <a href="https://www.eso.org/public/images/eso1723a/">Photo by ESO/G. Beccarii</a><br>
+License: <a href="https://www.eso.org/public/copyright/">Creative Commons Attribution 4.0 International License</a><br><br>
+Everest: <a href="https://commons.wikimedia.org/wiki/File:8,848m_Everest_8,516m_Lhotse_Himalaya_Mountain_Flights_Nepal_-_panoramio_(2).jpg">Photo by Hiroki Ogawai</a><br>
+License: <a href="https://creativecommons.org/licenses/by/3.0/deed.en">Creative Commons Attribution 3.0 Unported</a><br><br>
+Mt.Fuji: <a href="https://commons.wikimedia.org/wiki/File:Mount._Fuji_early_in_the_morning_%E6%97%A9%E6%9C%9D%E3%81%AE%E5%AF%8C%E5%A3%AB%E5%B1%B1_-_panoramio.jpg">Photo by Jack Somai</a><br>
+License: <a href="https://creativecommons.org/licenses/by/3.0/deed.en">Creative Commons Attribution 3.0 Unported</a><br><br>
+Desert: <a href="https://commons.wikimedia.org/wiki/File:Wadi_rum_desert.jpg">Photo by Peter Chisholmi</a><br>
+License: <a href="https://creativecommons.org/publicdomain/zero/1.0/deed.en">CC0 1.0 Universal Public Domain Dedication</a><br><br>
+Ocean: <a href="https://commons.wikimedia.org/wiki/File:%22_Palm_%22_Beach._Port_Douglas._-_panoramio.jpg">Photo by grumpylumixuseri</a><br>
+License: <a href="https://creativecommons.org/licenses/by/3.0/deed.en">Creative Commons Attribution 3.0 Unported</a><br><br>
+Green: <a href="https://github.com/Rescator7/Hearts/issues/4">Image by Attila Tóthi</a><br>
+License: Image created for this software.<br><br>
+Wood Texture: <a href="https://openclipart.org/detail/299936/wood-texture">Image by Firkini</a><br>
+License: <a href="https://creativecommons.org/publicdomain/zero/1.0/">Creative Commons Zero 1.0 License</a><br><br>
+Wooden Floor 2: <a href="https://openclipart.org/detail/267070/wooden-floor-2">Image by Firkin</a><br>
+License: <a href="https://creativecommons.org/publicdomain/zero/1.0/">Creative Commons Zero 1.0 License</a><br><br>
+Overlapping planks 5: <a href="https://openclipart.org/detail/269799/overlapping-planks-5">Image by Firkini</a><br>
+License: <a href="https://creativecommons.org/publicdomain/zero/1.0/">Creative Commons Zero 1.0 License</a><br><br>
+Wooden planks: <a href="https://openclipart.org/detail/269803/wooden-planks">Image by Firkin</a><br>
+License: <a href="https://creativecommons.org/publicdomain/zero/1.0/">Creative Commons Zero 1.0 License</a><br><br>
+Leaves &amp; Marble: Image created using gimp 2.10.18<br>
+License: <a href="https://creativecommons.org/publicdomain/zero/1.0/">Creative Commons Zero 1.0 License</a></p>
+
+    <!-- Ajoute ici toutes tes sections -->
+</body>
+</html>

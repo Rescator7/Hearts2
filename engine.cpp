@@ -603,36 +603,48 @@ void Engine::shoot_moon(int player)
 void Engine::update_total_scores()
 {
   int bonus;
+  bool moon = false;
 
   for (int p = 0; p < 4; p++) {
-    bonus = 0;
     if ((hand_score[p] == 26) && ((jack_diamond_owner == p) || !variant_omnibus)) {
       shoot_moon(p);
-    } else {  // those bonus don't apply if someone shoot the moon
-       if (variant_no_tricks && (hand_score[p] == 0)) {
-         qDebug() << "No tricks bonus to: " << p;
-         bonus += NO_TRICK_VALUE;
-       }
+      moon = true;
+    }
+  }
 
-       if (variant_omnibus && (jack_diamond_owner == p)) {
-         qDebug() << "Omnibus bonus to " << jack_diamond_owner;
-         bonus += OMNIBUS_VALUE;
-       }
+  for (int p = 0; p < 4; p++) {
+    // if someone moon we disable the bonus, except the PERFECT_100
+    if (!moon) {
+      bonus = 0;
 
-       qDebug() << "Bonus " << bonus << "Player " << p;
-       total_score[p] = std::max(0, total_score[p] + hand_score[p] + bonus);
+      if (variant_no_tricks && (hand_score[p] == 0)) {
+        qDebug() << "No tricks bonus to: " << p;
+        bonus += NO_TRICK_VALUE;
       }
+
+      if (variant_omnibus && (jack_diamond_owner == p)) {
+        qDebug() << "Omnibus bonus to " << jack_diamond_owner;
+        bonus += OMNIBUS_VALUE;
+      }
+
+      qDebug() << "Bonus " << bonus << "Player " << p;
+      total_score[p] = std::max(0, total_score[p] + hand_score[p] + bonus);
+    }
 
     if (variant_perfect_100 && (total_score[p] == GAME_OVER_SCORE)) {
       total_score[p] = PERFECT_100_VALUE;
       emit sig_perfect_100((PLAYER)p);
     }
 
+    // check for a new higher game_score
     if (total_score[p] > game_score) {
       game_score = total_score[p];
     }
+
+    // reset the players hand_score
     hand_score[p] = 0;
   }
+
   emit sig_update_scores_board(playersName, hand_score, total_score);
 }
 

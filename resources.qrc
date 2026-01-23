@@ -24,5 +24,6 @@
         <file>icons/computer-icon.png</file>
         <file>icons/calculator.svg</file>
         <file>icons/calculator-slash.svg</file>
+        <file>help.html</file>
     </qresource>
 </RCC>

@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 #include "define.h"
+#include "qscrollbar.h"
 
 #include <QList>
 #include <QDir>
@@ -17,6 +18,7 @@
 #include <QPropertyAnimation>  // Pas obligatoire ici, mais au cas où
 #include <QMessageBox>
 #include <QWindow>
+#include <QListWidget>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -29,6 +31,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->graphicsView->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
     ui->graphicsView->setCacheMode(QGraphicsView::CacheNone);
+
+    ui->splitterHelp->setSizes(QList<int>() << 250 << 750);
 
     setWindowTitle(VERSION);
 
@@ -53,6 +57,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     background = new Background(scene, this);
     scene->protectItem(background);
+
+    loadHelpFile();
 
     createButtonsGroups();
 
@@ -348,6 +354,80 @@ void MainWindow::aboutToQuit()
   QTimer::singleShot(200, qApp, &QApplication::quit);
 }
 
+void MainWindow::loadHelpFile()
+{
+  struct tocEntry {
+    QString title;
+    QString anchor;
+    bool isSubsection;
+  };
+
+  static const tocEntry TOC[] =  {
+                                 {"1. Règles de base du jeu", "regles", false },
+                                 {"2. Comptage des points", "points", false },
+                                 {"3. Shoot the Moon", "shoot", false },
+                                 {"4. Passage des trois cartes", "passing", false },
+                                 {"5. Variantes et options", "variantes", false },
+                                 {"6. Astuces et stratégies", "astuces", false },
+                                 {"7. Foire aux questions (FAQ)", "faq", false },
+                                 {"8. Credits", "credits", false },
+                                 {"8.1 Icons", "icons", true },
+                                 {"8.2 Backgrounds Images", "backgrounds", true }
+                                 };
+
+  QFile file(":/help.html");
+  if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    QTextStream in(&file);
+    QString html = in.readAll();
+    ui->textHelpContent->setHtml(html);
+    file.close();
+  } else {
+      qWarning() << "Impossible de charger help.html";
+      ui->textHelpContent->setPlainText("Erreur : fichier d'aide non trouvé.");
+    }
+
+  ui->treeHelpTOC->setHeaderHidden(true);  // pas de header
+  ui->treeHelpTOC->setColumnCount(1);
+  ui->treeHelpTOC->setStyleSheet("QTreeWidget { background: #2e5c3e; color: #e0ffe0; font-size: 12px; }"
+                                 "QTreeWidget::item { padding: 8px; }"
+                                 "QTreeWidget::item:selected { background: #5a9f5a; color: white; }"
+  );
+  ui->textHelpContent->setOpenExternalLinks(true);
+  ui->textHelpContent->setOpenLinks(true);
+
+  QTreeWidgetItem *lastParent = nullptr;
+
+  for (const auto &entry : TOC) {
+    QTreeWidgetItem *item;
+
+    if (entry.isSubsection && lastParent != nullptr) {
+        item = new QTreeWidgetItem(lastParent);
+    } else {
+        item = new QTreeWidgetItem(ui->treeHelpTOC);
+        lastParent = item;
+    }
+
+    item->setText(0, entry.title);
+    item->setData(0, Qt::UserRole, entry.anchor);
+    if (entry.isSubsection) {
+        QFont font = item->font(0);
+        font.setPointSize(font.pointSize() - 1);
+        item->setFont(0, font);
+    }
+  }
+
+  ui->treeHelpTOC->expandAll();
+
+  connect(ui->treeHelpTOC, &QTreeWidget::itemClicked, this, [this](QTreeWidgetItem *item, int column) {
+    QString anchor = item->data(0, Qt::UserRole).toString();
+    if (anchor.isEmpty()) {
+      return;
+    }
+    QUrl url("#" + anchor);
+    ui->textHelpContent->setSource(url);
+  });
+}
+
 bool MainWindow::loadBackgroundPreview(const QString &image_path)
 {
   QPixmap preview(image_path);
@@ -613,7 +693,7 @@ void MainWindow::onBackgroundPreviewClicked()
     QString fileName = QFileDialog::getOpenFileName(this,
         tr("Choose Background Image"),
         QDir::homePath() + FOLDER + QString("/backgrounds"),
-        tr("Images (*.png *.jpg *.jpeg *.bmp *.gif)"));
+        tr("Images (*.png *.jpg *.jpeg *.bmp *.gif *.svg)"));
 
     if (fileName.isEmpty()) return;
 
