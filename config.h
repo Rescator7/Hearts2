@@ -37,6 +37,8 @@ constexpr int CONFIG_ANIM_COLLECT_TRICKS     = 25;
 constexpr int CONFIG_ANIM_PASS_CARDS         = 26;
 constexpr int CONFIG_ANIMATED_ARROW          = 27;
 constexpr int CONFIG_ANIM_TURN_INDICATOR     = 28;
+constexpr int CONFIG_CONFIRM_EXIT            = 29;
+constexpr int CONFIG_CHEAT_REVEAL            = 30;
 
 constexpr int HEARTS_TEXT_ONLY               = 0;
 constexpr int HEARTS_ICONS_PINK              = 1;
@@ -118,6 +120,8 @@ private:
     bool card_display = false;
     bool save_game = true;
     bool empty_slot_opaque = true;
+    bool confirm_exit = true;
+    bool cheat_reveal = false;
 
     // Animations
     bool animations = true;
@@ -187,6 +191,8 @@ public:
     bool is_anim_pass_cards() { return anim_pass_cards; };
     bool is_animated_arrow() { return animated_arrow; };
     bool is_anim_turn_indicator() { return anim_turn_indication; };
+    bool is_confirm_exit() { return confirm_exit; };
+    bool is_cheat_reveal() { return cheat_reveal; };
 };
 
 #endif // CONFIG_H

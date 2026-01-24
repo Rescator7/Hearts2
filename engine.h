@@ -77,11 +77,11 @@ private:
     bool variant_no_draw = false;
     bool variant_no_tricks = false;
     bool variant_new_moon = false;
-    bool settings_tram = true;
 
     bool locked = false;
     bool hearts_broken = false;
     bool jack_diamond_in_trick = false;
+    bool detect_tram = true;
 
     int AI_players[3];
     int cpt_played = 0;
@@ -167,6 +167,7 @@ public:
     bool can_break_hearts(PLAYER player);
     int get_player_card(PLAYER player, int handIndex);
     int handSize(PLAYER player);
+    void set_tram(bool enabled) { detect_tram = enabled; };
 
     GAME_ERROR validate_move(PLAYER player, int cardId);
     PLAYER Owner(int cardId) const;

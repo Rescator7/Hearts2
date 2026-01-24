@@ -770,7 +770,7 @@ void Engine::filterValidMoves(PLAYER player)
 
 bool Engine::is_it_TRAM(PLAYER player)
 {
-  if (!settings_tram || (cards_left < 5)) {
+  if (!detect_tram || (cards_left < 5)) {
     return false;
   }
 

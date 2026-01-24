@@ -1,7 +1,6 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 #include "define.h"
-#include "qscrollbar.h"
 
 #include <QList>
 #include <QDir>
@@ -19,6 +18,8 @@
 #include <QMessageBox>
 #include <QWindow>
 #include <QListWidget>
+#include <QShortcut>
+#include <QKeySequence>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -140,7 +141,21 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(ui->pushButton_reveal, &QPushButton::clicked, this, [this](bool checked) {
       refresh_deck();
+      config->set_config_file(CONFIG_CHEAT_REVEAL, checked);
+    });
+
+    connect(ui->checkBox_confirm_exit, &QCheckBox::clicked, this, [this](bool checked) {
+      config->set_config_file(CONFIG_CONFIRM_EXIT, checked);
+    });
+
+    connect(ui->checkBox_tram, &QCheckBox::clicked, this, [this](bool checked) {
+      config->set_config_file(CONFIG_DETECT_TRAM, checked);
+      engine->set_tram(checked);
+    });
+
+    connect(ui->checkBox_cheat, &QCheckBox::clicked, this, [this](bool checked) {
       config->set_config_file(CONFIG_CHEAT_MODE, checked);
+      setCheatMode(checked);
     });
 
     connect(ui->pushButton_sound, &QPushButton::clicked, this, [this](bool checked) {
@@ -322,7 +337,25 @@ qDebug() << "sig_play_card **** player: " << player << "cardId: " << cardId;
 
     connect(qApp, &QCoreApplication::aboutToQuit, this, &MainWindow::aboutToQuit);
 
-    connect(ui->pushButton_exit, &QPushButton::clicked, qApp, &QApplication::quit);
+   // Global quick Quit with shortcut Ctrl+Q
+    QShortcut *quitShortcut = new QShortcut(QKeySequence("Ctrl+Q"), this);
+    quitShortcut->setContext(Qt::ApplicationShortcut);
+    connect(quitShortcut, &QShortcut::activated, qApp, &QApplication::quit);
+
+    connect(ui->pushButton_exit, &QPushButton::clicked, this, [this]() {
+       if (!ui->checkBox_confirm_exit->isChecked()) {
+         qApp->quit();
+         return;
+       }
+       QMessageBox::StandardButton reply = QMessageBox::question(this,
+       tr("Exit the game?"),
+       tr("Do you really want to leave the game?"),
+       QMessageBox::Yes | QMessageBox::No,
+       QMessageBox::No);
+       if (reply == QMessageBox::Yes) {
+         qApp->quit();
+       }
+    });
 }
 
 MainWindow::~MainWindow()
@@ -371,8 +404,11 @@ void MainWindow::loadHelpFile()
                                  {"6. Astuces et stratégies", "astuces", false },
                                  {"7. Foire aux questions (FAQ)", "faq", false },
                                  {"8. Credits", "credits", false },
-                                 {"8.1 Icons", "icons", true },
-                                 {"8.2 Backgrounds Images", "backgrounds", true }
+                                 {"8.1 Playing card decks", "decks", true },
+                                 {"8.2 Icons", "icons", true },
+                                 {"8.3 Backgrounds Images", "backgrounds", true },
+                                 {"8.4 Sounds", "sounds", true },
+                                 {"8.5 Special thanks", "special", true}
                                  };
 
   QFile file(":/help.html");
@@ -418,13 +454,15 @@ void MainWindow::loadHelpFile()
 
   ui->treeHelpTOC->expandAll();
 
-  connect(ui->treeHelpTOC, &QTreeWidget::itemClicked, this, [this](QTreeWidgetItem *item, int column) {
-    QString anchor = item->data(0, Qt::UserRole).toString();
-    if (anchor.isEmpty()) {
-      return;
-    }
-    QUrl url("#" + anchor);
-    ui->textHelpContent->setSource(url);
+  // keyboard
+  connect(ui->treeHelpTOC, &QTreeWidget::currentItemChanged,
+        this, [this](QTreeWidgetItem *current, QTreeWidgetItem *previous) {
+            if (!current) return;
+
+            QString anchor = current->data(0, Qt::UserRole).toString();
+            if (!anchor.isEmpty()) {
+                ui->textHelpContent->setSource(QUrl("#" + anchor));
+            }
   });
 }
 
@@ -443,7 +481,6 @@ bool MainWindow::loadBackgroundPreview(const QString &image_path)
 }
 
 void MainWindow::disableDeck(int deckId) {
-  // It's safe to call with invalid ID. eg: TIGULLIO_MODERN_DECK (8) unsupported. Last (7)
   QAbstractButton *button = deckGroup->button(deckId);
   if (button) {
     button->setChecked(false);
@@ -456,7 +493,6 @@ void MainWindow::disableDeck(int deckId) {
             "Please select a different deck in Settings."));
 
   if (!forced_new_deck) {
-// set the current tab to settings
     ui->tabWidget->setTabEnabled(0, false);
     ui->tabWidget->setCurrentIndex(4);
     forced_new_deck = true;
@@ -479,8 +515,6 @@ void MainWindow::applyAllSettings()
   enabled = config->is_sounds();
   ui->pushButton_sound->setChecked(enabled);
   sounds->setEnabled(enabled);
-
-  ui->pushButton_reveal->setChecked(config->is_cheat_mode());
 
   enabled = config->is_queen_spade_break_heart();
   ui->opt_queen_spade->setChecked(enabled);
@@ -509,6 +543,21 @@ void MainWindow::applyAllSettings()
   enabled = config->is_animated_play();
   ui->opt_animations->setChecked(enabled);
   setAnimationButtons(enabled);
+
+  enabled = config->is_confirm_exit();
+  ui->checkBox_confirm_exit->setChecked(enabled);
+
+  enabled = config->is_detect_tram();
+  ui->checkBox_tram->setChecked(enabled);
+
+  enabled = config->is_cheat_reveal();
+  ui->pushButton_reveal->setChecked(enabled);
+
+  // This settings must be applied after is_cheat_reveal(), so setCheatMode will unset
+  // reveal pushButton if the overall cheat mode has been set to false.
+  enabled = config->is_cheat_mode();
+  ui->checkBox_cheat->setChecked(enabled);
+  setCheatMode(enabled);
 
   ui->opt_anim_deal_cards->setChecked(config->is_anim_deal_cards());
   ui->opt_anim_play_card->setChecked(config->is_anim_play_card());
@@ -1281,15 +1330,14 @@ void MainWindow::createButtonsGroups()
           forced_new_deck = false;
           if (start_engine_dalayed) {
             start_engine_dalayed = false;
-qDebug() << "Forces deck";
             engine->Start();
-          //  engine->Step();
           } 
         }
-        enableAllDecks();
       } else {
-          enableAllDecksButOne(id);
-        }
+          disableDeck(id);
+          valid_deck[id] = false;
+          }
+      enableAllDecks();
       restoreTrickCards();
       scene->update();
     });
@@ -2542,19 +2590,23 @@ void MainWindow::disableAllDecks()
 void MainWindow::enableAllDecks()
 {
    QTimer::singleShot(500, this, [this]() {
+     int index = 0;
      for (QAbstractButton *btn : deckGroup->buttons()) {
-       btn->setEnabled(true);
-   }});
+       if (valid_deck[index]) {
+         btn->setEnabled(true);
+       };
+       index++;
+     }
+   });
 }
 
-void MainWindow::enableAllDecksButOne(int id)
+void MainWindow::setCheatMode(bool enabled)
 {
-   QTimer::singleShot(500, this, [this, id]() {
-        for (QAbstractButton *btn : deckGroup->buttons()) {
-          btn->setEnabled(true);
-        }
-        disableDeck(id);
-   });
+  if (!enabled) {
+    ui->pushButton_reveal->setChecked(false);
+    config->set_config_file(CONFIG_CHEAT_REVEAL, false);
+  }
+  ui->pushButton_reveal->setVisible(enabled);
 }
 
 void MainWindow::setAnimationButtons(bool enabled)

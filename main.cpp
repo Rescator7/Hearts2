@@ -7,16 +7,9 @@
 
 int main(int argc, char *argv[])
 {
-    qputenv("QT_MEDIA_BACKEND", "ffmpeg"); // remove QT 6.5
+    qputenv("QT_MEDIA_BACKEND", "ffmpeg");
 
-    QApplication a(argc, argv);
-
-/*  Not working QT 6.5 to stop flicking on resize
-    QApplication::setAttribute(Qt::AA_UseSoftwareOpenGL);
-    QApplication::setAttribute(Qt::AA_DontUseNativeMenuBar);  // parfois aide
-    QApplication::setAttribute(Qt::AA_ForceRasterWidgets);    // force raster (logiciel)
-*/
-  //  QApplication::setAttribute(Qt::AA_DisableHighDpiScaling);  // à tester, parfois réduit le flickering
+    QApplication app(argc, argv);
 
     QFont font("Noto Sans", 11);
     font.setStyleName("Regular");
@@ -26,11 +19,11 @@ int main(int argc, char *argv[])
     for (const QString &locale : uiLanguages) {
         const QString baseName = "Hearts2_" + QLocale(locale).name();
         if (translator.load(":/i18n/" + baseName)) {
-            a.installTranslator(&translator);
+            app.installTranslator(&translator);
             break;
         }
     }
     MainWindow w;
     w.show();
-    return a.exec();
+    return app.exec();
 }

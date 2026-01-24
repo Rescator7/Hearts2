@@ -477,7 +477,7 @@
        </palette>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>0</number>
       </property>
       <property name="iconSize">
        <size>
@@ -986,9 +986,6 @@
               <width>20</width>
               <height>20</height>
              </size>
-            </property>
-            <property name="shortcut">
-             <string>Ctrl+Q</string>
             </property>
            </widget>
           </item>
@@ -2968,7 +2965,6 @@ QGroupBox QLabel {
     padding: 12px;
     font-weight: bold;
 }
-
 QGroupBox::title {
     subcontrol-origin: margin;
     left: 12px;
@@ -2977,15 +2973,16 @@ QGroupBox::title {
     color: #d4ffd4;
     border-radius: 4px;
 }
-
 QGroupBox * {
     color: black
 }
-
 QGroupBox QCheckBox,
 QGroupBox QRadioButton,
 QGroupBox QLabel {
     color: black !important;
+}
+QGroupBox QRadioButton::disabled  {
+    color: #808080 !important;
 }</string>
          </property>
          <property name="title">
@@ -3140,6 +3137,10 @@ QGroupBox QCheckBox,
 QGroupBox QRadioButton,
 QGroupBox QLabel {
     color: black !important;
+}
+
+QGroupBox QCheckBox::disabled  {
+    color: #808080 !important;
 }</string>
          </property>
          <property name="title">
@@ -3361,12 +3362,97 @@ font-weight: bold;
           <string>Background</string>
          </property>
         </widget>
+        <widget class="QGroupBox" name="groupBox_miscellaneous">
+         <property name="geometry">
+          <rect>
+           <x>280</x>
+           <y>340</y>
+           <width>201</width>
+           <height>141</height>
+          </rect>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QGroupBox {
+    background-color: #7eb27a;
+    border: 2px solid #6bc96b;
+    border-radius: 8px;
+    margin-top: 18px;
+    padding: 12px;
+    font-weight: bold;
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    left: 12px;
+    padding: 2px 8px;
+    background-color: #7eb27a;
+    color: #d4ffd4;
+    border-radius: 4px;
+}
+
+QGroupBox * {
+    color: black
+}
+
+QGroupBox QCheckBox,
+QGroupBox QRadioButton,
+QGroupBox QLabel {
+    color: black !important;
+}</string>
+         </property>
+         <property name="title">
+          <string>Miscellaneous</string>
+         </property>
+         <widget class="QCheckBox" name="checkBox_confirm_exit">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>40</y>
+            <width>181</width>
+            <height>24</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Confirm Exit (Button)</string>
+          </property>
+          <property name="checked">
+           <bool>false</bool>
+          </property>
+         </widget>
+         <widget class="QCheckBox" name="checkBox_tram">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>70</y>
+            <width>161</width>
+            <height>24</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Detect TRAM</string>
+          </property>
+         </widget>
+         <widget class="QCheckBox" name="checkBox_cheat">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>100</y>
+            <width>161</width>
+            <height>24</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Cheat mode</string>
+          </property>
+         </widget>
+        </widget>
         <zorder>labelBackgroundPreview</zorder>
         <zorder>labelPreviewOverlay</zorder>
         <zorder>groupBox_Deck</zorder>
         <zorder>groupBox_animations</zorder>
         <zorder>groupBox_Language</zorder>
         <zorder>labelBackground</zorder>
+        <zorder>groupBox_miscellaneous</zorder>
        </widget>
        <zorder>frame</zorder>
        <zorder>groupBox_Variants</zorder>

@@ -253,7 +253,7 @@ bool Deck::set_deck(int style) {
                                       break;
     case TIGULLIO_INTERNATIONAL_DECK: folder_name = "tigullio-international";
                                       format = SVG_53_FILES_FORMAT;
-                                   //   format = SVG_1_FILE_FORMAT;
+                                     // format = SVG_1_FILE_FORMAT;
                                       break;
     case TIGULLIO_MODERN_DECK:        return false; // unsupported
 
