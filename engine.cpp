@@ -53,6 +53,7 @@ void Engine::generate_players_name()
 
   name_taken[0] = true; // reserved for player south as "You"
   playersName[PLAYER_SOUTH] = tr("You");
+  playersIndex[PLAYER_SOUTH] = 0;
 
   for (int p = 1; p < 4; p++) {
     int index = getRandomNameIndex();
@@ -60,7 +61,7 @@ void Engine::generate_players_name()
       index = getRandomNameIndex();
     name_taken[index] = true;
     playersName[p] = names[index];
-    AI_players[p - 1] = index;
+    playersIndex[p] = index;
   }
 }
 
@@ -87,6 +88,7 @@ void Engine::init_variables()
   hearts_broken = false;
 
   jack_diamond_in_trick = false;
+  queen_spade_in_trick = false;
 
   jack_diamond_owner = PLAYER_NOBODY;
 
@@ -97,18 +99,10 @@ void Engine::init_variables()
 
 GAME_ERROR Engine::start_new_game()
 {
-
-   qDebug() << "startNewGame() appelé depuis :" << Q_FUNC_INFO << QThread::currentThread();
-    // ou juste :
-   qDebug() << "Pourquoi new game ? currentStatus =" << game_status << "cpt_played =" << cpt_played;
-   qDebug() << "Locked: " << locked;
-
   if (locked) {
   //  emit sig_error(errorMessage(ERRLOCKED));
     return ERRLOCKED;
   }
-
-  qDebug() << "New game";
 
   direction = PASS_LEFT;
   game_status = NEW_ROUND;   // Init vars will be called in Loop() for the NEW_ROUND
@@ -120,7 +114,9 @@ GAME_ERROR Engine::start_new_game()
   }
 
   generate_players_name();
+  emit sig_message(tr("Starting a new game."));
   emit sig_new_players(playersName);
+  emit sig_update_stat(0, STATS_GAME_STARTED);
   emit sig_update_scores_board(playersName, hand_score, total_score);
   Loop();
 
@@ -137,6 +133,10 @@ bool Engine::undo()
   static bool success = false;
 
   success ^= 1;
+
+  if (success) {
+    emit sig_update_stat(0, STATS_UNDO);
+  }
 
   return success;
 }
@@ -200,7 +200,7 @@ void Engine::shuffle_deck()
     if (firstTime) {
       firstTime = false;
     } else {
-        emit sig_shuffle_deck();
+        emit sig_play_sound(SOUND_SHUFFLING_CARDS);
       }
 }
 
@@ -411,6 +411,10 @@ void Engine::Loop()
                              jack_diamond_owner = best_hand_owner;
                              jack_diamond_in_trick = false;
                            }
+                           if (queen_spade_in_trick) {
+                             queen_spade_in_trick = false;
+                             emit sig_update_stat(playersIndex[best_hand_owner], STATS_QUEEN_SPADE);
+                           }
                            emit sig_collect_tricks(turn, tram);
                            qDebug() << "END_TURN";
                            break;
@@ -442,7 +446,10 @@ void Engine::Loop()
                          break;
      case GAME_OVER:     qDebug() << "GAME_OVER";
                          locked = false;
-                         emit sig_game_over();
+                         sendGameResult();
+                         emit sig_play_sound(SOUND_GAME_OVER);
+                         emit sig_update_stat(0, STATS_GAME_FINISHED);
+                         emit sig_clear_deck();
                          break;
   }
 }
@@ -483,12 +490,29 @@ void Engine::advance_turn()
 
 void Engine::advance_direction()
 {
+  QString mesg, dirName;
+
   switch(direction) {
-    case PASS_LEFT:   direction = PASS_RIGHT; break;
-    case PASS_RIGHT:  direction = PASS_ACROSS; break;
-    case PASS_ACROSS: direction = PASS_HOLD; break;
-    case PASS_HOLD:   direction = PASS_LEFT; break;
+    case PASS_LEFT:   direction = PASS_RIGHT;
+                      dirName = tr("right");
+                      break;
+    case PASS_RIGHT:  direction = PASS_ACROSS;
+                      dirName = tr("across");
+                      break;
+    case PASS_ACROSS: direction = PASS_HOLD;
+                      dirName = "";
+                      break;
+    case PASS_HOLD:   direction = PASS_LEFT;
+                      dirName = tr("left");
+                      break;
   }
+  if (direction == PASS_HOLD) {
+    mesg = tr("No card exchange this round.");
+  } else {
+      mesg = tr("We now pass the cards to the ") + dirName + QString(".");
+    }
+
+  emit sig_message(mesg);
 }
 
 void Engine::check_for_best_hand(PLAYER player, int cardId)
@@ -521,16 +545,19 @@ void Engine::Play(int cardId, PLAYER player)
     trick_value++;
     if (!hearts_broken) {
       hearts_broken = true;
-      emit sig_hearts_broken();
+      emit sig_message(tr("Hearts has been broken!"));
+      emit sig_play_sound(SOUND_BREAKING_HEARTS);
     }
   } else
   if (cardId == SPADES_QUEEN) {
     trick_value += 13;
+    queen_spade_in_trick = true;
     if (variant_queen_spade) {
       hearts_broken = true;
-      emit sig_hearts_broken();
+      emit sig_message(tr("Hearts has been broken!"));
+      emit sig_play_sound(SOUND_BREAKING_HEARTS);
     }
-    emit sig_queen_spade();
+    emit sig_play_sound(SOUND_QUEEN_SPADE);
   } if (cardId == DIAMONDS_JACK) {
       jack_diamond_in_trick = true;
   }
@@ -546,6 +573,7 @@ int Engine::calculate_tricks_from_tram()
     for (int cardId : hand) {
        if (cardId == SPADES_QUEEN) {
          tricks += 13;
+         queen_spade_in_trick = true;
        } else {
            if (cardId == DIAMONDS_JACK) {
              jack_diamond_in_trick = true;
@@ -585,66 +613,128 @@ bool Engine::getNewMoonChoice()
 
 void Engine::shoot_moon(int player)
 {
-  int yesNo = true;
+  QString mesg;
+  int yesNo = true, bonus;
+
   if ((player == PLAYER_SOUTH) && variant_new_moon && (total_score[player] >= 26)) {
     yesNo = getNewMoonChoice();
   }
 
   if (yesNo == false) {
-    total_score[player] = std::max(0, total_score[player] - 26);
+     bonus = total_score[player] >= 26 ? 26 : total_score[player];
+     mesg = (player == PLAYER_SOUTH ? tr("You") : playersName[player]) + tr(" substracted ") + QString::number(bonus) + tr(" pts to ") +
+                             (player == PLAYER_SOUTH ? tr("your") : tr("his/her")) + tr(" score!");
+    total_score[player] -= bonus;
   } else {
+      mesg = (player == PLAYER_SOUTH ? tr("You") : playersName[player]) + tr(" added 26 pts to everyone's scores!");
+
       for (int p = 0; p < 4; p++) {
         if (p == player) continue;
         total_score[p] += 26;
       }
   }
+
+  emit sig_message(mesg);
 }
 
 void Engine::update_total_scores()
 {
+  QString mesg;
+
   int bonus;
   bool moon = false;
 
   for (int p = 0; p < 4; p++) {
     if ((hand_score[p] == 26) && ((jack_diamond_owner == p) || !variant_omnibus)) {
+      if (p == PLAYER_SOUTH) {
+        mesg = tr("You shoot the moon!");
+      } else {
+        mesg = tr("Player '") + playersName[p] + tr("' shoot the moon!");
+      }
+      emit sig_message(mesg);
+
       shoot_moon(p);
       moon = true;
+      emit sig_update_stat(playersIndex[p], STATS_SHOOT_MOON);
     }
   }
 
   for (int p = 0; p < 4; p++) {
     // if someone moon we disable the bonus, except the PERFECT_100
     if (!moon) {
-      bonus = 0;
+      total_score[p] += hand_score[p];
 
       if (variant_no_tricks && (hand_score[p] == 0)) {
-        qDebug() << "No tricks bonus to: " << p;
-        bonus += NO_TRICK_VALUE;
+        bonus = total_score[p] >= NO_TRICK_VALUE ? NO_TRICK_VALUE : total_score[p];
+
+        if (bonus) {
+          total_score[p] -= bonus;
+
+          if (p == PLAYER_SOUTH) {
+            mesg = tr("You receive the bonus: no tricks bonus ") + QString::number(bonus) + tr(" point(s)");
+          }
+          else {
+            mesg = tr("Player '") + playersName[p] + tr("' receive the bonus: no tricks bonus ") + QString::number(bonus) + tr(" point(s)");
+          }
+          emit sig_update_stat(playersIndex[p], STATS_NO_TRICKS);
+          emit sig_message(mesg);
+        }
       }
 
       if (variant_omnibus && (jack_diamond_owner == p)) {
-        qDebug() << "Omnibus bonus to " << jack_diamond_owner;
-        bonus += OMNIBUS_VALUE;
-      }
+        bonus = total_score[p] >= OMNIBUS_VALUE ? OMNIBUS_VALUE : total_score[p];
 
-      qDebug() << "Bonus " << bonus << "Player " << p;
-      total_score[p] = std::max(0, total_score[p] + hand_score[p] + bonus);
+        if (bonus) {
+          total_score[p] -= bonus;
+          if (p == PLAYER_SOUTH) {
+            mesg = tr("You receive the bonus: omnibus ") + QString::number(bonus) + tr(" point(s)");
+          }
+          else {
+            mesg = tr("Player '") + playersName[p] + tr("' receive the bonus: omnibus ") + QString::number(bonus) + tr(" point(s)");
+          }
+          emit sig_update_stat(playersIndex[p], STATS_OMNIBUS);
+          emit sig_message(mesg);
+        }
+      }
     }
 
     if (variant_perfect_100 && (total_score[p] == GAME_OVER_SCORE)) {
       total_score[p] = PERFECT_100_VALUE;
-      emit sig_perfect_100((PLAYER)p);
+
+      if (p == PLAYER_SOUTH) {
+        mesg = tr("You got the perfect 100!\n[Info]: Your score has been set to 50.");
+      } else {
+          mesg = tr("Player '") + playersName[p] + tr("' got the perfect 100!\n[Info]: Player '") +
+                                  playersName[p] + tr("' score has been set to 50.");
+        }
+
+      emit sig_message(mesg);
+      emit sig_update_stat(playersIndex[p], STATS_PERFECT_100);
+      emit sig_play_sound(SOUND_PERFECT_100);
     }
 
     // check for a new higher game_score
     if (total_score[p] > game_score) {
       game_score = total_score[p];
     }
+  }
 
-    // reset the players hand_score
+  mesg = tr("New scores: '") + playersName[PLAYER_SOUTH] + ": " +
+          QString::number(total_score[PLAYER_SOUTH]) + " (" + QString::number(hand_score[PLAYER_SOUTH]) + ")', '" +
+                                   playersName[PLAYER_WEST] + ": " +
+          QString::number(total_score[PLAYER_WEST]) + " (" + QString::number(hand_score[PLAYER_WEST]) + ")', '" +
+                                   playersName[PLAYER_NORTH] + ": " +
+          QString::number(total_score[PLAYER_NORTH]) + " (" + QString::number(hand_score[PLAYER_NORTH]) + ")', '" +
+                                   playersName[PLAYER_EAST] + ": " +
+          QString::number(total_score[PLAYER_EAST]) + " (" + QString::number(hand_score[PLAYER_EAST]) + ")'";
+
+  emit sig_message(mesg);
+
+  for (int p = 0; p < 4; p++) {
     hand_score[p] = 0;
   }
 
+  emit sig_update_stat(0, STATS_HANDS_PLAYED);
   emit sig_update_scores_board(playersName, hand_score, total_score);
 }
 
@@ -815,7 +905,14 @@ bool Engine::is_it_TRAM(PLAYER player)
 
   cards_left = 0;
 
-  emit sig_tram();
+  QString mesg;
+  if (player == PLAYER_SOUTH)
+    mesg = tr("You takes the rest!");
+  else
+    mesg = tr("Player '") + playersName[player] + tr("' takes the rest!");
+
+  emit sig_message(mesg);
+  emit sig_play_sound(SOUND_TRAM);
 
   return true;
 }
@@ -850,6 +947,46 @@ bool Engine::is_it_draw()
   }
 
   return cpt;
+}
+
+void Engine::sendGameResult()
+{
+  QString mesg, result;
+
+  int lowest = 0;
+
+  result = is_it_draw() ? tr("Drew !") : tr("Won !");
+
+  for (int i =0 ; i < 4; i++) {
+    int cpt = 0;
+    for (int i2 = 0; i2 < 4; i2++)
+      if (total_score[i] > total_score[i2])
+        cpt++;
+
+    switch(cpt) {
+      case 0 : emit sig_update_stat(playersIndex[i], STATS_FIRST_PLACE);
+               lowest = total_score[i];
+               break;
+      case 1 : emit sig_update_stat(playersIndex[i], STATS_SECOND_PLACE);
+               break;
+      case 2 : emit sig_update_stat(playersIndex[i], STATS_THIRD_PLACE);
+               break;
+      case 3 : emit sig_update_stat(playersIndex[i], STATS_FOURTH_PLACE);
+               break;
+    }
+    emit sig_update_stat_score(playersIndex[i], total_score[i]);
+  }
+
+  mesg = tr("GAME OVER!\n[Info]: Player '")  + tr("You") + "': " +
+         QString::number(total_score[PLAYER_SOUTH]) + tr(" point(s) ") + (total_score[PLAYER_SOUTH] == lowest ? result : "") +
+        tr("\n[Info]: Player '")                    + playersName[PLAYER_WEST] + "': " +
+         QString::number(total_score[PLAYER_WEST]) + tr(" point(s) ") + (total_score[PLAYER_WEST] == lowest ? result : "") +
+        tr("\n[Info]: Player '")                    + playersName[PLAYER_NORTH] + "': " +
+         QString::number(total_score[PLAYER_NORTH]) + tr(" point(s) ") + (total_score[PLAYER_NORTH] == lowest ? result : "") +
+        tr("\n[Info]: Player '")                    + playersName[PLAYER_EAST] + "': " +
+         QString::number(total_score[PLAYER_EAST]) + tr(" point(s) ") + (total_score[PLAYER_EAST] == lowest ? result : "");
+
+  emit sig_message(mesg);
 }
 
 int Engine::lowestCardInSuitForPlayer(PLAYER player, SUIT suit) const

@@ -50,6 +50,12 @@ enum ScoreAnchorSide {
 };
 */
 
+enum MESSAGE {
+  MESSAGE_ERROR  = 0,
+  MESSAGE_SYSTEM = 1,
+  MESSAGE_INFO   = 2
+};
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -146,7 +152,7 @@ private:
 
 public:
 //    void saveDragPosition(QPointF pos) {savedScorePos = pos; };
-    void message(QString mesg);
+    void message(QString mesg, MESSAGE type);
     void updateBackground();
     void updateTrickPile();
     void updateYourTurnIndicator();

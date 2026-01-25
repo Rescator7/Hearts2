@@ -37,7 +37,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     setWindowTitle(VERSION);
 
-    message(tr("Welcome to ") + QString(VERSION));
+    message(tr("Welcome to ") + QString(VERSION), MESSAGE_SYSTEM);
 
     config = new Config();
 
@@ -184,8 +184,7 @@ MainWindow::MainWindow(QWidget *parent)
       GAME_ERROR err = engine->start_new_game();
       if (err) {
       qDebug() << "pushButton_new";
-        sounds->play(SOUND_ERROR);
-        message(engine->errorMessage(err));
+        message(engine->errorMessage(err), MESSAGE_ERROR);
       }
       // Note: engine will emit sig_clear_deck() --> scene->clear() + clearTricks() + yourTurnIndicator->hide() = arrowLabel->hide()
     });
@@ -224,33 +223,29 @@ MainWindow::MainWindow(QWidget *parent)
         }
     });
 
+    connect(statistics, &Statistics::sig_message, this, [this](const QString &mesg) {
+      message(mesg, MESSAGE_SYSTEM);
+    });
+
     connect(engine, &Engine::sig_your_turn, this, [this]() {
        disableInvalidCards();
        showTurnIndicator();
     });
 
-    connect(engine, &Engine::sig_hearts_broken, this, [this]() {
-      sounds->play(SOUND_BREAKING_HEARTS);
+    connect(engine, &Engine::sig_play_sound, this, [this](SOUNDS soundId) {
+      sounds->play(soundId);
     });
 
-    connect(engine, &Engine::sig_queen_spade, this, [this]() {
-      sounds->play(SOUND_QUEEN_SPADE);
+    connect(engine, &Engine::sig_update_stat, this, [this](int player, STATS stat) {
+      statistics->increase_stats(player, stat);
     });
 
-    connect(engine, &Engine::sig_shuffle_deck, this, [this]() {
-      sounds->play(SOUND_SHUFFLING_CARDS);
+    connect(engine, &Engine::sig_update_stat_score, this, [this](int player, int score) {
+      statistics->set_score(player, score);
     });
 
-    connect(engine, &Engine::sig_game_over, this, [this]() {
-      sounds->play(SOUND_GAME_OVER);
-    });
-
-    connect(engine, &Engine::sig_perfect_100, this, [this](PLAYER player) {
-      sounds->play(SOUND_PERFECT_100);
-    });
-
-    connect(engine, &Engine::sig_tram, this, [this]() {
-      sounds->play(SOUND_TRAM);
+    connect(engine, &Engine::sig_message, this, [this](QString mesg) {
+      message(mesg, MESSAGE_INFO);
     });
 /*
     connect(engine, &Engine::sig_error, this, [this](QString err) {
@@ -377,6 +372,8 @@ MainWindow::~MainWindow()
 
 void MainWindow::aboutToQuit()
 {
+  statistics->save_stats_file();
+
   config->set_width(size().width());
   config->set_height(size().height());
   config->set_posX(pos().x());
@@ -396,19 +393,15 @@ void MainWindow::loadHelpFile()
   };
 
   static const tocEntry TOC[] =  {
-                                 {"1. Règles de base du jeu", "regles", false },
-                                 {"2. Comptage des points", "points", false },
-                                 {"3. Shoot the Moon", "shoot", false },
-                                 {"4. Passage des trois cartes", "passing", false },
-                                 {"5. Variantes et options", "variantes", false },
-                                 {"6. Astuces et stratégies", "astuces", false },
-                                 {"7. Foire aux questions (FAQ)", "faq", false },
-                                 {"8. Credits", "credits", false },
-                                 {"8.1 Playing card decks", "decks", true },
-                                 {"8.2 Icons", "icons", true },
-                                 {"8.3 Backgrounds Images", "backgrounds", true },
-                                 {"8.4 Sounds", "sounds", true },
-                                 {"8.5 Special thanks", "special", true}
+                                 {"1. Basic rules of the game", "rules", false },
+                                 {"2. Game settings", "settings", false },
+                                 {"3. Playing online", "online", false },
+                                 {"4. Credits", "credits", false },
+                                 {"4.1 Playing card decks", "decks", true },
+                                 {"4.2 Icons", "icons", true },
+                                 {"4.3 Backgrounds Images", "backgrounds", true },
+                                 {"4.4 Sounds", "sounds", true },
+                                 {"4.5 Special thanks", "special", true}
                                  };
 
   QFile file(":/help.html");
@@ -815,8 +808,7 @@ void MainWindow::onArrowClicked()
 {
 qDebug() << "Clicked";
   if (selectedCards.size() != 3) {
-    sounds->play(SOUND_ERROR);
-    message(tr("You must select 3 cards to pass!"));
+    message(tr("You must select 3 cards to pass!"), MESSAGE_ERROR);
   } else {
 
 qDebug() << "before: " << selectedCards.size();
@@ -1514,9 +1506,21 @@ void MainWindow::createScoreDisplay()
 
 // ************************************************************************************************
 
-void MainWindow::message(QString mesg)
+void MainWindow::message(QString mesg, MESSAGE type)
 {
-  ui->channel->append(mesg);
+  QString complete;
+  switch (type) {
+    case MESSAGE_ERROR: complete = tr("[Error]: ");
+                        sounds->play(SOUND_ERROR);
+                        break;
+    case MESSAGE_INFO:  complete = tr("[Info]: " );
+                        break;
+    case MESSAGE_SYSTEM:
+    default: break;
+  }
+
+  complete += mesg;
+  ui->channel->append(complete);
 }
 
 void MainWindow::adjustGraphicsViewSize()

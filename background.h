@@ -10,19 +10,21 @@
 #include <QColor>
 #include <QString>
 
-constexpr int BACKGROUND_NONE                = 0;
-constexpr int BACKGROUND_GREEN               = 1;
-constexpr int BACKGROUND_UNIVERSE            = 2;
-constexpr int BACKGROUND_OCEAN               = 3;
-constexpr int BACKGROUND_MT_FUJI             = 4;
-constexpr int BACKGROUND_EVEREST             = 5;
-constexpr int BACKGROUND_DESERT              = 6;
-constexpr int BACKGROUND_WOODEN_1            = 7;
-constexpr int BACKGROUND_WOODEN_2            = 8;
-constexpr int BACKGROUND_WOODEN_3            = 9;
-constexpr int BACKGROUND_WOODEN_4            = 10;
-constexpr int BACKGROUND_LEAVES              = 11;
-constexpr int BACKGROUND_MARBLE              = 12;
+enum BACKGROUND {
+     BACKGROUND_NONE                = 0,
+     BACKGROUND_GREEN               = 1,
+     BACKGROUND_UNIVERSE            = 2,
+     BACKGROUND_OCEAN               = 3,
+     BACKGROUND_MT_FUJI             = 4,
+     BACKGROUND_EVEREST             = 5,
+     BACKGROUND_DESERT              = 6,
+     BACKGROUND_WOODEN_1            = 7,
+     BACKGROUND_WOODEN_2            = 8,
+     BACKGROUND_WOODEN_3            = 9,
+     BACKGROUND_WOODEN_4            = 10,
+     BACKGROUND_LEAVES              = 11,
+     BACKGROUND_MARBLE              = 12
+};
 
 constexpr int BACKGROUND_LAST_INDEX          = 12;
 

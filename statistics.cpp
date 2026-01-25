@@ -1,6 +1,7 @@
 #include <QFile>
 #include <QDir>
 #include <QTextStream>
+#include <QMessageBox>
 
 #include "statistics.h"
 #include "ui_statistics.h"
@@ -26,6 +27,20 @@ Statistics::Statistics(QWidget *parent) :
   initTableContent();
 
   file.close();
+
+  connect(ui->pushButton_reset, &QPushButton::clicked, this, [this]() {
+    QMessageBox msgBox(this);
+
+    QMessageBox::StandardButton reply = QMessageBox::question(this,
+       tr("Reset the statistics"),
+       tr("Do you really want to reset the statistics?"),
+       QMessageBox::Yes | QMessageBox::No,
+       QMessageBox::No);
+       if (reply == QMessageBox::Yes) {
+         reset();
+         emit sig_message(tr("You have reset the statistics!"));
+       }
+  });
 }
 
 Statistics::~Statistics()
@@ -35,7 +50,7 @@ Statistics::~Statistics()
 
 void Statistics::init_vars()
 {
-  game_started = 1;
+  game_started = 0;
   game_finished = 0;
   hands_played = 0;
   undo = 0;

@@ -14,20 +14,22 @@ constexpr int ERROPENWO  =  3;
 const char STATS_FILENAME[20] = "/.hearts.stats";
 const char STATS_BACKUP_FILE[20] = "/.hearts.stats.bak";
 
-#define STATS_GAME_STARTED  0
-#define STATS_GAME_FINISHED 1
-#define STATS_HANDS_PLAYED  2
-#define STATS_SCORES        3
-#define STATS_FIRST_PLACE   4
-#define STATS_SECOND_PLACE  5
-#define STATS_THIRD_PLACE   6
-#define STATS_FOURTH_PLACE  7
-#define STATS_SHOOT_MOON    8
-#define STATS_QUEEN_SPADE   9
-#define STATS_OMNIBUS       10
-#define STATS_NO_TRICKS     11
-#define STATS_PERFECT_100   12
-#define STATS_UNDO          13
+enum STATS {
+     STATS_GAME_STARTED        = 0,
+     STATS_GAME_FINISHED       = 1,
+     STATS_HANDS_PLAYED        = 2,
+     STATS_SCORES              = 3,
+     STATS_FIRST_PLACE         = 4,
+     STATS_SECOND_PLACE        = 5,
+     STATS_THIRD_PLACE         = 6,
+     STATS_FOURTH_PLACE        = 7,
+     STATS_SHOOT_MOON          = 8,
+     STATS_QUEEN_SPADE         = 9,
+     STATS_OMNIBUS             = 10,
+     STATS_NO_TRICKS           = 11,
+     STATS_PERFECT_100         = 12,
+     STATS_UNDO                = 13
+};
 
 namespace Ui {
 class Statistics;
@@ -40,6 +42,9 @@ class Statistics : public QWidget
 public:
     explicit Statistics(QWidget *parent = nullptr);
     ~Statistics();
+
+signals:
+    void sig_message(const QString &message);
 
 private:
     Ui::Statistics *ui;

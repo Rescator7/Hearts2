@@ -25,5 +25,6 @@
         <file>icons/calculator.svg</file>
         <file>icons/calculator-slash.svg</file>
         <file>help.html</file>
+        <file>icons/play-duotone.svg</file>
     </qresource>
 </RCC>

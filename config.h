@@ -8,37 +8,39 @@
 #include <QString>
 #include <QList>
 
-constexpr int CONFIG_AUTO_CENTERING          = 0;
-constexpr int CONFIG_CHEAT_MODE              = 1;
-constexpr int CONFIG_INFO_CHANNEL            = 2;
-constexpr int CONFIG_SOUNDS                  = 3;
-constexpr int CONFIG_DETECT_TRAM             = 4;
-constexpr int CONFIG_PERFECT_100             = 5;
-constexpr int CONFIG_OMNIBUS                 = 6;
-constexpr int CONFIG_QUEEN_SPADE             = 7;
-constexpr int CONFIG_NO_TRICK                = 8;
-constexpr int CONFIG_NEW_MOON                = 9;
-constexpr int CONFIG_NO_DRAW                 = 10;
-constexpr int CONFIG_SAVE_GAME               = 11;
-constexpr int CONFIG_LANGUAGE                = 12;
-constexpr int CONFIG_EASY_CARD_SELECTION     = 13;
-constexpr int CONFIG_CARD_DISPLAY            = 14;
-constexpr int CONFIG_AUTO_START              = 15;
-constexpr int CONFIG_DECK_STYLE              = 16;
-constexpr int CONFIG_ANIMATED_PLAY           = 17;
-constexpr int CONFIG_USERNAME                = 18;
-constexpr int CONFIG_PASSWORD                = 19;
-constexpr int CONFIG_WARNING                 = 20;
-constexpr int CONFIG_SHOW_DIRECTION          = 21;
-constexpr int CONFIG_EMPTY_SLOT              = 22;
-constexpr int CONFIG_ANIM_DEAL_CARDS         = 23;
-constexpr int CONFIG_ANIM_PLAY_CARD          = 24;
-constexpr int CONFIG_ANIM_COLLECT_TRICKS     = 25;
-constexpr int CONFIG_ANIM_PASS_CARDS         = 26;
-constexpr int CONFIG_ANIMATED_ARROW          = 27;
-constexpr int CONFIG_ANIM_TURN_INDICATOR     = 28;
-constexpr int CONFIG_CONFIRM_EXIT            = 29;
-constexpr int CONFIG_CHEAT_REVEAL            = 30;
+enum CONFIG {
+     CONFIG_AUTO_CENTERING          = 0,
+     CONFIG_CHEAT_MODE              = 1,
+     CONFIG_INFO_CHANNEL            = 2,
+     CONFIG_SOUNDS                  = 3,
+     CONFIG_DETECT_TRAM             = 4,
+     CONFIG_PERFECT_100             = 5,
+     CONFIG_OMNIBUS                 = 6,
+     CONFIG_QUEEN_SPADE             = 7,
+     CONFIG_NO_TRICK                = 8,
+     CONFIG_NEW_MOON                = 9,
+     CONFIG_NO_DRAW                 = 10,
+     CONFIG_SAVE_GAME               = 11,
+     CONFIG_LANGUAGE                = 12,
+     CONFIG_EASY_CARD_SELECTION     = 13,
+     CONFIG_CARD_DISPLAY            = 14,
+     CONFIG_AUTO_START              = 15,
+     CONFIG_DECK_STYLE              = 16,
+     CONFIG_ANIMATED_PLAY           = 17,
+     CONFIG_USERNAME                = 18,
+     CONFIG_PASSWORD                = 19,
+     CONFIG_WARNING                 = 20,
+     CONFIG_SHOW_DIRECTION          = 21,
+     CONFIG_EMPTY_SLOT              = 22,
+     CONFIG_ANIM_DEAL_CARDS         = 23,
+     CONFIG_ANIM_PLAY_CARD          = 24,
+     CONFIG_ANIM_COLLECT_TRICKS     = 25,
+     CONFIG_ANIM_PASS_CARDS         = 26,
+     CONFIG_ANIMATED_ARROW          = 27,
+     CONFIG_ANIM_TURN_INDICATOR     = 28,
+     CONFIG_CONFIRM_EXIT            = 29,
+     CONFIG_CHEAT_REVEAL            = 30
+};
 
 constexpr int HEARTS_TEXT_ONLY               = 0;
 constexpr int HEARTS_ICONS_PINK              = 1;

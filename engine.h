@@ -2,22 +2,26 @@
 #define ENGINE_H
 
 #include "define.h"
+#include "statistics.h"
+#include "sounds.h"
 
 #include <QObject>
 #include <QList>
 #include <QString>
 
-constexpr int VARIANT_QUEEN_SPADE = 0;
-constexpr int VARIANT_PERFECT_100 = 1;
-constexpr int VARIANT_OMNIBUS     = 2;
-constexpr int VARIANT_NO_TRICKS   = 3;
-constexpr int VARIANT_NEW_MOON    = 4;
-constexpr int VARIANT_NO_DRAW     = 5;
+enum VARIANT {
+     VARIANT_QUEEN_SPADE = 0,
+     VARIANT_PERFECT_100 = 1,
+     VARIANT_OMNIBUS     = 2,
+     VARIANT_NO_TRICKS   = 3,
+     VARIANT_NEW_MOON    = 4,
+     VARIANT_NO_DRAW     = 5
+};
 
-constexpr int PERFECT_100_VALUE   = 50;      // the hand score will be set to this number.
-constexpr int NO_TRICK_VALUE      = -5;      // the no trick bonus will substract this number to the hand score.
-constexpr int OMNIBUS_VALUE       = -10;     // the bonus for winning the jack of diamond.
-constexpr int GAME_OVER_SCORE     = 100;     // reach this score to make the game over.
+constexpr int PERFECT_100_VALUE   =  50;  // the hand score will be set to this number.
+constexpr int NO_TRICK_VALUE      =   5;  // the no trick bonus will substract this number to the hand score.
+constexpr int OMNIBUS_VALUE       =  10;  // the bonus for winning the jack of diamond.
+constexpr int GAME_OVER_SCORE     = 100;  // reach this score to make the game over.
 
 enum DIRECTION {
     PASS_LEFT     = 0,
@@ -63,7 +67,7 @@ private:
     QList<int> validHandsById[4];
     QList<int> cardsSelected[4];
     QList<int> passedCards[4];
-    QString playersName[4] = {"South", "West", "North", "East"};
+    QString playersName[4] = {tr("You"), tr("West"), tr("North"), tr("East")};
     DIRECTION direction = PASS_LEFT;
     PLAYER best_hand_owner;
     PLAYER jack_diamond_owner;
@@ -81,9 +85,11 @@ private:
     bool locked = false;
     bool hearts_broken = false;
     bool jack_diamond_in_trick = false;
+    bool queen_spade_in_trick = false;
     bool detect_tram = true;
 
-    int AI_players[3];
+  //  int AI_players[3];
+    int playersIndex[4];
     int cpt_played = 0;
     int cards_left;
     int game_score;
@@ -124,6 +130,7 @@ private:
     void check_for_best_hand(PLAYER player, int cardId);
     void update_total_scores();
     int calculate_tricks_from_tram();
+    void sendGameResult();
     void shoot_moon(int player);
     void Loop();
 
@@ -138,18 +145,16 @@ signals:
     void sig_setCurrentSuit(int);
     void sig_enableAllCards();
     void sig_clear_deck();
-    void sig_shuffle_deck();
     void sig_refresh_deck();
     void sig_deal_cards();
-    void sig_hearts_broken();
-    void sig_queen_spade();
     void sig_play_card(int cardId, PLAYER player);
     void sig_collect_tricks(PLAYER winner, bool TRAM);
     void sig_new_players(const QString names[4]);
     void sig_update_scores_board(const QString names[4], const int hand[4], const int total[4]);
-    void sig_perfect_100(PLAYER player);
-    void sig_tram();
-    void sig_game_over();
+    void sig_update_stat(int player, STATS stat);
+    void sig_update_stat_score(int player, int score);
+    void sig_play_sound(SOUNDS soundId);
+    void sig_message(QString message);
  //   void sig_error(QString err);
 
 public:
