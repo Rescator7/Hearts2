@@ -2050,6 +2050,9 @@ QPushButton:checked:hover {
               <height>20</height>
              </size>
             </property>
+            <property name="shortcut">
+             <string>Esc</string>
+            </property>
             <property name="checkable">
              <bool>true</bool>
             </property>

@@ -18,7 +18,7 @@ enum PLAYER  {
    PLAYER_NORTH     = 2,
    PLAYER_EAST      = 3,
    PLAYER_COUNT     = 4,
-   PLAYER_NOBODY    = 127
+   PLAYER_NOBODY    = -1
 };
 
 enum ZLayer {

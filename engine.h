@@ -23,6 +23,10 @@ constexpr int NO_TRICK_VALUE      =   5;  // the no trick bonus will substract t
 constexpr int OMNIBUS_VALUE       =  10;  // the bonus for winning the jack of diamond.
 constexpr int GAME_OVER_SCORE     = 100;  // reach this score to make the game over.
 
+constexpr char SAVEDGAME_FILENAME[]  = "/.hearts.saved";
+constexpr char SAVEDGAME_CORRUPTED[] = "/.hearts.saved.bak";
+
+
 enum DIRECTION {
     PASS_LEFT     = 0,
     PASS_RIGHT    = 1,
@@ -53,7 +57,8 @@ enum GAME_ERROR {
    ERRQUEEN         = 3,
    ERRSUIT          = 4,
    ERRINVALID       = 5,
-   ERRLOCKED        = 6
+   ERRLOCKED        = 6,
+   ERRCORRUPTED     = 7
 };
 
 class Engine : public QObject
@@ -72,6 +77,7 @@ private:
     PLAYER best_hand_owner;
     PLAYER jack_diamond_owner;
     PLAYER turn;
+    PLAYER previous_winner;
     GAME_STATUS game_status = SELECT_CARDS;
     SUIT currentSuit = SUIT::CLUBS;
 
@@ -87,6 +93,7 @@ private:
     bool jack_diamond_in_trick = false;
     bool queen_spade_in_trick = false;
     bool detect_tram = true;
+    bool firstTime = true;
 
   //  int AI_players[3];
     int playersIndex[4];
@@ -155,6 +162,7 @@ signals:
     void sig_update_stat_score(int player, int score);
     void sig_play_sound(SOUNDS soundId);
     void sig_message(QString message);
+    void sig_setTrickPile(QList<int> pile);
  //   void sig_error(QString err);
 
 public:
@@ -165,6 +173,8 @@ public:
     void Step();
     void Play(int cardId, PLAYER player = PLAYER_SOUTH);
     void LockedLoop();
+    bool load_game();
+    bool save_game();
     bool undo();
     bool isPlaying() { return (game_status == PLAY_A_CARD_1) || (game_status == PLAY_A_CARD_2) ||
                               (game_status == PLAY_A_CARD_3) || (game_status == PLAY_A_CARD_4) ||
@@ -181,7 +191,7 @@ public:
     DIRECTION Direction() { return direction; };
     QList<int> &Hand(int player) { return playerHandsById[player]; };
     QString &PlayerName(int player) { return playersName[player]; };
-    QString errorMessage(GAME_ERROR err) const;
+    QString errorMessage(GAME_ERROR err);
     const QList<int>& getPassedCards(PLAYER player) const { return passedCards[static_cast<int>(player)]; }
 };
 

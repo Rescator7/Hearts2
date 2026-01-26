@@ -223,7 +223,7 @@ MainWindow::MainWindow(QWidget *parent)
         }
     });
 
-    connect(statistics, &Statistics::sig_message, this, [this](const QString &mesg) {
+    connect(statistics, &Statistics::sig_message, this, [this](const QString mesg) {
       message(mesg, MESSAGE_SYSTEM);
     });
 
@@ -246,6 +246,23 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(engine, &Engine::sig_message, this, [this](QString mesg) {
       message(mesg, MESSAGE_INFO);
+    });
+
+    connect(engine, &Engine::sig_setTrickPile, this, [this](QList<int> pile) {
+      int cpt = 0;
+      currentTrick = pile;
+      for (int i = pile.size() - 1; i >= 0; --i) {
+        QGraphicsSvgItem *item = deck->get_card_item(currentTrick.at(i), true);
+        switch (cpt) {
+          case 0: item->setRotation(-90); break;
+          case 1: item->setRotation(180); break;
+          case 2: item->setRotation(90); break;
+                  break;
+        }
+        cpt++;
+        item->setZValue(Z_TRICKS_BASE - cpt);
+      }
+      updateTrickPile();
     });
 /*
     connect(engine, &Engine::sig_error, this, [this](QString err) {
@@ -285,7 +302,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(engine, &Engine::sig_play_card, this, [this](int cardId, PLAYER player) {
        sounds->play(SOUND_DEALING_CARD);
-qDebug() << "sig_play_card **** player: " << player << "cardId: " << cardId;
        playCard(cardId, player);
     });
 
@@ -373,6 +389,7 @@ MainWindow::~MainWindow()
 void MainWindow::aboutToQuit()
 {
   statistics->save_stats_file();
+  engine->save_game();
 
   config->set_width(size().width());
   config->set_height(size().height());
@@ -395,13 +412,14 @@ void MainWindow::loadHelpFile()
   static const tocEntry TOC[] =  {
                                  {"1. Basic rules of the game", "rules", false },
                                  {"2. Game settings", "settings", false },
-                                 {"3. Playing online", "online", false },
-                                 {"4. Credits", "credits", false },
-                                 {"4.1 Playing card decks", "decks", true },
-                                 {"4.2 Icons", "icons", true },
-                                 {"4.3 Backgrounds Images", "backgrounds", true },
-                                 {"4.4 Sounds", "sounds", true },
-                                 {"4.5 Special thanks", "special", true}
+                                 {"3. Game shortcuts", "shortcuts", false },
+                                 {"4. Playing online", "online", false },
+                                 {"5. Credits", "credits", false },
+                                 {"5.1 Playing card decks", "decks", true },
+                                 {"5.2 Icons", "icons", true },
+                                 {"5.3 Backgrounds Images", "backgrounds", true },
+                                 {"5.4 Sounds", "sounds", true },
+                                 {"5.5 Special thanks", "special", true}
                                  };
 
   QFile file(":/help.html");
@@ -706,9 +724,10 @@ void MainWindow::showEvent(QShowEvent *event)
 
         // Let the layout fully settle, then reposition everything and start the engine.
         QTimer::singleShot(0, this, [this]() {
-            engine->Start();
             updateSceneRect();
             repositionAllCardsAndElements();
+            engine->Start();
+
         });
     }
 }
@@ -901,7 +920,6 @@ qDebug() << "Tricks: " << currentTrick;
         item->setZValue(ZLayer::Z_TRICKS_BASE + i);  // Ensure on top (100 reserved for Arrow)
         item->setScale(calc_scale());
         qDebug() << "scene: " << item->scene() << "Z: " << item->zValue() << "Visibility: " << item->isVisible() << "Pos: " << item->pos() << "Rotation: " << item->rotation();
-
     }
 }
 

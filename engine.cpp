@@ -5,9 +5,7 @@
 #include <QRandomGenerator>
 #include <QTimer>
 #include <QMessageBox>
-
-#include <QThread> // temporaire
-#include <QTime>
+#include <QDir>
 
 #include "define.h"
 #include "cpus.h"
@@ -17,7 +15,6 @@
 std::random_device rd;
 std::mt19937 gen(rd());
 
-
 Engine::Engine(QWidget* mainWin, QObject* parent)
     : QObject(parent), mainWindow(mainWin)
 {
@@ -25,9 +22,24 @@ Engine::Engine(QWidget* mainWin, QObject* parent)
 
 void Engine::Start()
 {
-  if (!load_saved_game()) {
-    start_new_game();
-  }
+  init_variables();
+
+  if (load_game()) {
+    emit sig_message(tr("Previous saved game has been loaded!"));
+  } else {
+      // Remove any previous backup of saved game file.
+      // Or file.rename() will fail, and we'll always start a game
+      // with a corrupted saved game.
+      QFile file_corrupted(QDir::homePath() + SAVEDGAME_CORRUPTED);
+      if (file_corrupted.exists())
+        file_corrupted.remove();
+
+      // Make a backup of the current corrupted game. (for analyze)
+      QFile file(QDir::homePath() + SAVEDGAME_FILENAME);
+      file.rename(QDir::homePath() + SAVEDGAME_CORRUPTED);
+      emit sig_message(errorMessage(ERRCORRUPTED));
+      start_new_game();
+    }
 }
 
 int Engine::getRandomNameIndex() {
@@ -76,7 +88,7 @@ void Engine::init_variables()
 }
 
 // clear the tricks pile
-  currentTrick.clear();
+   currentTrick.clear();
 
 // Set the leading suit
   currentSuit = CLUBS;
@@ -91,6 +103,7 @@ void Engine::init_variables()
   queen_spade_in_trick = false;
 
   jack_diamond_owner = PLAYER_NOBODY;
+  previous_winner = PLAYER_SOUTH;
 
   best_hand = 0;
 
@@ -308,7 +321,6 @@ void Engine::cpus_select_cards()
 
 void Engine::Loop()
 {
-  static bool firstTime = true;
   bool tram;
   PLAYER owner;
   int cardId;
@@ -374,7 +386,8 @@ void Engine::Loop()
                              emit sig_your_turn();
                            }
                            break;
-     case PLAY_A_CARD_1 :
+     case PLAY_A_CARD_1 : previous_winner = turn;
+                          currentTrick.clear();
      case PLAY_A_CARD_2 :
      case PLAY_A_CARD_3 :
      case PLAY_A_CARD_4 : qDebug() << "Play a card: " << game_status;
@@ -423,7 +436,7 @@ void Engine::Loop()
                        qDebug() << "Westh: " << playerHandsById[PLAYER_WEST] << "sise:" << playerHandsById[PLAYER_WEST].size();
                        qDebug() << "North: " << playerHandsById[PLAYER_NORTH] << "sise:" << playerHandsById[PLAYER_NORTH].size();
                        qDebug() << "East: " << playerHandsById[PLAYER_EAST] << "sise:" << playerHandsById[PLAYER_EAST].size();
-                       qDebug() << "Pile: " << currentTrick;
+  //                     qDebug() << "Pile: " << currentTrick;
 
                         cpt_played = 1;
                         if (cards_left > 0) {
@@ -449,6 +462,11 @@ void Engine::Loop()
                          sendGameResult();
                          emit sig_play_sound(SOUND_GAME_OVER);
                          emit sig_update_stat(0, STATS_GAME_FINISHED);
+                         for (int p = 0; p < 4; p++) {
+                           // while new game will call init_variables, and this list will be cleared.
+                           // This clear() prevent using the reveal button to show cards that weren't "played" before a TRAM.
+                           playerHandsById[p].clear();
+                         }
                          emit sig_clear_deck();
                          break;
   }
@@ -490,27 +508,22 @@ void Engine::advance_turn()
 
 void Engine::advance_direction()
 {
-  QString mesg, dirName;
+  QString mesg;
 
   switch(direction) {
     case PASS_LEFT:   direction = PASS_RIGHT;
-                      dirName = tr("right");
+                      mesg = tr("We now pass the cards to the person on the right.");
                       break;
     case PASS_RIGHT:  direction = PASS_ACROSS;
-                      dirName = tr("across");
+                      mesg = tr("We now pass the cards to the player opposite.");
                       break;
     case PASS_ACROSS: direction = PASS_HOLD;
-                      dirName = "";
+                      mesg = tr("No card exchange this round.");
                       break;
     case PASS_HOLD:   direction = PASS_LEFT;
-                      dirName = tr("left");
+                      mesg = tr("We now pass the cards to the person on the left.");
                       break;
   }
-  if (direction == PASS_HOLD) {
-    mesg = tr("No card exchange this round.");
-  } else {
-      mesg = tr("We now pass the cards to the ") + dirName + QString(".");
-    }
 
   emit sig_message(mesg);
 }
@@ -534,6 +547,9 @@ void Engine::Play(int cardId, PLAYER player)
 {
   playerHandsById[player].removeAll(cardId);
   cards_left--;
+
+  currentTrick.append(cardId);
+
   check_for_best_hand(player, cardId);
 
   // MainWindow already play / animate the move for PLAYER_SOUTH. (removing disabled cards effect too)
@@ -1094,16 +1110,323 @@ int Engine::countCardsInSuit(PLAYER player, SUIT suit) const
   return count;
 }
 
-QString Engine::errorMessage(GAME_ERROR err) const
+bool Engine::save_game()
+{
+  if (game_status == GAME_OVER) {
+    return false;
+  }
+
+  if ((game_score == 0) && (cards_left == DECK_SIZE)) {
+    return false;
+  }
+
+  QFile file(QDir::homePath() + SAVEDGAME_FILENAME);
+
+  if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text)) {
+     return false;
+  }
+
+  QTextStream out(&file);
+
+  out << playersIndex[PLAYER_SOUTH] << " " << playersIndex[PLAYER_WEST] << " "
+      << playersIndex[PLAYER_NORTH] << " " << playersIndex[PLAYER_EAST] << "\n";
+
+  out << turn            << " " << QString::number(currentTrick.size()) << " "
+      << best_hand_owner << " " << jack_diamond_owner << " "
+      << direction       << " " << currentSuit << " " << "\n";
+
+  out << hearts_broken  << " " << trick_value << " "
+      << best_hand      << " " << (isPlaying() ? "1" : "0") << "\n";
+
+  out << hand_score[PLAYER_SOUTH] << " "
+      << hand_score[PLAYER_WEST]  << " "
+      << hand_score[PLAYER_NORTH] << " "
+      << hand_score[PLAYER_EAST]  << "\n";
+
+  out << total_score[PLAYER_SOUTH] << " "
+      << total_score[PLAYER_WEST]  << " "
+      << total_score[PLAYER_NORTH] << " "
+      << total_score[PLAYER_EAST]  << "\n";
+
+  for (int cardId : currentTrick) {
+    out << QString::number(cardId) << " ";
+  }
+
+  int fill;
+  fill = 4 - currentTrick.size();
+  for (int i = 0; i < fill; i++) {
+    out << QString::number(INVALID_CARD) << " ";
+  }
+  out << "\n";
+
+  for (int p = 0; p < 4; p++) {
+     QList<int> hand = playerHandsById[p];
+
+     for (int cardId : hand) {
+       out << QString::number(cardId) << " ";
+     }
+
+     fill = 13 - hand.size();
+     for (int i = 0; i < fill; i++) {
+       out << QString::number(INVALID_CARD) << " ";
+     }
+
+     out << "\n";
+  }
+
+  file.close();
+
+  return true;
+}
+
+bool Engine::load_game()
+{
+  QFile file(QDir::homePath() + SAVEDGAME_FILENAME);
+
+  if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    return false;
+  }
+
+  int cpt = 0;
+  int trickPileSize = 0;
+  bool card_found[DECK_SIZE] = {};
+
+  game_score = 0;
+
+  while (!file.atEnd()) {
+    int value;
+    QString line = file.readLine();
+    cpt++;
+    qDebug() << "Step: " << cpt;
+
+    switch (cpt) {
+       // Line #1: Data = 4 x players index (0 = You)
+       case 1: for (int p = 0; p < 4; p++) {
+                 value = line.section(' ', p, p).toInt();
+                 if ((value < 0) || (value >= MAX_PLAYERS_NAME)) {
+                   return false;
+                 }
+                 qDebug() << "case 1: " << value;
+                 playersIndex[p] = value;
+                 playersName[p] = names[value];
+               }
+               // check for duplicate.
+               for (int i = 0; i < 4; ++i)
+                 for (int j = i + 1; j < 4; ++j)
+                   if (playersIndex[i] == playersIndex[j])
+                     return false;
+               break;
+
+       // Line #2: Data = Turn, Trick Pile size, Best Hand owner, Jack of diamond owner, Direction, current suit
+       case 2: for (int d = 0; d < 6; d++) {
+                 value = line.section(' ', d, d).toInt();
+                           if ((value < -1) || (value > 4))
+                     return false;
+
+                   if ((value > 3) && (d != 5))                // current_suit can have value = 4 = FREESUIT
+                     return false;
+
+                   if ((value == -1) && (d != 2) && (d != 3))  // plr_best_hand, plr_jack_diamond = -1 = NOTFOUND
+                      return false;
+
+                   qDebug() << "case 2: " << value;
+                   switch (d) {
+                      case 0 : turn = (PLAYER)value; break;
+                      case 1 : trickPileSize = value; break;
+                      case 2 : best_hand_owner = (PLAYER)value; break;
+                      case 3 : jack_diamond_owner = (PLAYER)value; break;
+                      case 4 : direction = (DIRECTION)value; break;
+                      case 5 : currentSuit = (SUIT)value; break;
+                   }
+               }
+               break;
+
+        // Line #3: Data = Hearts broken, trick_value, best_hand, is playing
+        case 3: for (int i = 0; i < 4; i++) {
+                   value = line.section(' ', i, i).toInt();
+
+                   qDebug() << "case 3: " << value;
+                   switch (i) {
+                      case 0 : if ((value < 0) || (value > 1))
+                                 return false;
+                               hearts_broken = value;
+                               break;
+                      case 1 : if ((value < 0) || (value > 26))
+                                 return false;
+                               trick_value = value;
+                               break;
+                      case 2 : if ((value < CLUBS_TWO) || (value >= DECK_SIZE))
+                                 return false;
+                               best_hand = value;
+                               break;
+                      case 3 : if ((value < 0) || (value > 1))
+                                 return false;
+
+                               if (value == 0) {
+                                 game_status = SELECT_CARDS;
+                               } else {
+                                     switch (trickPileSize) {
+                                       case 1: game_status = PLAY_A_CARD_2;
+                                               break;
+                                       case 2: game_status = PLAY_A_CARD_3;
+                                               break;
+                                       case 3: game_status = PLAY_A_CARD_4;
+                                               break;
+                                       default: // ???
+                                               break;
+                                     }
+                                     // We'll only know later if PLAYER_SOUTH hold the two of clubs, then game_status should be play_two_clubs
+                                 }
+                               break;
+                    }
+                }
+               break;
+
+        // Line #4: Data = Players hand scores
+        case 4: for (int p = 0; p < 4; p++) {
+                  value = line.section(' ', p, p).toInt();
+                  qDebug() << "case 4: " << value;
+
+                   if ((value < 0) || (value > 26))
+                     return false;
+                   hand_score[p] = value;
+                }
+               break;
+
+        // Line #5: Data = Players total scores
+        case 5: for (int p = 0; p < 4; p++) {
+                  value = line.section(' ', p, p).toInt();
+                  qDebug() << "case 5: " << value;
+
+                  if (value < 0) {
+                     return false;
+                  }
+                  if ((value >= GAME_OVER_SCORE) && !variant_no_draw)
+                    return false;
+                  total_score[p] = value;
+                  if (value > game_score) {
+                    game_score = value;
+                  }
+                 }
+                break;
+
+        // Line #6: Data = Trick Pile
+        case 6: for (int i = 0; i < 4; i++) {
+                  value = line.section(' ', i, i).toInt();
+                  qDebug() << "case 6: " << value;
+
+                  if (value == INVALID_CARD)
+                    break;
+
+                  if (card_found[value]) return false;
+
+                  if (value == DIAMONDS_JACK)
+                    jack_diamond_in_trick = true;
+
+                  card_found[value] = true;
+
+                  if (value == INVALID_CARD) break;
+                  if ((value < CLUBS_TWO) || (value >= DECK_SIZE)) {
+                    return false;
+                  }
+                  currentTrick.append(value);
+                }
+                break;
+
+        // Line #7 - #10: Data = 4 x Players hand.
+        case 7:
+        case 8:
+        case 9:
+        case 10: for (int i = 0; i < 13; i++) {
+                  value = line.section(' ', i, i).toInt();
+                  qDebug() << "case 7: " << value;
+
+                  if (value == INVALID_CARD)
+                    break;
+
+                  if (card_found[value]) {
+                    return false;
+                  }
+
+                  if ((value < CLUBS_TWO) || (value >= DECK_SIZE))
+                    return false;
+
+                  card_found[value] = true;
+
+                  playerHandsById[cpt - 7].append(value);
+                }
+                 break;
+
+        default: break;
+    }
+  }
+
+  if (trickPileSize) {}; // avoid compiler warning
+
+  if (cpt != 10) return false;
+
+  cards_left = 0;
+  for (int p = 0; p < 4; p++) {
+    cards_left += playerHandsById[p].size();
+  }
+
+qDebug() << "Cards Left: " << cards_left;
+qDebug() << "SOUTH" << playerHandsById[PLAYER_SOUTH];
+qDebug() << "WEST" << playerHandsById[PLAYER_WEST];
+qDebug() << "NORTH" << playerHandsById[PLAYER_NORTH];
+qDebug() << "EAST" << playerHandsById[PLAYER_EAST];
+qDebug() << "Pile" << trickPileSize;
+
+  if ((game_status == SELECT_CARDS) && (cards_left != DECK_SIZE))
+    return false;
+
+  if (isPlaying() && (cards_left < 1))
+    return false;
+
+  if (playersIndex[PLAYER_SOUTH] != 0)
+    return false;
+
+  int s = playerHandsById[PLAYER_SOUTH].size();
+  for (int p = 1; p < 4; p++) {
+    int diff = s - playerHandsById[p].size();
+    if ((diff < -1) || (diff > 1))
+      return false;
+  }
+
+ // emit sig_clear_deck();
+ // emit sig_enableAllCards();
+  firstTime = false;
+  emit sig_setTrickPile(currentTrick);
+qDebug() << "Pile: " << currentTrick;
+  emit sig_refresh_deck();
+
+  emit sig_new_players(playersName);
+  emit sig_update_scores_board(playersName, hand_score, total_score);
+
+  if (game_status == SELECT_CARDS) {
+    emit sig_pass_to(direction);
+  } else {
+      emit sig_your_turn();
+      if (playerHandsById[PLAYER_SOUTH].indexOf(CLUBS_TWO) != -1) {
+        game_status = PLAY_TWO_CLUBS;
+      }
+    }
+qDebug() << "Step H";
+
+  return true;
+}
+
+QString Engine::errorMessage(GAME_ERROR err)
 {
     switch (err) {
-        case NOERROR:     return "";
-        case ERR2CLUBS:   return tr("You must play the 2 of Clubs on the first trick!");
-        case ERRHEARTS:   return tr("Hearts are not broken yet!");
-        case ERRQUEEN:    return tr("The Queen of Spades is not allowed on the first trick!");
-        case ERRSUIT:     return tr("You must follow the suit led!");
-        case ERRINVALID:  return tr("Invalid card or not in your hand.");
-        case ERRLOCKED:   return tr("The game engine is busy, please try again when it's your turn to play.");
-        default:          return tr("Unknown error.");
+        case NOERROR:      return "";
+        case ERR2CLUBS:    return tr("You must play the 2 of Clubs on the first trick!");
+        case ERRHEARTS:    return tr("Hearts are not broken yet!");
+        case ERRQUEEN:     return tr("The Queen of Spades is not allowed on the first trick!");
+        case ERRSUIT:      return tr("You must follow the suit led!");
+        case ERRINVALID:   return tr("Invalid card or not in your hand.");
+        case ERRLOCKED:    return tr("The game engine is busy, please try again when it's your turn to play.");
+        case ERRCORRUPTED: return tr("The saved game file is corrupted! Deleted!");
+        default:           return tr("Unknown error.");
     }
 }

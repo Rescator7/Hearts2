@@ -114,13 +114,6 @@ void Background::setBackground(int index)
   if (index == BACKGROUND_NONE)
     return;
 
-  if ((index == BACKGROUND_LEAVES) || (index == BACKGROUND_MARBLE))
-    credit = tr("Background created using gimp 2.10.18");
-  else {
-    credit = tr("Background image by: ");
-    credit += FILES_CREDIT[index];
-  }
-
   filename = BACKGROUND_FILES[index];
   creditColor = CREDITS_COLOR[index];
 
@@ -130,11 +123,18 @@ void Background::setBackground(int index)
   aFile.setFileName(fullpath);
 
   if (!aFile.exists()) {
-    fullpath = QDir::homePath() + QString("/Hearts2/backgrounds/" + filename);
+    fullpath = QDir::homePath() + QString("/DEV/Hearts2/backgrounds/" + filename);
     aFile.setFileName(fullpath);
 
     if (!aFile.exists())
       return;
+  }
+
+  if ((index == BACKGROUND_LEAVES) || (index == BACKGROUND_MARBLE))
+    credit = tr("Background created using gimp 2.10.18");
+  else {
+    credit = tr("Background image by: ");
+    credit += FILES_CREDIT[index];
   }
 
   setBackgroundPixmap(fullpath, false);
