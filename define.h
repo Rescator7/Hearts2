@@ -41,7 +41,6 @@ enum SUIT {
    HEARTS       = 3,
    SUIT_COUNT   = 4,
    SUIT_ALL     = 5,
-   SUIT_NONE    = 6
 };
 
 constexpr bool isValid(SUIT suit) {

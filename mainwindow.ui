@@ -2051,7 +2051,7 @@ QPushButton:checked:hover {
              </size>
             </property>
             <property name="shortcut">
-             <string>Esc</string>
+             <string>Ctrl+C</string>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -3415,8 +3415,15 @@ QGroupBox QLabel {
             <height>24</height>
            </rect>
           </property>
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enable or disable the option to request confirmation from the user when using the exit button.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
-           <string>Confirm Exit (Button)</string>
+           <string>Confirm to Exit</string>
+          </property>
+          <property name="icon">
+           <iconset resource="resources.qrc">
+            <normaloff>:/icons/sign-out.svg</normaloff>:/icons/sign-out.svg</iconset>
           </property>
           <property name="checked">
            <bool>false</bool>
@@ -3431,6 +3438,9 @@ QGroupBox QLabel {
             <height>24</height>
            </rect>
           </property>
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enable or disable the game engine's ability to detect the winner of all remaining cards.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>Detect TRAM</string>
           </property>
@@ -3443,6 +3453,9 @@ QGroupBox QLabel {
             <width>161</width>
             <height>24</height>
            </rect>
+          </property>
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enable or disable &amp;quot;cheat mode&amp;quot;; when enabled, the &amp;quot;Reveal&amp;quot; button and the information tab listing the cards already played will be available.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="text">
            <string>Cheat mode</string>

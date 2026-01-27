@@ -91,7 +91,7 @@ void Sounds::setEnabled(bool activate)
   enabled = activate;
 
   if (!enabled) {
-    qDebug() << "Sounds stopped: " << activePlayers.size();
+ //   qDebug() << "Sounds stopped: " << activePlayers.size();
     stopAllSounds();
   }
 }

@@ -24,9 +24,12 @@ void Engine::Start()
 {
   init_variables();
 
-  if (load_game()) {
-    emit sig_message(tr("Previous saved game has been loaded!"));
-  } else {
+  QFile file(QDir::homePath() + SAVEDGAME_FILENAME);
+  if (file.exists()) {
+    if (load_game()) {
+      emit sig_message(tr("Previous saved game has been loaded!"));
+      file.remove();
+    } else {
       // Remove any previous backup of saved game file.
       // Or file.rename() will fail, and we'll always start a game
       // with a corrupted saved game.
@@ -35,11 +38,13 @@ void Engine::Start()
         file_corrupted.remove();
 
       // Make a backup of the current corrupted game. (for analyze)
-      QFile file(QDir::homePath() + SAVEDGAME_FILENAME);
       file.rename(QDir::homePath() + SAVEDGAME_CORRUPTED);
       emit sig_message(errorMessage(ERRCORRUPTED));
       start_new_game();
     }
+  } else {
+      start_new_game();
+  }
 }
 
 int Engine::getRandomNameIndex() {
@@ -136,11 +141,6 @@ GAME_ERROR Engine::start_new_game()
   return NOERROR;
 }
 
-bool Engine::load_saved_game()
-{
-  return false;
-}
-
 bool Engine::undo()
 {
   static bool success = false;
@@ -187,8 +187,6 @@ void Engine::sort_players_hand()
 
 void Engine::shuffle_deck()
 {
-    static bool firstTime = true;
-
     QList<int> shuffled_cards;
 
     int player = 0;
@@ -210,11 +208,9 @@ void Engine::shuffle_deck()
     }
 
 // We don't emit shuffle sound when booting the game either from a saved game or "new game".
-    if (firstTime) {
-      firstTime = false;
-    } else {
-        emit sig_play_sound(SOUND_SHUFFLING_CARDS);
-      }
+    if (!firstTime) {
+      emit sig_play_sound(SOUND_SHUFFLING_CARDS);
+    }
 }
 
 void Engine::completePassCards()
@@ -317,8 +313,6 @@ void Engine::cpus_select_cards()
   }
 }
 
-
-
 void Engine::Loop()
 {
   bool tram;
@@ -358,6 +352,7 @@ void Engine::Loop()
                              LockedLoop();
                            } else
                                emit sig_pass_to(direction);
+                           emit sig_busy(false);
                            locked = false;
                            break;
     case TRADE_CARDS:      qDebug() << "TRADE CARDS";
@@ -379,10 +374,12 @@ void Engine::Loop()
                            if ((owner != PLAYER_SOUTH) && (owner != PLAYER_NOBODY)) {
                              playerHandsById[owner].removeAll(CLUBS_TWO);
                              cards_left--;
+                             currentTrick.append(CLUBS_TWO);
                              emit sig_play_card(CLUBS_TWO, owner);
                            }
                            if (owner == PLAYER_SOUTH) {
                              locked = false;
+                             emit sig_busy(false);
                              emit sig_your_turn();
                            }
                            break;
@@ -404,6 +401,7 @@ void Engine::Loop()
                               if (turn == PLAYER_SOUTH) {
                                 qDebug() << "Your turn, cards left: " << cards_left;
                                 locked = false;
+                                emit sig_busy(false);
                                 emit sig_your_turn();
                               }
                               qDebug() << "Refresh";
@@ -458,6 +456,7 @@ void Engine::Loop()
                          LockedLoop();
                          break;
      case GAME_OVER:     qDebug() << "GAME_OVER";
+                         emit sig_busy(false);
                          locked = false;
                          sendGameResult();
                          emit sig_play_sound(SOUND_GAME_OVER);
@@ -503,6 +502,11 @@ void Engine::advance_turn()
     case PLAYER_COUNT :
     case PLAYER_NOBODY : qCritical() << "advance_turn invalid turn !";
   }
+
+  if (turn != PLAYER_SOUTH) {
+    emit sig_busy(true);
+  }
+
   cpt_played++;
 }
 
@@ -1220,23 +1224,20 @@ bool Engine::load_game()
        // Line #2: Data = Turn, Trick Pile size, Best Hand owner, Jack of diamond owner, Direction, current suit
        case 2: for (int d = 0; d < 6; d++) {
                  value = line.section(' ', d, d).toInt();
-                           if ((value < -1) || (value > 4))
-                     return false;
-
-                   if ((value > 3) && (d != 5))                // current_suit can have value = 4 = FREESUIT
-                     return false;
-
-                   if ((value == -1) && (d != 2) && (d != 3))  // plr_best_hand, plr_jack_diamond = -1 = NOTFOUND
-                      return false;
-
-                   qDebug() << "case 2: " << value;
+                   qDebug() << "case 2: " << value << " d: " << d;
                    switch (d) {
-                      case 0 : turn = (PLAYER)value; break;
-                      case 1 : trickPileSize = value; break;
-                      case 2 : best_hand_owner = (PLAYER)value; break;
-                      case 3 : jack_diamond_owner = (PLAYER)value; break;
-                      case 4 : direction = (DIRECTION)value; break;
-                      case 5 : currentSuit = (SUIT)value; break;
+                      case 0 : if ((value < 0) || (value > 3)) return false;
+                               turn = (PLAYER)value; break;
+                      case 1 : if ((value < 0) || (value > 3)) return false;
+                               trickPileSize = value; break;
+                      case 2 : if ((value < -1) || (value > 3)) return false;
+                               best_hand_owner = (PLAYER)value; break;
+                      case 3 : if ((value < -1) || (value > 3)) return false;
+                               jack_diamond_owner = (PLAYER)value; break;
+                      case 4 : if ((value < 0) || (value > 3)) return false;
+                               direction = (DIRECTION)value; break;
+                      case 5 : if ((value < 0) || (value == SUIT_COUNT) || (value > SUIT_ALL)) return false;
+                               currentSuit = (SUIT)value; break;
                    }
                }
                break;
@@ -1261,7 +1262,6 @@ bool Engine::load_game()
                                break;
                       case 3 : if ((value < 0) || (value > 1))
                                  return false;
-
                                if (value == 0) {
                                  game_status = SELECT_CARDS;
                                } else {
@@ -1272,7 +1272,7 @@ bool Engine::load_game()
                                                break;
                                        case 3: game_status = PLAY_A_CARD_4;
                                                break;
-                                       default: // ???
+                                       default:game_status = PLAY_A_CARD_1;
                                                break;
                                      }
                                      // We'll only know later if PLAYER_SOUTH hold the two of clubs, then game_status should be play_two_clubs
@@ -1379,6 +1379,7 @@ qDebug() << "Pile" << trickPileSize;
 
   if ((game_status == SELECT_CARDS) && (cards_left != DECK_SIZE))
     return false;
+qDebug() << "Step select";
 
   if (isPlaying() && (cards_left < 1))
     return false;

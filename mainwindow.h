@@ -75,6 +75,7 @@ protected:
     void resizeEvent(QResizeEvent *event) override;
     void showEvent(QShowEvent *event) override;
     bool eventFilter(QObject *obj, QEvent *event) override;
+    void closeEvent(QCloseEvent *event) override;
 
 private:
     QParallelAnimationGroup *animateCardsOffBoard(const QList<int>& cardsId, int winner);
@@ -82,6 +83,8 @@ private:
                                       QParallelAnimationGroup *masterGroup,
                                       int startDelay,
                                       int perCardStagger);
+    void tryQuit();
+
 private slots:
     void onCardClicked(QGraphicsItem *item);
     void onBackgroundPreviewClicked();

@@ -132,7 +132,6 @@ private:
     int countCardsInSuit(PLAYER player, SUIT suit) const;
     int leftInSuit(SUIT suit) const;
     int getRandomNameIndex();
-    bool load_saved_game();
     void sort_players_hand();
     void check_for_best_hand(PLAYER player, int cardId);
     void update_total_scores();
@@ -163,6 +162,7 @@ signals:
     void sig_play_sound(SOUNDS soundId);
     void sig_message(QString message);
     void sig_setTrickPile(QList<int> pile);
+    void sig_busy(bool b);
  //   void sig_error(QString err);
 
 public:
@@ -179,6 +179,9 @@ public:
     bool isPlaying() { return (game_status == PLAY_A_CARD_1) || (game_status == PLAY_A_CARD_2) ||
                               (game_status == PLAY_A_CARD_3) || (game_status == PLAY_A_CARD_4) ||
                               (game_status == PLAY_TWO_CLUBS); };
+    bool isBusy() {
+ //   qDebug() << "turn: " << turn << "status: " << game_status << "condition: " << ((turn != PLAYER_SOUTH) && (game_status != SELECT_CARDS) ? "1" : "0");
+    return (turn != PLAYER_SOUTH) && (game_status != SELECT_CARDS); };
     bool can_break_hearts(PLAYER player);
     int get_player_card(PLAYER player, int handIndex);
     int handSize(PLAYER player);

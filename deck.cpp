@@ -38,7 +38,6 @@ bool Deck::check_file(QString &filename) {
       return false;
     }
 
- //   qDebug() << filename << ": loaded.";
     return true;
 }
 
@@ -173,12 +172,9 @@ QGraphicsSvgItem *Deck::get_card_item(int cardId, bool revealed) {
   }
 
   if (revealed) {
-  // qDebug() << "Front ID: " << cardId << " Size: " << deck.size();
    return deck.at(cardId);
   }
   else {
-  // qDebug() << "Back ID: " << cardId << " Size: " << deck.size();
-
    return deck.at(cardId + 52);
   }
 }
@@ -196,13 +192,9 @@ void Deck::apply_settings(QGraphicsItem *item, int cardId) {
 
 // Désactive complètement l'effet de sélection visuel
     item->setSelected(false);
-    item->setFlag(QGraphicsItem::ItemHasNoContents, false); // si tu veux
+    item->setFlag(QGraphicsItem::ItemHasNoContents, false);
 
     item->hide();
-
-  //  QRectF native = item->boundingRect();
-  //  item->setTransformOriginPoint(native.center());  // ← CENTRE !
- // item->setTransformOriginPoint(item->boundingRect().center());
 }
 
 void Deck::reset_selections()

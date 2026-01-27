@@ -8,7 +8,6 @@ CardScene::CardScene(QObject *parent) : QGraphicsScene(parent) {}
 
 void CardScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-qDebug() << "****";
     if (event->button() != Qt::LeftButton) {
         QGraphicsScene::mousePressEvent(event);
         return;
@@ -35,9 +34,6 @@ qDebug() << "****";
           return;  // Ignore click completely
         }
 
-        // 3. Optional: skip your turn arrow explicitly by type (very safe)
-        // if (dynamic_cast<TurnArrow*>(item)) continue;
-
         // 4. Skip background or other non-card items (by negative Z or data key)
         if (item->zValue() < 0) {
             continue;
@@ -48,10 +44,6 @@ qDebug() << "****";
           emit arrowClicked();
           continue;
         }
-
-        // 5. Only accept actual cards — you can add a data key or type check
-        // Example: if your cards have item->setData(0, "card");
-        // if (item->data(0).toString() != "card") continue;
 
         // If we reach here: it's a clickable, selectable card
         clickedCard = item;

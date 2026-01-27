@@ -351,7 +351,7 @@ MainWindow::MainWindow(QWidget *parent)
    // Global quick Quit with shortcut Ctrl+Q
     QShortcut *quitShortcut = new QShortcut(QKeySequence("Ctrl+Q"), this);
     quitShortcut->setContext(Qt::ApplicationShortcut);
-    connect(quitShortcut, &QShortcut::activated, qApp, &QApplication::quit);
+    connect(quitShortcut, &QShortcut::activated, this, &MainWindow::tryQuit);
 
     connect(ui->pushButton_exit, &QPushButton::clicked, this, [this]() {
        if (!ui->checkBox_confirm_exit->isChecked()) {
@@ -610,6 +610,7 @@ void MainWindow::applyAllSettings()
 //            resizeEvent(QResizeEvent *event)
 //            eventFilter(QObject *obj, QEvent *event)
 //            showEvent(QShowEvent *event)
+//            closeEvent(QCloseEvent *event) override
 //
 // Section 2- [ Private Slots ]
 //            onDeckChanged(int deckId)
@@ -731,6 +732,67 @@ void MainWindow::showEvent(QShowEvent *event)
         });
     }
 }
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    qDebug() << "closeEvent appelé, busy =" << engine->isBusy();
+
+    tryQuit();
+
+    event->ignore();
+}
+
+void MainWindow::tryQuit()
+{
+    if (!engine->isBusy()) {
+        qDebug() << "tryQuit : idle → fermeture immédiate";
+        qApp->quit();
+        return;
+    }
+
+    sounds->setEnabled(false);
+    sounds->stopAllSounds();
+
+    ui->opt_animations->setChecked(false);
+    hide();
+
+    qDebug() << "tryQuit : busy → attente sig_busy(false)";
+
+    static QMetaObject::Connection busyConnection;
+
+    // On déconnecte l'ancienne si elle existe (pour éviter accumulation)
+    if (busyConnection) {
+        disconnect(busyConnection);
+    }
+
+    busyConnection = connect(engine, &Engine::sig_busy, this,
+        [this](bool busy) {
+            qDebug() << "sig_busy pendant fermeture :" << busy;
+            if (!busy) {
+                qDebug() << "→ idle détecté → on quitte";
+                qApp->quit();
+
+                // Optionnel : on peut déconnecter ici, mais pas obligatoire
+                // (la static reste mais la connexion est inactive)
+                if (busyConnection) {
+                    disconnect(busyConnection);
+                    busyConnection = {};  // reset pour la prochaine fois
+                }
+            }
+        });
+
+    QTimer::singleShot(10000, this, [this]() {
+        qWarning() << "Timeout → fermeture forcée";
+        qApp->quit();
+
+        // Nettoyage aussi dans le timeout
+        if (busyConnection) {
+            disconnect(busyConnection);
+            busyConnection = {};
+        }
+    });
+}
+
 // ************************************************************************************************
 
 
@@ -1428,37 +1490,6 @@ void MainWindow::createButtonsGroups()
     });
 }
 
-/*
-void MainWindow::createScoreDisplay()
-{
-    if (m_scoreGroup) return;
-
-    m_scoreGroup = new QGraphicsItemGroup();
-    m_scoreGroup->setZValue(Z_SCORE);
-
-    // Fond et texte (comme avant)
-    m_scoreBackground = new QGraphicsRectItem(0, 0, 320, 140);
-    m_scoreBackground->setBrush(QColor(30, 30, 50, 180));
-    m_scoreBackground->setPen(QPen(QColor(180, 180, 220, 200), 2));
-    m_scoreBackground->setOpacity(0.88);
-    m_scoreGroup->addToGroup(m_scoreBackground);
-
-    m_scoreText = new QGraphicsTextItem();
-    m_scoreText->setDefaultTextColor(Qt::white);
-    m_scoreText->setFont(QFont("Arial", 11));
-    m_scoreText->setPos(12, 12);
-    m_scoreGroup->addToGroup(m_scoreText);
-
-    scene->addItem(m_scoreGroup);
-
-    // Position initiale FORCÉE en bas à gauche (marge 20 px gauche, 80 px bas)
-    m_scoreGroup->setPos(20, 0);  // temporaire y=0 pour ajouter
-
-    // Appel immédiat pour repositionner correctement
-    updateScorePosition();
-}
-*/
-
 void MainWindow::createScoreDisplay()
 {
     if (m_scoreGroup) {
@@ -2109,12 +2140,6 @@ void MainWindow::animateDeal(int dealDuration, int delayBetweenCards)
         item->setZValue(ZLayer::Z_CARDS_BASE - i);  // Back card on top
         item->setVisible(true);
 
-        // Reset to center with shuffle for animation start
-    //    item->setPos(deckCenter);
-     //   item->setRotation(QRandomGenerator::global()->bounded(-8, 9));
-
-        // NOW calculate final target position and rotation
-
         // Calculate final position
         set_card_pos(cardId, player, handIndex, revealed);
         QPointF targetPos = item->pos();
@@ -2125,10 +2150,6 @@ void MainWindow::animateDeal(int dealDuration, int delayBetweenCards)
         // Reset for animation start
         item->setPos(deckCenter);
         item->setRotation(QRandomGenerator::global()->bounded(-8, 9));
-
-        // Reset again for animation start (only pos and random rotation)
-     //   item->setPos(deckCenter);
-   //     item->setRotation(QRandomGenerator::global()->bounded(-8, 9));
 
         // Create parallel group
         QParallelAnimationGroup *group = new QParallelAnimationGroup(this);
@@ -2489,12 +2510,6 @@ void MainWindow::disableInvalidCards()
         GAME_ERROR err = engine->validate_move(PLAYER_SOUTH, cardId);
         bool isLegal = (err == NOERROR);
 
-        // Optionnel : on peut aussi utiliser legalSuit si tu veux garder une pré-filtration rapide
-        // mais la vérification moteur est plus fiable et complète
-        // if (legalSuit != SUIT_ALL && legalSuit != SUIT_NONE) {
-        //     isLegal = isLegal && ((cardId / 13) == legalSuit);
-        // }
-
         if (isLegal) {
             card->setOpacity(1.0);
             card->setGraphicsEffect(nullptr);
@@ -2507,13 +2522,9 @@ void MainWindow::disableInvalidCards()
             card->setGraphicsEffect(effect);
             card->setData(10, true);   // Disabled
             card->setToolTip(engine->errorMessage(err));
-
-            // Optionnel : afficher le motif de l'erreur pour debug
-            // qDebug() << "Carte" << cardId << "invalide :" << engine->errorMessage(err);
         }
     }
 
-    // Optionnel : rafraîchir la scène pour que les effets s'appliquent immédiatement
     scene->update();
 }
 
