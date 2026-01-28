@@ -94,6 +94,26 @@ private slots:
     void on_opt_animations_clicked();
     void on_pushButton_score_clicked();
 
+    void onYourTurn();
+    void onPlaySound(SOUNDS soundId);
+    void onUpdateStat(int player, STATS stat);
+    void onEngineMessage(const QString &msg);
+    void onSetTrickPile(const QList<int> &pile);
+    void onClearDeck();
+    void onCollectTricks(PLAYER winner, bool tram);
+    void onPlayCard(int cardId, PLAYER player);
+    void onDealCards();
+    void onPassed();
+    void onPassTo(int direction);
+    void onNewPlayers();
+    void onUpdateScoresBoard(const QString names[4], const int hand[4], const int total[4]);
+    void onUpdateStatScore(int player, int score);
+    void onNewGame();
+    void onTabChanged(int index);
+    void onDeckStyleClicked(int id);
+    void onVariantToggled(int id, bool checked);
+    void onAnimationToggled(int id, bool checked);
+
 private:
 /*
     QSize lastViewSize = QSize(0, 0);

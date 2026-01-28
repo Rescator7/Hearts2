@@ -66,6 +66,28 @@ class Engine : public QObject
     Q_OBJECT
 
 private:
+    struct UNDO {
+       bool available = false;
+       QList<int> playerHandsById[4];
+       QList<int> currentTrick;
+       bool hearts_broken = false;
+       bool jack_diamond_in_trick = false;
+       bool queen_spade_in_trick = false;
+       int cpt_played = 0;
+       int cards_left;
+       int game_score;
+       int best_hand = 0;
+       int trick_value = 0;
+       int hand_score[4] = {};
+       int total_score[4] = {};
+       DIRECTION direction = PASS_LEFT;
+       PLAYER best_hand_owner;
+       PLAYER jack_diamond_owner;
+       PLAYER turn;
+       PLAYER previous_winner;
+       GAME_STATUS game_status = SELECT_CARDS;
+       SUIT currentSuit = SUIT::CLUBS;
+    } undoStack;
     QWidget* mainWindow;
     QList<int> currentTrick;
     QList<int> playerHandsById[4];
@@ -138,6 +160,8 @@ private:
     int calculate_tricks_from_tram();
     void sendGameResult();
     void shoot_moon(int player);
+    void pushUndo();
+    void popUndo();
     void Loop();
 
 public:
@@ -155,7 +179,7 @@ signals:
     void sig_deal_cards();
     void sig_play_card(int cardId, PLAYER player);
     void sig_collect_tricks(PLAYER winner, bool TRAM);
-    void sig_new_players(const QString names[4]);
+    void sig_new_players();
     void sig_update_scores_board(const QString names[4], const int hand[4], const int total[4]);
     void sig_update_stat(int player, STATS stat);
     void sig_update_stat_score(int player, int score);
@@ -179,9 +203,8 @@ public:
     bool isPlaying() { return (game_status == PLAY_A_CARD_1) || (game_status == PLAY_A_CARD_2) ||
                               (game_status == PLAY_A_CARD_3) || (game_status == PLAY_A_CARD_4) ||
                               (game_status == PLAY_TWO_CLUBS); };
-    bool isBusy() {
- //   qDebug() << "turn: " << turn << "status: " << game_status << "condition: " << ((turn != PLAYER_SOUTH) && (game_status != SELECT_CARDS) ? "1" : "0");
-    return (turn != PLAYER_SOUTH) && (game_status != SELECT_CARDS); };
+    bool isBusy() { return (turn != PLAYER_SOUTH) && (game_status != SELECT_CARDS); };
+    bool isMyTurn() { return isPlaying() && (turn == PLAYER_SOUTH); };
     bool can_break_hearts(PLAYER player);
     int get_player_card(PLAYER player, int handIndex);
     int handSize(PLAYER player);

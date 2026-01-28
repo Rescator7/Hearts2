@@ -15,7 +15,10 @@ Deck::Deck(QObject *parent) : QObject(parent)
 }
 
 Deck::~Deck() {
-  // No need to delete renderer — QObject parent auto-deletes children
+  if (renderer) {
+    delete renderer;
+    renderer = nullptr;
+  }
 }
 
 void Deck::delete_current_deck() {

@@ -113,6 +113,8 @@ void Engine::init_variables()
   best_hand = 0;
 
   trick_value = 0;
+
+  undoStack.available = false;
 }
 
 GAME_ERROR Engine::start_new_game()
@@ -133,25 +135,22 @@ GAME_ERROR Engine::start_new_game()
 
   generate_players_name();
   emit sig_message(tr("Starting a new game."));
-  emit sig_new_players(playersName);
+  emit sig_new_players();
   emit sig_update_stat(0, STATS_GAME_STARTED);
   emit sig_update_scores_board(playersName, hand_score, total_score);
-  Loop();
+  LockedLoop();
 
   return NOERROR;
 }
 
 bool Engine::undo()
 {
-  static bool success = false;
-
-  success ^= 1;
-
-  if (success) {
-    emit sig_update_stat(0, STATS_UNDO);
+  if (undoStack.available) {
+    popUndo();
+    return true;
   }
 
-  return success;
+ return false;
 }
 
 void Engine::sort_players_hand()
@@ -319,8 +318,6 @@ void Engine::Loop()
   PLAYER owner;
   int cardId;
 
-  bool yesNo = false; // for testing to be removed
-
   switch (game_status) {
      case NEW_ROUND:       qDebug() << "NEW ROUND";
                            locked = true;
@@ -342,10 +339,6 @@ void Engine::Loop()
     case SELECT_CARDS:     qDebug() << "SELECT_CARDS direction " << direction;
                            sort_players_hand();          // sort after animated deal
                            emit sig_refresh_deck();
-
-                           // testing
-                           // yesNo = getNewMoonChoice();
-                           // qDebug() << yesNo;
 
                            if (direction == PASS_HOLD) {
                              game_status = PLAY_TWO_CLUBS;
@@ -549,6 +542,13 @@ void Engine::check_for_best_hand(PLAYER player, int cardId)
 
 void Engine::Play(int cardId, PLAYER player)
 {
+  // TODO: Maybe i could check if the move is valid for PLAYER_SOUTH ?
+  // This would be required if "disableInvalidMove" is made as a settings option.
+
+  if (player == PLAYER_SOUTH) {
+    pushUndo();
+  }
+
   playerHandsById[player].removeAll(cardId);
   cards_left--;
 
@@ -1348,6 +1348,11 @@ bool Engine::load_game()
                     return false;
                   }
 
+                  // Now we can be more precise about is_playing is true.
+                  if ((value == CLUBS_TWO) && (game_status != SELECT_CARDS)) {
+                    game_status = PLAY_TWO_CLUBS;
+                  }
+
                   if ((value < CLUBS_TWO) || (value >= DECK_SIZE))
                     return false;
 
@@ -1397,24 +1402,79 @@ qDebug() << "Step select";
  // emit sig_clear_deck();
  // emit sig_enableAllCards();
   firstTime = false;
+
   emit sig_setTrickPile(currentTrick);
 qDebug() << "Pile: " << currentTrick;
   emit sig_refresh_deck();
 
-  emit sig_new_players(playersName);
+  emit sig_new_players();
   emit sig_update_scores_board(playersName, hand_score, total_score);
 
-  if (game_status == SELECT_CARDS) {
-    emit sig_pass_to(direction);
-  } else {
-      emit sig_your_turn();
-      if (playerHandsById[PLAYER_SOUTH].indexOf(CLUBS_TWO) != -1) {
-        game_status = PLAY_TWO_CLUBS;
-      }
-    }
+qDebug() << "STATUS: " << game_status;
+
+  LockedLoop();
+
 qDebug() << "Step H";
 
   return true;
+}
+
+void Engine::pushUndo()
+{
+  undoStack.available = true;
+  for (int i = 0; i < 4; i++) {
+    undoStack.playerHandsById[i] = playerHandsById[i];
+    undoStack.hand_score[i] = hand_score[i];
+    undoStack.total_score[i] = total_score[i];
+  }
+  undoStack.currentTrick = currentTrick;
+  undoStack.hearts_broken = hearts_broken;
+  undoStack.jack_diamond_in_trick = jack_diamond_in_trick;
+  undoStack.queen_spade_in_trick = queen_spade_in_trick;
+  undoStack.cpt_played = cpt_played;
+  undoStack.cards_left = cards_left;
+  undoStack.game_score = game_score;
+  undoStack.best_hand = best_hand;
+  undoStack.trick_value = trick_value;
+  undoStack.direction = direction;
+  undoStack.best_hand_owner = best_hand_owner;
+  undoStack.jack_diamond_owner = jack_diamond_owner;
+  undoStack.turn = turn;
+  undoStack.previous_winner = previous_winner;
+  undoStack.game_status = game_status;
+  undoStack.currentSuit = currentSuit;
+}
+
+void Engine::popUndo()
+{
+  undoStack.available = false;
+  for (int i = 0; i < 4; i++) {
+    playerHandsById[i] = undoStack.playerHandsById[i];
+    hand_score[i] = undoStack.hand_score[i];
+    total_score[i] = undoStack.total_score[i];
+  }
+  currentTrick = undoStack.currentTrick;
+  hearts_broken = undoStack.hearts_broken;
+  jack_diamond_in_trick = undoStack.jack_diamond_in_trick;
+  queen_spade_in_trick = undoStack.queen_spade_in_trick;
+  cpt_played = undoStack.cpt_played;
+  cards_left = undoStack.cards_left;
+  game_score = undoStack.game_score;
+  best_hand = undoStack.best_hand;
+  trick_value = undoStack.trick_value;
+  direction = undoStack.direction;
+  best_hand_owner = undoStack.best_hand_owner;
+  jack_diamond_owner = undoStack.jack_diamond_owner;
+  turn = undoStack.turn;
+  previous_winner = undoStack.previous_winner;
+  game_status = undoStack.game_status;
+  currentSuit = undoStack.currentSuit;
+
+  emit sig_setTrickPile(currentTrick);
+  emit sig_refresh_deck();
+  emit sig_update_scores_board(playersName, hand_score, total_score);
+
+  LockedLoop();
 }
 
 QString Engine::errorMessage(GAME_ERROR err)

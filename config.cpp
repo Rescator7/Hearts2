@@ -323,10 +323,13 @@ bool Config::load_config_file() {
       else
       if (param == "Cheat_Reveal")
         cheat_reveal = enable;
+      else
+      if (param == "Confirm_New_Game")
+        confirm_new_game = enable;
       else {
           // unknown param
       }
-      if (cpt > 47) break; // too many lines ?? corrupted file ??
+      if (cpt > 48) break; // too many lines ?? corrupted file ??
   }
   file.close();
 
@@ -406,6 +409,7 @@ bool Config::set_config_file(int param, bool enable)
     case CONFIG_ANIM_TURN_INDICATOR :     anim_turn_indication = enable; break;
     case CONFIG_CONFIRM_EXIT :            confirm_exit = enable; break;
     case CONFIG_CHEAT_REVEAL :            cheat_reveal = enable; break;
+    case CONFIG_COMFIRM_NEW_GAME :        confirm_new_game = enable; break;
   }
 
   return save_config_file();
@@ -486,6 +490,7 @@ bool Config::save_config_file()
   out << "Easy_Card_Selection = " << (easy_card_selection ? "true" : "false") << "\n";
   out << "Card_Display = " << (card_display ? "true" : "false") << "\n";
   out << "Confirm_Exit = " << (confirm_exit ? "true" : "false") << "\n";
+  out << "Confirm_New_Game = " << (confirm_new_game ? "true" : "false") << "\n";
   out << "Empty_Slot = " << (empty_slot_opaque ? "true" : "false") << "\n";
   out << "Auto_Start = " << (auto_start ? "true" : "false") << "\n";
   out << "Anim_Deal_Cards = " << (anim_deal_cards ? "true" : "false") << "\n";

@@ -39,7 +39,8 @@ enum CONFIG {
      CONFIG_ANIMATED_ARROW          = 27,
      CONFIG_ANIM_TURN_INDICATOR     = 28,
      CONFIG_CONFIRM_EXIT            = 29,
-     CONFIG_CHEAT_REVEAL            = 30
+     CONFIG_CHEAT_REVEAL            = 30,
+     CONFIG_COMFIRM_NEW_GAME        = 31
 };
 
 constexpr int HEARTS_TEXT_ONLY               = 0;
@@ -124,6 +125,7 @@ private:
     bool empty_slot_opaque = true;
     bool confirm_exit = true;
     bool cheat_reveal = false;
+    bool confirm_new_game = true;
 
     // Animations
     bool animations = true;
@@ -195,6 +197,7 @@ public:
     bool is_anim_turn_indicator() { return anim_turn_indication; };
     bool is_confirm_exit() { return confirm_exit; };
     bool is_cheat_reveal() { return cheat_reveal; };
+    bool is_confirm_new_game() { return confirm_new_game; };
 };
 
 #endif // CONFIG_H

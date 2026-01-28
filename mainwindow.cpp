@@ -163,58 +163,24 @@ MainWindow::MainWindow(QWidget *parent)
       config->set_config_file(CONFIG_SOUNDS, checked);
     });
 
-    connect(ui->pushButton_new, &QPushButton::clicked, this, [this]() {
-      // unselect any selected cards.
-      selectedCards.clear();
-      deck->reset_selections();
-
-        // Anti-spam
-      if (newGameDebounceTimer && newGameDebounceTimer->isActive()) {
-        qDebug() << "New game ignoré (debounce)";
-        return;
-      }
-
-      if (!newGameDebounceTimer) {
-        newGameDebounceTimer = new QTimer(this);
-        newGameDebounceTimer->setSingleShot(true);
-      }
-      newGameDebounceTimer->start(1000);
-
-      qDebug() << "new game";
-      GAME_ERROR err = engine->start_new_game();
-      if (err) {
-      qDebug() << "pushButton_new";
-        message(engine->errorMessage(err), MESSAGE_ERROR);
-      }
-      // Note: engine will emit sig_clear_deck() --> scene->clear() + clearTricks() + yourTurnIndicator->hide() = arrowLabel->hide()
-    });
+    connect(ui->pushButton_new, &QPushButton::clicked, this, &MainWindow::onNewGame);
 
     connect(ui->pushButton_undo, &QPushButton::clicked, this, [this]() {
-      engine->undo() ? sounds->play(SOUND_UNDO) : sounds->play(SOUND_ERROR);
+      bool success = engine->undo();
+      if (success) {
+        sounds->play(SOUND_UNDO);
+        statistics->increase_stats(STATS_UNDO, PLAYER_SOUTH);
+        message(tr("The cancellation was successful!"), MESSAGE_INFO);
+      } else {
+          message(tr("There is no undo available!"), MESSAGE_ERROR);
+        }
     });
 
-    connect(ui->tabWidget, &QTabWidget::currentChanged, this, [this](int index) {
-      if (index == 0) {  // Switched TO Board tab
-        QTimer::singleShot(0, this, [this]() {
-          QSize currentSize = ui->graphicsView->size();
-
-          bool sizeChanged = (currentSize != lastBoardViewSize);
-          bool needsFullReposition = sizeChanged && windowWasResizedWhileAway;
-
-          updateSceneRect();
-          if (needsFullReposition) {
-            repositionAllCardsAndElements();
-            lastBoardViewSize = currentSize;
-          }
-          else {
-            refresh_deck();
-            updateTrickPile();
-          }
-
-          windowWasResizedWhileAway = false;
-        });
-      }
+    connect(ui->checkBox_new_game, &QCheckBox::clicked, this, [this](bool checked) {
+      config->set_config_file(CONFIG_COMFIRM_NEW_GAME, checked);
     });
+
+    connect(ui->tabWidget, &QTabWidget::currentChanged, this, &MainWindow::onTabChanged);
 
     connect(background, &Background::backgroundChanged, this, [this](const QString &path) {
         if (loadBackgroundPreview(path)) {
@@ -227,124 +193,29 @@ MainWindow::MainWindow(QWidget *parent)
       message(mesg, MESSAGE_SYSTEM);
     });
 
-    connect(engine, &Engine::sig_your_turn, this, [this]() {
-       disableInvalidCards();
-       showTurnIndicator();
-    });
-
-    connect(engine, &Engine::sig_play_sound, this, [this](SOUNDS soundId) {
-      sounds->play(soundId);
-    });
-
-    connect(engine, &Engine::sig_update_stat, this, [this](int player, STATS stat) {
-      statistics->increase_stats(player, stat);
-    });
-
-    connect(engine, &Engine::sig_update_stat_score, this, [this](int player, int score) {
-      statistics->set_score(player, score);
-    });
-
-    connect(engine, &Engine::sig_message, this, [this](QString mesg) {
-      message(mesg, MESSAGE_INFO);
-    });
-
-    connect(engine, &Engine::sig_setTrickPile, this, [this](QList<int> pile) {
-      int cpt = 0;
-      currentTrick = pile;
-      for (int i = pile.size() - 1; i >= 0; --i) {
-        QGraphicsSvgItem *item = deck->get_card_item(currentTrick.at(i), true);
-        switch (cpt) {
-          case 0: item->setRotation(-90); break;
-          case 1: item->setRotation(180); break;
-          case 2: item->setRotation(90); break;
-                  break;
-        }
-        cpt++;
-        item->setZValue(Z_TRICKS_BASE - cpt);
-      }
-      updateTrickPile();
-    });
 /*
     connect(engine, &Engine::sig_error, this, [this](QString err) {
       sounds->play(SOUND_ERROR);
       message(err);
     });
 */
-
- //   connect(engine, &Engine::sig_setCurrentSuit, this, &MainWindow::setCurrentSuit);
+ // connect(engine, &Engine::sig_setCurrentSuit, this, &MainWindow::setCurrentSuit);
+    connect(engine, &Engine::sig_your_turn, this, &MainWindow::onYourTurn);
+    connect(engine, &Engine::sig_play_sound, this, &MainWindow::onPlaySound);
+    connect(engine, &Engine::sig_update_stat, this, &MainWindow::onUpdateStat);
+    connect(engine, &Engine::sig_update_stat_score, this, &MainWindow::onUpdateStatScore);
+    connect(engine, &Engine::sig_message, this, &MainWindow::onEngineMessage);
+    connect(engine, &Engine::sig_setTrickPile, this, &MainWindow::onSetTrickPile);
     connect(engine, &Engine::sig_enableAllCards, this, &MainWindow::enableAllCards);
     connect(engine, &Engine::sig_refresh_deck, this, &MainWindow::refresh_deck);
-    connect(engine, &Engine::sig_clear_deck, this, [this]() {
-       scene->clear();
-       clearTricks();
-       yourTurnIndicator->hide();
-       arrowLabel->hide();
-    });
-
-    connect(engine, &Engine::sig_new_players, this, [this](const QString names[4]) {
-       updatePlayerNames();
-    });
-
-    connect(engine, &Engine::sig_update_scores_board, this, [this](const QString names[4], const int hand[4], const int total[4]) {
-       updateScores(names, hand, total, icons);
-    });
-
-    connect(engine, &Engine::sig_collect_tricks, this, [this](PLAYER winner, bool TRAM) {
-       if (ui->opt_animations->isChecked() && ui->opt_anim_collect_tricks->isChecked()) {
-         animateCollectTrick(winner, TRAM);
-       } else {
-           QTimer::singleShot(1000, this, [this]() {
-             clearTricks();
-             engine->Step();
-           });
-         }
-    });
-
-    connect(engine, &Engine::sig_play_card, this, [this](int cardId, PLAYER player) {
-       sounds->play(SOUND_DEALING_CARD);
-       playCard(cardId, player);
-    });
-
-    connect(engine, &Engine::sig_deal_cards, this, [this]() {
-      if (ui->opt_animations->isChecked() && ui->opt_anim_deal_cards->isChecked()) {
-        animateDeal();
-      } else {
-          engine->Step();
-      }
-    });
-
-    connect(engine, &Engine::sig_passed, this, [this]() {
-       if (ui->opt_animations->isChecked() && (ui->opt_anim_pass_cards->isChecked())) {
-         QList<int> passedCards[4];
-         passedCards[PLAYER_SOUTH] = engine->getPassedCards(PLAYER_SOUTH);
-         passedCards[PLAYER_WEST] = engine->getPassedCards(PLAYER_WEST);
-         passedCards[PLAYER_NORTH] = engine->getPassedCards(PLAYER_NORTH);
-         passedCards[PLAYER_EAST] = engine->getPassedCards(PLAYER_EAST);
-
-        setAnimationLock();
-    //    ui->graphicsView->setCursor(Qt::ArrowCursor);
-
-     //    2. Avance les cartes de l'IA (West, North, East) vers le centre
-        highlightAIPassedCards(PLAYER_WEST,  passedCards[PLAYER_WEST]);
-        highlightAIPassedCards(PLAYER_NORTH, passedCards[PLAYER_NORTH]);
-        highlightAIPassedCards(PLAYER_EAST,  passedCards[PLAYER_EAST]);
-
-        // 3. Attends un court instant (ex. 1 seconde) pour que le joueur voie
-        QTimer::singleShot(1000, this, [this, passedCards]() {
-            // Une fois le délai passé, lance l'animation réelle
-            sounds->play(SOUND_PASSING_CARDS);
-
-            animatePassCards(passedCards, engine->Direction());
-        });
-      } else {
-           deck->reset_selections();
-           engine->Step();
-       }
-    });
-
-    connect(engine, &Engine::sig_pass_to, this, [this](int direction) {
-       showTurnArrow(direction);
-    });
+    connect(engine, &Engine::sig_clear_deck, this, &MainWindow::onClearDeck);
+    connect(engine, &Engine::sig_new_players, this, &MainWindow::onNewPlayers);
+    connect(engine, &Engine::sig_update_scores_board, this, &MainWindow::onUpdateScoresBoard);
+    connect(engine, &Engine::sig_collect_tricks, this, &MainWindow::onCollectTricks);
+    connect(engine, &Engine::sig_play_card, this, &MainWindow::onPlayCard);
+    connect(engine, &Engine::sig_deal_cards, this, &MainWindow::onDealCards);
+    connect(engine, &Engine::sig_passed, this, &MainWindow::onPassed);
+    connect(engine, &Engine::sig_pass_to, this, &MainWindow::onPassTo);
 
     connect(qApp, &QCoreApplication::aboutToQuit, this, &MainWindow::aboutToQuit);
 
@@ -371,19 +242,10 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    delete ui;
-    delete config;
-    delete deckGroup;
-    delete variantsGroup;
-    delete languageGroup;
-    delete animationsGroup;
-    delete sounds;
-    delete deck;
-    delete engine;
-    delete background;
-    delete arrowLabel;
-    delete arrowMovie;
-    delete scene;
+    disconnect(this, nullptr, nullptr, nullptr);
+    delete config; config = nullptr; // no parent
+
+    qDebug() << "~MainWindow() terminé";
 }
 
 void MainWindow::aboutToQuit()
@@ -564,6 +426,9 @@ void MainWindow::applyAllSettings()
   enabled = config->is_cheat_reveal();
   ui->pushButton_reveal->setChecked(enabled);
 
+  enabled = config->is_confirm_new_game();
+  ui->checkBox_new_game->setChecked(enabled);
+
   // This settings must be applied after is_cheat_reveal(), so setCheatMode will unset
   // reveal pushButton if the overall cheat mode has been set to false.
   enabled = config->is_cheat_mode();
@@ -604,7 +469,6 @@ void MainWindow::applyAllSettings()
 }
 
 
-
 // ************************************************************************************************
 // Section 1- [ EVENTS OVERRIDE ]
 //            resizeEvent(QResizeEvent *event)
@@ -617,6 +481,26 @@ void MainWindow::applyAllSettings()
 //            onBackgroundPreviewClicked()
 //            onCardClicked(QGraphicsItem *item)
 //            onArrowClicked
+//
+//            onYourTurn();
+//            onPlaySound(SOUNDS soundId);
+//            onUpdateStat(int player, STATS stat);
+//            onEngineMessage(const QString &msg);
+//            onSetTrickPile(const QList<int> &pile);
+//            onClearDeck();
+//            onCollectTricks(PLAYER winner, bool tram);
+//            onPlayCard(int cardId, PLAYER player);
+//            onDealCards();
+//            onPassed();
+//            onPassTo(int direction);
+//            onNewPlayers(const QString names[4]);
+//            onUpdateScoresBoard(const QString names[4], const int hand[4], const int total[4]);
+//            onUpdateStatScore(int player, int score);
+//            onNewGame();
+//            onTabChanged(int index);
+//            onDeckStyle(int id);
+//            onVariantToggled(int id, bool checked);
+//            onAnimationToggled(int id, bool checked);
 //
 // Section 3- [ Create Functions ]
 //            createCreditsLabel()
@@ -728,7 +612,6 @@ void MainWindow::showEvent(QShowEvent *event)
             updateSceneRect();
             repositionAllCardsAndElements();
             engine->Start();
-
         });
     }
 }
@@ -902,6 +785,245 @@ qDebug() << "before: " << selectedCards.size();
   //  update_cards_pos();
   }
 }
+
+void MainWindow::onYourTurn() {
+  disableInvalidCards();
+  showTurnIndicator();
+}
+
+void MainWindow::onPlaySound(SOUNDS soundId) {
+  sounds->play(soundId);
+}
+
+void MainWindow::onUpdateStat(int player, STATS stat) {
+  statistics->increase_stats(player, stat);
+}
+
+void MainWindow::onEngineMessage(const QString &msg) {
+  message(msg, MESSAGE_INFO);
+}
+
+void MainWindow::onSetTrickPile(const QList<int> &pile) {
+  int cpt = 0;
+  currentTrick = pile;
+  for (int i = pile.size() - 1; i >= 0; --i) {
+    QGraphicsSvgItem *item = deck->get_card_item(currentTrick.at(i), true);
+    switch (cpt) {
+      case 0: item->setRotation(-90); break;
+      case 1: item->setRotation(180); break;
+      case 2: item->setRotation(90); break;
+              break;
+    }
+    cpt++;
+    item->setZValue(Z_TRICKS_BASE - cpt);
+  }
+  updateTrickPile();
+}
+
+void MainWindow::onClearDeck() {
+  scene->clear();
+  clearTricks();
+  yourTurnIndicator->hide();
+  arrowLabel->hide();
+}
+
+void MainWindow::onCollectTricks(PLAYER winner, bool tram) {
+  if (ui->opt_animations->isChecked() && ui->opt_anim_collect_tricks->isChecked()) {
+    animateCollectTrick(winner, tram);
+  } else {
+      QTimer::singleShot(1000, this, [this]() {
+        clearTricks();
+        engine->Step();
+      });
+    }
+}
+
+void MainWindow::onPlayCard(int cardId, PLAYER player) {
+  sounds->play(SOUND_DEALING_CARD);
+  playCard(cardId, player);
+}
+
+void MainWindow::onDealCards() {
+  if (ui->opt_animations->isChecked() && ui->opt_anim_deal_cards->isChecked()) {
+    animateDeal();
+  } else {
+      engine->Step();
+    }
+}
+
+void MainWindow::onPassed() {
+  if (ui->opt_animations->isChecked() && (ui->opt_anim_pass_cards->isChecked())) {
+    QList<int> passedCards[4];
+    passedCards[PLAYER_SOUTH] = engine->getPassedCards(PLAYER_SOUTH);
+    passedCards[PLAYER_WEST] = engine->getPassedCards(PLAYER_WEST);
+    passedCards[PLAYER_NORTH] = engine->getPassedCards(PLAYER_NORTH);
+    passedCards[PLAYER_EAST] = engine->getPassedCards(PLAYER_EAST);
+
+    setAnimationLock();
+    //    ui->graphicsView->setCursor(Qt::ArrowCursor);
+
+    //    2. Avance les cartes de l'IA (West, North, East) vers le centre
+    highlightAIPassedCards(PLAYER_WEST,  passedCards[PLAYER_WEST]);
+    highlightAIPassedCards(PLAYER_NORTH, passedCards[PLAYER_NORTH]);
+    highlightAIPassedCards(PLAYER_EAST,  passedCards[PLAYER_EAST]);
+
+    // 3. Attends un court instant (ex. 1 seconde) pour que le joueur voie
+    QTimer::singleShot(1000, this, [this, passedCards]() {
+    // Une fois le délai passé, lance l'animation réelle
+      sounds->play(SOUND_PASSING_CARDS);
+      animatePassCards(passedCards, engine->Direction());
+    });
+  } else {
+      deck->reset_selections();
+      engine->Step();
+    }
+}
+
+void MainWindow::onPassTo(int direction) {
+  showTurnArrow(direction);
+}
+
+void MainWindow::onNewPlayers() {
+  updatePlayerNames();
+}
+
+void MainWindow::onUpdateScoresBoard(const QString names[4], const int hand[4], const int total[4]) {
+  updateScores(names, hand, total, icons);
+}
+
+void MainWindow::onUpdateStatScore(int player, int score) {
+  statistics->set_score(player, score);
+}
+
+void MainWindow::onNewGame() {
+  if (ui->checkBox_new_game->isChecked()) {
+    QMessageBox::StandardButton reply = QMessageBox::question(this,
+    tr("Start a new game?"),
+    tr("Are you ready to start a new game?"),
+    QMessageBox::Yes | QMessageBox::No,
+    QMessageBox::No);
+    if (reply == QMessageBox::No) {
+       return;
+    }
+  }
+
+  // unselect any selected cards.
+  selectedCards.clear();
+  deck->reset_selections();
+
+  // Anti-spam
+  if (newGameDebounceTimer && newGameDebounceTimer->isActive()) {
+    qDebug() << "New game ignoré (debounce)";
+    return;
+  }
+
+  if (!newGameDebounceTimer) {
+    newGameDebounceTimer = new QTimer(this);
+    newGameDebounceTimer->setSingleShot(true);
+  }
+  newGameDebounceTimer->start(1000);
+
+  qDebug() << "new game";
+  GAME_ERROR err = engine->start_new_game();
+  if (err) {
+    qDebug() << "pushButton_new";
+    message(engine->errorMessage(err), MESSAGE_ERROR);
+  }
+  // Note: engine will emit sig_clear_deck() --> scene->clear() + clearTricks() + yourTurnIndicator->hide() = arrowLabel->hide()
+}
+
+void MainWindow::onTabChanged(int index) {
+  if (index == 0) {  // Switched TO Board tab
+    QTimer::singleShot(0, this, [this]() {
+      QSize currentSize = ui->graphicsView->size();
+
+      bool sizeChanged = (currentSize != lastBoardViewSize);
+      bool needsFullReposition = sizeChanged && windowWasResizedWhileAway;
+
+      updateSceneRect();
+      if (needsFullReposition) {
+        repositionAllCardsAndElements();
+        lastBoardViewSize = currentSize;
+      } else {
+          refresh_deck();
+          updateTrickPile();
+        }
+
+      windowWasResizedWhileAway = false;
+    });
+  }
+}
+
+void MainWindow::onDeckStyleClicked(int id) {
+  if (deck->Style() == id)
+   return;
+
+  saveCurrentTrickState();
+  disableAllDecks();
+  if (deck->set_deck(id)) {
+    config->set_deck_style(id);
+    import_allCards_to_scene();
+
+    if (forced_new_deck) {
+      ui->tabWidget->setTabEnabled(0, true);
+      ui->tabWidget->setCurrentIndex(0);
+      forced_new_deck = false;
+      if (start_engine_dalayed) {
+        start_engine_dalayed = false;
+        engine->Start();
+      }
+    }
+  } else {
+      disableDeck(id);
+      valid_deck[id] = false;
+    }
+
+  enableAllDecks();
+  restoreTrickCards();
+  if (engine->isMyTurn()) {
+    disableInvalidCards();
+  }
+
+  scene->update();
+}
+
+void MainWindow::onVariantToggled(int id, bool checked) {
+  QAbstractButton *button = variantsGroup->button(id);
+
+  switch (id) {
+    case 0: config->set_config_file(CONFIG_QUEEN_SPADE, checked);
+            engine->set_variant(VARIANT_QUEEN_SPADE, checked);
+            break;
+    case 1: config->set_config_file(CONFIG_PERFECT_100, checked);
+            engine->set_variant(VARIANT_PERFECT_100, checked);
+            break;
+    case 2: config->set_config_file(CONFIG_OMNIBUS, checked);
+            engine->set_variant(VARIANT_OMNIBUS, checked);
+            break;
+    case 3: config->set_config_file(CONFIG_NO_TRICK, checked);
+            engine->set_variant(VARIANT_NO_TRICKS, checked);
+            break;
+    case 4: config->set_config_file(CONFIG_NEW_MOON, checked);
+            engine->set_variant(VARIANT_NEW_MOON, checked);
+            break;
+    case 5: config->set_config_file(CONFIG_NO_DRAW, checked);
+            engine->set_variant(VARIANT_NO_DRAW, checked);
+            break;
+    }
+}
+
+void MainWindow::onAnimationToggled(int id, bool checked) {
+  QAbstractButton *button = animationsGroup->button(id);
+
+  switch (id) {
+    case 0: config->set_config_file(CONFIG_ANIM_DEAL_CARDS, checked); break;
+    case 1: config->set_config_file(CONFIG_ANIM_PLAY_CARD, checked); break;
+    case 2: config->set_config_file(CONFIG_ANIM_COLLECT_TRICKS, checked); break;
+    case 3: config->set_config_file(CONFIG_ANIM_PASS_CARDS, checked); break;
+    case 4: config->set_config_file(CONFIG_ANIMATED_ARROW, checked); break;
+    case 5: config->set_config_file(CONFIG_ANIM_TURN_INDICATOR, checked); break;
+  }
+}
 // ************************************************************************************************
 
 
@@ -961,15 +1083,11 @@ void MainWindow::updateYourTurnIndicator()
 
 void MainWindow::updateTrickPile()
 {
-qDebug() << "Trick size: " << currentTrick.size();
-
     if (currentTrick.isEmpty()) return;
 
     QSize viewSize = ui->graphicsView->size();
 
     int count = currentTrick.size();
-
-qDebug() << "Tricks: " << currentTrick;
 
     QGraphicsSvgItem *item;
     for (int i = 0; i < count; ++i) {
@@ -1324,7 +1442,7 @@ void MainWindow::create_arrows()
     arrowLabel->setScaledContents(true);  // KEY: Movie scales to label size
 //    arrowLabel->setStyleSheet("background: transparent;");  // Extra safety
 
-    arrowMovie = new QMovie(":/icons/arrow-11610_128.gif");
+    arrowMovie = new QMovie(":/icons/arrow-11610_128.gif", QByteArray(), arrowLabel);
     arrowMovie->setSpeed(150);
 
     if (arrowMovie->isValid()) {
@@ -1386,33 +1504,7 @@ void MainWindow::createButtonsGroups()
     deckGroup->addButton(ui->button_Deck_Neo_Classical, 7);
     deckGroup->setExclusive(true);
 
-    connect(deckGroup, QOverload<int>::of(&QButtonGroup::idClicked), this, [this](int id) {
-      if (deck->Style() == id)
-         return;
-
-      saveCurrentTrickState();
-      disableAllDecks();
-      if (deck->set_deck(id)) {
-        config->set_deck_style(id);
-        import_allCards_to_scene();
-
-        if (forced_new_deck) {
-          ui->tabWidget->setTabEnabled(0, true);
-          ui->tabWidget->setCurrentIndex(0);
-          forced_new_deck = false;
-          if (start_engine_dalayed) {
-            start_engine_dalayed = false;
-            engine->Start();
-          } 
-        }
-      } else {
-          disableDeck(id);
-          valid_deck[id] = false;
-          }
-      enableAllDecks();
-      restoreTrickCards();
-      scene->update();
-    });
+    connect(deckGroup, QOverload<int>::of(&QButtonGroup::idClicked), this, &MainWindow::onDeckStyleClicked);
 
 // Game Variants buttons
     variantsGroup = new QButtonGroup(this);
@@ -1423,34 +1515,9 @@ void MainWindow::createButtonsGroups()
     variantsGroup->addButton(ui->opt_no_tricks, 3);
     variantsGroup->addButton(ui->opt_new_moon, 4);
     variantsGroup->addButton(ui->opt_no_draw, 5);
-
     variantsGroup->setExclusive(false);
 
-    connect(variantsGroup, QOverload<int>::of(&QButtonGroup::idClicked), this, [this](int id) {
-       QAbstractButton *button = variantsGroup->button(id);
-       bool checked = button->isChecked();
-
-       switch (id) {
-          case 0: config->set_config_file(CONFIG_QUEEN_SPADE, checked);
-                  engine->set_variant(VARIANT_QUEEN_SPADE, checked);
-                  break;
-          case 1: config->set_config_file(CONFIG_PERFECT_100, checked);
-                  engine->set_variant(VARIANT_PERFECT_100, checked);
-                  break;
-          case 2: config->set_config_file(CONFIG_OMNIBUS, checked);
-                  engine->set_variant(VARIANT_OMNIBUS, checked);
-                  break;
-          case 3: config->set_config_file(CONFIG_NO_TRICK, checked);
-                  engine->set_variant(VARIANT_NO_TRICKS, checked);
-                  break;
-          case 4: config->set_config_file(CONFIG_NEW_MOON, checked);
-                  engine->set_variant(VARIANT_NEW_MOON, checked);
-                  break;
-          case 5: config->set_config_file(CONFIG_NO_DRAW, checked);
-                  engine->set_variant(VARIANT_NO_DRAW, checked);
-                  break;
-       }
-    });
+    connect(variantsGroup, &QButtonGroup::idToggled, this, &MainWindow::onVariantToggled);
 
 // Language buttons
    languageGroup = new QButtonGroup(this);
@@ -1475,19 +1542,7 @@ void MainWindow::createButtonsGroups()
    animationsGroup->addButton(ui->opt_anim_triangle, 5);
    animationsGroup->setExclusive(false);
 
-   connect(animationsGroup, QOverload<int>::of(&QButtonGroup::idClicked), this, [this](int id) {
-       QAbstractButton *button = animationsGroup->button(id);
-       bool checked = button->isChecked();
-
-       switch (id) {
-          case 0: config->set_config_file(CONFIG_ANIM_DEAL_CARDS, checked); break;
-          case 1: config->set_config_file(CONFIG_ANIM_PLAY_CARD, checked); break;
-          case 2: config->set_config_file(CONFIG_ANIM_COLLECT_TRICKS, checked); break;
-          case 3: config->set_config_file(CONFIG_ANIM_PASS_CARDS, checked); break;
-          case 4: config->set_config_file(CONFIG_ANIMATED_ARROW, checked); break;
-          case 5: config->set_config_file(CONFIG_ANIM_TURN_INDICATOR, checked); break;
-       }
-    });
+   connect(animationsGroup, &QButtonGroup::idToggled, this, &MainWindow::onAnimationToggled);
 }
 
 void MainWindow::createScoreDisplay()

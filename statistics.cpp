@@ -45,7 +45,6 @@ Statistics::Statistics(QWidget *parent) :
 
 Statistics::~Statistics()
 {
-  delete ui;
 }
 
 void Statistics::init_vars()
