@@ -92,6 +92,11 @@ void Engine::init_variables()
     hand_score[p] = 0;
 }
 
+// clear cards played
+  for (int i = 0; i < DECK_SIZE; i++) {
+    cardPlayed[i] = false;
+  }
+
 // clear the tricks pile
    currentTrick.clear();
 
@@ -145,6 +150,10 @@ GAME_ERROR Engine::start_new_game()
 
 bool Engine::undo()
 {
+  if (!isMyTurn()) {
+    return false;
+  }
+
   if (undoStack.available) {
     popUndo();
     return true;
@@ -322,6 +331,7 @@ void Engine::Loop()
      case NEW_ROUND:       qDebug() << "NEW ROUND";
                            locked = true;
                            init_variables();
+                           emit sig_refresh_cards_played();
                            shuffle_deck();
                            emit sig_enableAllCards();
                            emit sig_clear_deck();
@@ -345,7 +355,9 @@ void Engine::Loop()
                              LockedLoop();
                            } else
                                emit sig_pass_to(direction);
-                           emit sig_busy(false);
+
+                           busy = false;
+                           emit sig_busy(busy);
                            locked = false;
                            break;
     case TRADE_CARDS:      qDebug() << "TRADE CARDS";
@@ -369,10 +381,12 @@ void Engine::Loop()
                              cards_left--;
                              currentTrick.append(CLUBS_TWO);
                              emit sig_play_card(CLUBS_TWO, owner);
+                             emit sig_card_played(CLUBS_TWO);
                            }
                            if (owner == PLAYER_SOUTH) {
                              locked = false;
-                             emit sig_busy(false);
+                             busy = false;
+                             emit sig_busy(busy);
                              emit sig_your_turn();
                            }
                            break;
@@ -394,7 +408,8 @@ void Engine::Loop()
                               if (turn == PLAYER_SOUTH) {
                                 qDebug() << "Your turn, cards left: " << cards_left;
                                 locked = false;
-                                emit sig_busy(false);
+                                busy = false;
+                                emit sig_busy(busy);
                                 emit sig_your_turn();
                               }
                               qDebug() << "Refresh";
@@ -449,8 +464,9 @@ void Engine::Loop()
                          LockedLoop();
                          break;
      case GAME_OVER:     qDebug() << "GAME_OVER";
-                         emit sig_busy(false);
+                         busy = false;
                          locked = false;
+                         emit sig_busy(busy);
                          sendGameResult();
                          emit sig_play_sound(SOUND_GAME_OVER);
                          emit sig_update_stat(0, STATS_GAME_FINISHED);
@@ -496,9 +512,8 @@ void Engine::advance_turn()
     case PLAYER_NOBODY : qCritical() << "advance_turn invalid turn !";
   }
 
-  if (turn != PLAYER_SOUTH) {
-    emit sig_busy(true);
-  }
+  busy = true;
+  emit sig_busy(busy);
 
   cpt_played++;
 }
@@ -545,12 +560,18 @@ void Engine::Play(int cardId, PLAYER player)
   // TODO: Maybe i could check if the move is valid for PLAYER_SOUTH ?
   // This would be required if "disableInvalidMove" is made as a settings option.
 
+  busy = true;
+  emit sig_busy(busy);
+
   if (player == PLAYER_SOUTH) {
     pushUndo();
   }
 
   playerHandsById[player].removeAll(cardId);
   cards_left--;
+
+  cardPlayed[cardId] = true;
+  emit sig_card_played(cardId);
 
   currentTrick.append(cardId);
 
@@ -950,6 +971,15 @@ bool Engine::is_game_over()
   return true;
 }
 
+bool Engine::isCardPlayed(int cardId)
+{
+  if ((cardId < 0) || (cardId >= DECK_SIZE)) {
+    return false;
+  }
+
+  return cardPlayed[cardId];
+}
+
 bool Engine::is_it_draw()
 {
   int lowest = total_score[PLAYER_SOUTH];
@@ -1196,6 +1226,9 @@ bool Engine::load_game()
   bool card_found[DECK_SIZE] = {};
 
   game_score = 0;
+  for (int i = 0; i < DECK_SIZE; i++) {
+    cardPlayed[i] = true;
+  }
 
   while (!file.atEnd()) {
     int value;
@@ -1357,7 +1390,7 @@ bool Engine::load_game()
                     return false;
 
                   card_found[value] = true;
-
+                  cardPlayed[value] = false;
                   playerHandsById[cpt - 7].append(value);
                 }
                  break;
@@ -1403,6 +1436,7 @@ qDebug() << "Step select";
  // emit sig_enableAllCards();
   firstTime = false;
 
+  emit sig_refresh_cards_played();
   emit sig_setTrickPile(currentTrick);
 qDebug() << "Pile: " << currentTrick;
   emit sig_refresh_deck();
@@ -1427,6 +1461,9 @@ void Engine::pushUndo()
     undoStack.hand_score[i] = hand_score[i];
     undoStack.total_score[i] = total_score[i];
   }
+  for (int i = 0; i < DECK_SIZE; i++) {
+    undoStack.cardPlayed[i] = cardPlayed[i];
+  }
   undoStack.currentTrick = currentTrick;
   undoStack.hearts_broken = hearts_broken;
   undoStack.jack_diamond_in_trick = jack_diamond_in_trick;
@@ -1443,6 +1480,7 @@ void Engine::pushUndo()
   undoStack.previous_winner = previous_winner;
   undoStack.game_status = game_status;
   undoStack.currentSuit = currentSuit;
+  undoStack.busy = busy;
 }
 
 void Engine::popUndo()
@@ -1452,6 +1490,9 @@ void Engine::popUndo()
     playerHandsById[i] = undoStack.playerHandsById[i];
     hand_score[i] = undoStack.hand_score[i];
     total_score[i] = undoStack.total_score[i];
+  }
+  for (int i = 0; i < DECK_SIZE; i++) {
+    cardPlayed[i] = undoStack.cardPlayed[i];
   }
   currentTrick = undoStack.currentTrick;
   hearts_broken = undoStack.hearts_broken;
@@ -1469,7 +1510,10 @@ void Engine::popUndo()
   previous_winner = undoStack.previous_winner;
   game_status = undoStack.game_status;
   currentSuit = undoStack.currentSuit;
+  busy = undoStack.busy;
 
+  emit sig_busy(busy);
+  emit sig_refresh_cards_played();
   emit sig_setTrickPile(currentTrick);
   emit sig_refresh_deck();
   emit sig_update_scores_board(playersName, hand_score, total_score);

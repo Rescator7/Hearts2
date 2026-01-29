@@ -78,11 +78,13 @@ protected:
     void closeEvent(QCloseEvent *event) override;
 
 private:
+    QLabel *cardLabels[DECK_SIZE];
     QParallelAnimationGroup *animateCardsOffBoard(const QList<int>& cardsId, int winner);
     void animateCardsToCenter(const QList<int> &cardsId,
                                       QParallelAnimationGroup *masterGroup,
                                       int startDelay,
                                       int perCardStagger);
+    void initCardsPlayedPointers();
     void tryQuit();
 
 private slots:
@@ -113,6 +115,8 @@ private slots:
     void onDeckStyleClicked(int id);
     void onVariantToggled(int id, bool checked);
     void onAnimationToggled(int id, bool checked);
+    void onRefreshCardsPlayed();
+    void onCardPlayed(int cardId);
 
 private:
 /*
@@ -212,6 +216,7 @@ public:
     void createCreditsLabel();
     void loadHelpFile();
     void setCheatMode(bool enabled);
+    void loadCardsPlayed();
 
     // Setters (publics)
     /*

@@ -4,6 +4,7 @@
 #include "define.h"
 #include "statistics.h"
 #include "sounds.h"
+#include "deck.h"
 
 #include <QObject>
 #include <QList>
@@ -73,6 +74,8 @@ private:
        bool hearts_broken = false;
        bool jack_diamond_in_trick = false;
        bool queen_spade_in_trick = false;
+       bool cardPlayed[DECK_SIZE];
+       bool busy;
        int cpt_played = 0;
        int cards_left;
        int game_score;
@@ -116,6 +119,8 @@ private:
     bool queen_spade_in_trick = false;
     bool detect_tram = true;
     bool firstTime = true;
+    bool busy = false;
+    bool cardPlayed[DECK_SIZE];
 
   //  int AI_players[3];
     int playersIndex[4];
@@ -187,6 +192,8 @@ signals:
     void sig_message(QString message);
     void sig_setTrickPile(QList<int> pile);
     void sig_busy(bool b);
+    void sig_refresh_cards_played();
+    void sig_card_played(int cardId);
  //   void sig_error(QString err);
 
 public:
@@ -203,9 +210,10 @@ public:
     bool isPlaying() { return (game_status == PLAY_A_CARD_1) || (game_status == PLAY_A_CARD_2) ||
                               (game_status == PLAY_A_CARD_3) || (game_status == PLAY_A_CARD_4) ||
                               (game_status == PLAY_TWO_CLUBS); };
-    bool isBusy() { return (turn != PLAYER_SOUTH) && (game_status != SELECT_CARDS); };
+    bool isBusy() { return busy || locked; };
     bool isMyTurn() { return isPlaying() && (turn == PLAYER_SOUTH); };
     bool can_break_hearts(PLAYER player);
+    bool isCardPlayed(int cardId);
     int get_player_card(PLAYER player, int handIndex);
     int handSize(PLAYER player);
     void set_tram(bool enabled) { detect_tram = enabled; };

@@ -69,6 +69,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     applyAllSettings();
 
+    initCardsPlayedPointers();
+
+    loadCardsPlayed();
+
     ui->channel->setStyleSheet(
       "color: yellow;"              // Text color
       "background-color: black;"    // Background of the widget itself
@@ -127,9 +131,7 @@ MainWindow::MainWindow(QWidget *parent)
 // Important anchors
     ui->graphicsView->setResizeAnchor(QGraphicsView::AnchorViewCenter);
     ui->graphicsView->setAlignment(Qt::AlignCenter);
-
-  //  ui->graphicsView->setAlignment(Qt::AlignCenter);  // Critical for proper centering
-    ui->graphicsView->setSceneRect(scene->itemsBoundingRect());  // Or set a large fixed rect
+    ui->graphicsView->setSceneRect(scene->itemsBoundingRect());
 
 // Solid green background (no repeat)
     ui->graphicsView->setBackgroundBrush(QBrush(QColor(0, 100, 0)));  // dark green felt
@@ -169,7 +171,7 @@ MainWindow::MainWindow(QWidget *parent)
       bool success = engine->undo();
       if (success) {
         sounds->play(SOUND_UNDO);
-        statistics->increase_stats(STATS_UNDO, PLAYER_SOUTH);
+        statistics->increase_stats(PLAYER_SOUTH, STATS_UNDO);
         message(tr("The cancellation was successful!"), MESSAGE_INFO);
       } else {
           message(tr("There is no undo available!"), MESSAGE_ERROR);
@@ -216,6 +218,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(engine, &Engine::sig_deal_cards, this, &MainWindow::onDealCards);
     connect(engine, &Engine::sig_passed, this, &MainWindow::onPassed);
     connect(engine, &Engine::sig_pass_to, this, &MainWindow::onPassTo);
+    connect(engine, &Engine::sig_refresh_cards_played, this, &MainWindow::onRefreshCardsPlayed);
+    connect(engine, &Engine::sig_card_played, this, &MainWindow::onCardPlayed);
 
     connect(qApp, &QCoreApplication::aboutToQuit, this, &MainWindow::aboutToQuit);
 
@@ -366,9 +370,83 @@ void MainWindow::disableDeck(int deckId) {
             "Please select a different deck in Settings."));
 
   if (!forced_new_deck) {
-    ui->tabWidget->setTabEnabled(0, false);
-    ui->tabWidget->setCurrentIndex(4);
+    ui->tabWidget->setTabEnabled(TAB_BOARD, false);
+    ui->tabWidget->setCurrentIndex(TAB_SETTINGS);
     forced_new_deck = true;
+  }
+}
+
+void MainWindow::initCardsPlayedPointers()
+{
+  cardLabels[CLUBS_TWO] =   ui->label_clubs_2;
+  cardLabels[CLUBS_THREE] = ui->label_clubs_3;
+  cardLabels[CLUBS_FOUR] =  ui->label_clubs_4;
+  cardLabels[CLUBS_FIVE] =  ui->label_clubs_5;
+  cardLabels[CLUBS_SIX] =   ui->label_clubs_6;
+  cardLabels[CLUBS_SEVEN] = ui->label_clubs_7;
+  cardLabels[CLUBS_EIGHT] = ui->label_clubs_8;
+  cardLabels[CLUBS_NINE] =  ui->label_clubs_9;
+  cardLabels[CLUBS_TEN] =   ui->label_clubs_10;
+  cardLabels[CLUBS_JACK] =  ui->label_clubs_jack;
+  cardLabels[CLUBS_QUEEN] = ui->label_clubs_queen;
+  cardLabels[CLUBS_KING] =  ui->label_clubs_king;
+  cardLabels[CLUBS_ACE] =   ui->label_clubs_ace;
+
+  cardLabels[SPADES_TWO] =   ui->label_spades_2;
+  cardLabels[SPADES_THREE] = ui->label_spades_3;
+  cardLabels[SPADES_FOUR] =  ui->label_spades_4;
+  cardLabels[SPADES_FIVE] =  ui->label_spades_5;
+  cardLabels[SPADES_SIX] =   ui->label_spades_6;
+  cardLabels[SPADES_SEVEN] = ui->label_spades_7;
+  cardLabels[SPADES_EIGHT] = ui->label_spades_8;
+  cardLabels[SPADES_NINE] =  ui->label_spades_9;
+  cardLabels[SPADES_TEN] =   ui->label_spades_10;
+  cardLabels[SPADES_JACK] =  ui->label_spades_jack;
+  cardLabels[SPADES_QUEEN] = ui->label_spades_queen;
+  cardLabels[SPADES_KING] =  ui->label_spades_king;
+  cardLabels[SPADES_ACE] =   ui->label_spades_ace;
+
+  cardLabels[DIAMONDS_TWO] =   ui->label_diamonds_2;
+  cardLabels[DIAMONDS_THREE] = ui->label_diamonds_3;
+  cardLabels[DIAMONDS_FOUR] =  ui->label_diamonds_4;
+  cardLabels[DIAMONDS_FIVE] =  ui->label_diamonds_5;
+  cardLabels[DIAMONDS_SIX] =   ui->label_diamonds_6;
+  cardLabels[DIAMONDS_SEVEN] = ui->label_diamonds_7;
+  cardLabels[DIAMONDS_EIGHT] = ui->label_diamonds_8;
+  cardLabels[DIAMONDS_NINE] =  ui->label_diamonds_9;
+  cardLabels[DIAMONDS_TEN] =   ui->label_diamonds_10;
+  cardLabels[DIAMONDS_JACK] =  ui->label_diamonds_jack;
+  cardLabels[DIAMONDS_QUEEN] = ui->label_diamonds_queen;
+  cardLabels[DIAMONDS_KING] =  ui->label_diamonds_king;
+  cardLabels[DIAMONDS_ACE] =   ui->label_diamonds_ace;
+
+  cardLabels[HEARTS_TWO] =   ui->label_hearts_2;
+  cardLabels[HEARTS_THREE] = ui->label_hearts_3;
+  cardLabels[HEARTS_FOUR] =  ui->label_hearts_4;
+  cardLabels[HEARTS_FIVE] =  ui->label_hearts_5;
+  cardLabels[HEARTS_SIX] =   ui->label_hearts_6;
+  cardLabels[HEARTS_SEVEN] = ui->label_hearts_7;
+  cardLabels[HEARTS_EIGHT] = ui->label_hearts_8;
+  cardLabels[HEARTS_NINE] =  ui->label_hearts_9;
+  cardLabels[HEARTS_TEN] =   ui->label_hearts_10;
+  cardLabels[HEARTS_JACK] =  ui->label_hearts_jack;
+  cardLabels[HEARTS_QUEEN] = ui->label_hearts_queen;
+  cardLabels[HEARTS_KING] =  ui->label_hearts_king;
+  cardLabels[HEARTS_ACE] =   ui->label_hearts_ace;
+}
+
+void MainWindow::loadCardsPlayed()
+{
+  static const QStringList ranks = { "2", "3", "4", "5", "6", "7", "8", "9", "10", tr("Jack"), tr("Queen"), tr("King"), tr("Ace") };
+  static const QStringList suits = { " ♣", " ♠", " ♦", " ♥" };
+
+  QPixmap pix;
+
+  for (int cardId = 0; cardId < DECK_SIZE; cardId++) {
+    pix = deck->get_card_pixmap(cardId);
+    cardLabels[cardId]->setPixmap(pix);
+    cardLabels[cardId]->setToolTip(QString(ranks[cardId % 13]) + QString(suits[cardId / 13]));
+    cardLabels[cardId]->setDisabled(engine->isCardPlayed(cardId));
   }
 }
 
@@ -501,6 +579,8 @@ void MainWindow::applyAllSettings()
 //            onDeckStyle(int id);
 //            onVariantToggled(int id, bool checked);
 //            onAnimationToggled(int id, bool checked);
+//            onRefreshCardsPlayed()
+//            onCardPlayed()
 //
 // Section 3- [ Create Functions ]
 //            createCreditsLabel()
@@ -559,7 +639,7 @@ void MainWindow::resizeEvent(QResizeEvent *event)
     }
 
     // Only update if Board tab is visible (avoids unnecessary work)
-    if (ui->tabWidget->currentIndex() == 0) {  // 0 = Board tab
+    if (ui->tabWidget->currentIndex() == TAB_BOARD) {
       updateSceneRect();
       repositionAllCardsAndElements();
       ui->graphicsView->scene()->update();
@@ -691,6 +771,7 @@ void MainWindow::onDeckChanged(int deckId)
     item = deck->get_card_item(selectedCards.at(i), true);
     item->setData(1, true);
   }
+  loadCardsPlayed();
 }
 
 //TODO: fix the default path
@@ -770,19 +851,14 @@ qDebug() << "We clicked to play a card";
 
 void MainWindow::onArrowClicked()
 {
-qDebug() << "Clicked";
   if (selectedCards.size() != 3) {
     message(tr("You must select 3 cards to pass!"), MESSAGE_ERROR);
   } else {
-
-qDebug() << "before: " << selectedCards.size();
     arrowLabel->hide();
 
     engine->set_passedFromSouth(selectedCards);
     selectedCards.clear();
     engine->Step();
-  //  deck->reset_selections();
-  //  update_cards_pos();
   }
 }
 
@@ -965,8 +1041,8 @@ void MainWindow::onDeckStyleClicked(int id) {
     import_allCards_to_scene();
 
     if (forced_new_deck) {
-      ui->tabWidget->setTabEnabled(0, true);
-      ui->tabWidget->setCurrentIndex(0);
+      ui->tabWidget->setTabEnabled(TAB_BOARD, true);
+      ui->tabWidget->setCurrentIndex(TAB_BOARD);
       forced_new_deck = false;
       if (start_engine_dalayed) {
         start_engine_dalayed = false;
@@ -988,8 +1064,6 @@ void MainWindow::onDeckStyleClicked(int id) {
 }
 
 void MainWindow::onVariantToggled(int id, bool checked) {
-  QAbstractButton *button = variantsGroup->button(id);
-
   switch (id) {
     case 0: config->set_config_file(CONFIG_QUEEN_SPADE, checked);
             engine->set_variant(VARIANT_QUEEN_SPADE, checked);
@@ -1013,8 +1087,6 @@ void MainWindow::onVariantToggled(int id, bool checked) {
 }
 
 void MainWindow::onAnimationToggled(int id, bool checked) {
-  QAbstractButton *button = animationsGroup->button(id);
-
   switch (id) {
     case 0: config->set_config_file(CONFIG_ANIM_DEAL_CARDS, checked); break;
     case 1: config->set_config_file(CONFIG_ANIM_PLAY_CARD, checked); break;
@@ -1023,6 +1095,18 @@ void MainWindow::onAnimationToggled(int id, bool checked) {
     case 4: config->set_config_file(CONFIG_ANIMATED_ARROW, checked); break;
     case 5: config->set_config_file(CONFIG_ANIM_TURN_INDICATOR, checked); break;
   }
+}
+
+void MainWindow::onRefreshCardsPlayed()
+{
+  for (int cardId = 0; cardId < DECK_SIZE; cardId++) {
+    cardLabels[cardId]->setDisabled(engine->isCardPlayed(cardId));
+  }
+}
+
+void MainWindow::onCardPlayed(int cardId)
+{
+  cardLabels[cardId]->setDisabled(true);
 }
 // ************************************************************************************************
 
@@ -1654,7 +1738,7 @@ void MainWindow::setAnimationLock()
         setFixedSize(m_fixedSizeDuringLock);
 
         // Disable deck switch tab
-        ui->tabWidget->setTabEnabled(4, false);
+        ui->tabWidget->setTabEnabled(TAB_SETTINGS, false);
 
         // Disable cards reveal
         ui->pushButton_reveal->setDisabled(true);
@@ -1683,7 +1767,7 @@ void MainWindow::setAnimationUnlock()
     if (m_animationLockCount == 0) {
         // Fully unlocked
  //       qDebug() << "unlocked";
-        ui->tabWidget->setTabEnabled(4, true);
+        ui->tabWidget->setTabEnabled(TAB_SETTINGS, true);
 
         // TODO don't enable reveal and undo, if we're playing ONLINE
         ui->pushButton_reveal->setDisabled(false);
@@ -2456,16 +2540,11 @@ qreal MainWindow::calc_scale() const
   // Base scale when view is 1200px wide (adjust this "reference width" to your taste)
   int REFERENCE_WIDTH = 1200;
 
-//  if (deck->Style() == TIGULLIO_MODERN_DECK)
-//    REFERENCE_WIDTH = 900;
-
   qreal baseScale = 1.0;
 
   // Calculate scale: clamp between 0.5 and 2.0
   qreal scale = static_cast<qreal>(viewWidth) / REFERENCE_WIDTH;
   scale = qBound(0.5, scale, 2.0);  // Clamps to 0.5–2.0 range
-
-//  qDebug() << "scale: " << scale;
 
   return scale;
 }
@@ -2614,10 +2693,10 @@ void MainWindow::set_card_pos(int cardId, int player, int handIndex, bool frontC
 void MainWindow::saveCurrentTrickState()
 {
     currentTrickInfo.clear();
-    for (int index : currentTrick) {  // ta liste actuelle des items du pli
+    for (int index : currentTrick) {
         QGraphicsSvgItem *item = deck->get_card_item(index, true);
         TrickCardInfo info;
-        info.cardId = item->data(0).toInt();  // ton cardId
+        info.cardId = item->data(0).toInt();
         info.rotation = item->rotation();
         info.position = item->pos();
         currentTrickInfo.append(info);
@@ -2635,8 +2714,7 @@ void MainWindow::restoreTrickCards()
 
             newItem->setPos(info.position);
             newItem->setRotation(info.rotation);
-qDebug() << "Nouvelle carte" << info.cardId << "reçue Z =" << newItem->zValue();
-   //         scene->addItem(newItem);
+
             currentTrick.append(info.cardId);
         }
     }
@@ -2644,8 +2722,6 @@ qDebug() << "Nouvelle carte" << info.cardId << "reçue Z =" << newItem->zValue()
 
 void MainWindow::clearTricks()
 {
-  qDebug() << "clearTricks() CALLED " << currentTrick;;
-
   for (int cardId : currentTrick) {
     QGraphicsSvgItem *card = deck->get_card_item(cardId, true);
     card->hide();
@@ -2694,6 +2770,7 @@ void MainWindow::setCheatMode(bool enabled)
     ui->pushButton_reveal->setChecked(false);
     config->set_config_file(CONFIG_CHEAT_REVEAL, false);
   }
+  ui->tabWidget->setTabVisible(TAB_CARDS_PLAYED, enabled);
   ui->pushButton_reveal->setVisible(enabled);
 }
 

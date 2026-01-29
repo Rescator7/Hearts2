@@ -10,6 +10,15 @@ constexpr const char FOLDER[] = "/DEV/Hearts2/";
 constexpr int MIN_APPL_WIDTH = 500;
 constexpr int MIN_APPL_HEIGHT = 460;
 
+enum TABS {
+   TAB_BOARD        = 0,
+   TAB_CHANNEL      = 1,
+   TAB_STATISTICS   = 2,
+   TAB_CARDS_PLAYED = 3,
+   TAB_HELP         = 4,
+   TAB_SETTINGS     = 5
+};
+
 constexpr int SELECTED_CARD_OFFSET = 40;
 
 enum PLAYER  {

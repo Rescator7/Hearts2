@@ -30,6 +30,7 @@ void Deck::delete_current_deck() {
   // → Scene count drops correctly, permanent items stay
   qDeleteAll(deck);
   deck.clear();
+  pixImages.clear();
 }
 
 bool Deck::check_file(QString &filename) {
@@ -44,50 +45,62 @@ bool Deck::check_file(QString &filename) {
     return true;
 }
 
-/*
-QGraphicsItem* Deck::convertToPixmap(QGraphicsSvgItem *item)
+void Deck::createPixmap(int cardId, bool suitFirst, int format)
 {
-   if (!item) return nullptr;
-   if (!item->renderer()->isValid()) return nullptr;
+  if (!renderer || !renderer->isValid()) {
+    return;
+  }
 
-// Render at 4× target size for crispness
-   const qreal renderScale = 4.0;
-   QSize renderSize = QSize(90 * 4, 130 * 4);
+  QSize targetSize = QSize(90, 130);
+  QPixmap pixmap(targetSize);
+  pixmap.fill(Qt::transparent);           // important for transparency in cards
 
-   QPixmap backPixmap(renderSize);
-   backPixmap.fill(Qt::transparent);
+  QPainter painter(&pixmap);
 
-   QPainter painter(&backPixmap);
-   painter.setRenderHint(QPainter::Antialiasing);
-   painter.setRenderHint(QPainter::SmoothPixmapTransform);
+  // Enable high-quality rendering
+  painter.setRenderHint(QPainter::Antialiasing, true);
+  painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
+  // Optional but often nice too:
+  painter.setRenderHint(QPainter::TextAntialiasing, true);
 
-   item->renderer()->render(&painter, QRectF(0, 0, renderSize.width(), renderSize.height()));
-
-// Now create final item with scale-down
-   QGraphicsPixmapItem *backItem = new QGraphicsPixmapItem(backPixmap);
-   backItem->setScale(1.0 / renderScale);  // Back to target size
-
-   delete item;
-
-   return backItem;
+  // Render the whole document (if no specific element)
+  if (format == SVG_1_FILE_FORMAT) {
+    QString elementId = getElementIdForCard(cardId, suitFirst);
+    renderer->render(&painter, elementId, QRectF(0, 0, targetSize.width(), targetSize.height()));
+  } else {
+      renderer->render(&painter, QRectF(0, 0, targetSize.width(), targetSize.height()));
+  }
+  pixImages.append(pixmap);
 }
-*/
 
+QString Deck::getElementIdForCard(int cardId, bool suitFirst) const {
+   if (cardId < 0 || cardId >= DECK_SIZE) return QString();
+
+   static const QStringList textSuit = QStringList{"club", "spade", "diamond", "heart"};
+   static const QStringList textRank = QStringList{"2", "3", "4", "5", "6", "7", "8", "9", "10", "jack", "queen", "king", "1"};
+
+   int suit  = cardId / 13;
+   int rank  = cardId % 13;
+
+   if (suitFirst) {
+     return textSuit[suit] + "_" + textRank[rank];
+   } else {
+       return textRank[rank] + "_" + textSuit[suit];
+     }
+ }
 
 QGraphicsSvgItem *Deck::createSvgCardElement(int cardId, bool suitFirst)
 {
     QString elementId;
     if (cardId == BACK_CARD) {
-        elementId = "back";
+      elementId = "back";
     } else {
-        QString suit = QStringList{"club", "spade", "diamond", "heart"}[cardId / 13];
-        QString rank = QStringList{"2", "3", "4", "5", "6", "7", "8", "9", "10", "jack", "queen", "king", "1"}[cardId % 13];
-        elementId = suitFirst ? suit + "_" + rank : rank + "_" + suit;
+        elementId = getElementIdForCard(cardId, suitFirst);
     }
 
     if (!renderer->elementExists(elementId)) {
-        qWarning() << "Element ID not found:" << elementId;
-        return nullptr;
+      qWarning() << "Element ID not found:" << elementId;
+      return nullptr;
     }
 
     QGraphicsSvgItem *item = new QGraphicsSvgItem();
@@ -182,6 +195,16 @@ QGraphicsSvgItem *Deck::get_card_item(int cardId, bool revealed) {
   }
 }
 
+const QPixmap &Deck::get_card_pixmap(int cardId) const {
+  static QPixmap empty;
+
+  if ((cardId < 0) || (cardId >= pixImages.size())) {
+    return empty;
+  }
+
+  return pixImages.at(cardId);
+}
+
 void Deck::apply_settings(QGraphicsItem *item, int cardId) {
     item->setData(0, cardId);                              // save the cardId at Data(0)
     item->setData(1, false);                               // the card is not selected
@@ -259,6 +282,11 @@ bool Deck::set_deck(int style) {
                                       break;
   }
 
+  if (renderer) {
+    delete renderer;
+  }
+  renderer = new QSvgRenderer(this);
+
   // built-in deck
   if (style == STANDARD_DECK) {
     fullpath = QString(":/SVG-cards/Default");
@@ -277,21 +305,17 @@ bool Deck::set_deck(int style) {
       return false;
     }
 
-    if (renderer) {
-      delete renderer;
-    }
-
-    renderer = new QSvgRenderer(location);
-
+    renderer->load(location);
     if (!renderer->isValid()) {
       delete_current_deck();
       qCritical() << "Failed to load deck SVG! [" << location << "]";
       return false;
     } else {
  //     qDebug() << "Deck SVG loaded successfully";
-    }
+      }
   }
 
+ // renderer = new QSvgRenderer(location);
   int cpt = 0, suit = 0;
 
   for (int i = 0; i < DECK_SIZE; i++) {
@@ -303,6 +327,7 @@ bool Deck::set_deck(int style) {
                                    return false;
                                  }
                                  item = loadGraphicsItem(location);
+                                 renderer->load(location);   // This will be needed to create the pixmap
                                  break;
        case SVG_1_FILE_FORMAT: item = createSvgCardElement(i, suitFirst);
                                break;
@@ -315,6 +340,7 @@ bool Deck::set_deck(int style) {
 
     apply_settings(item, i);
     deck.append(item);
+    createPixmap(i, suitFirst, format);
 
     if (++cpt == 13) {
       suit++;

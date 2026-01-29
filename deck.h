@@ -102,9 +102,12 @@ class Deck : public QObject
 
 private:
     QList<QGraphicsSvgItem *> deck;
+    QList<QPixmap> pixImages;
     int current_deck_style = UNSET_DECK;
     QGraphicsSvgItem *loadGraphicsItem(const QString &filePath);
     QSvgRenderer *renderer = nullptr;
+    void createPixmap(int cardId, bool suitFirst, int format);
+    QString getElementIdForCard(int cardId, bool suitFirst) const;
 
 signals:
     void deckChange(int deckId);
@@ -120,6 +123,7 @@ public:
     int Style() { return current_deck_style; };
     QPixmap loadToPixmap(const QString &filePath);
     QGraphicsSvgItem* get_card_item(int cardId, bool revealed);
+    const QPixmap& get_card_pixmap(int cardId) const;
     QGraphicsSvgItem* createCardItem(int cardId, bool suitFirst);
     QGraphicsSvgItem* createSvgCardElement(int cardId, bool suitFirst);
 };
