@@ -31,7 +31,7 @@ MainWindow::MainWindow(QWidget *parent)
 // setMinimumHeight(MIN_APPL_HEIGHT);
 
     ui->graphicsView->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
-    ui->graphicsView->setCacheMode(QGraphicsView::CacheNone);
+ //   ui->graphicsView->setCacheMode(QGraphicsView::CacheNone);
 
     ui->splitterHelp->setSizes(QList<int>() << 250 << 750);
 
@@ -278,6 +278,8 @@ void MainWindow::loadHelpFile()
   static const tocEntry TOC[] =  {
                                  {"1. Basic rules of the game", "rules", false },
                                  {"2. Game settings", "settings", false },
+                                 {"2.1 Game variants", "variants", true },
+                                 {"2.2 Miscellaneous", "miscellaneous", true },
                                  {"3. Game shortcuts", "shortcuts", false },
                                  {"4. Playing online", "online", false },
                                  {"5. Credits", "credits", false },
@@ -517,7 +519,11 @@ void MainWindow::applyAllSettings()
   ui->opt_anim_play_card->setChecked(config->is_anim_play_card());
   ui->opt_anim_collect_tricks->setChecked(config->is_anim_collect_tricks());
   ui->opt_anim_pass_cards->setChecked(config->is_anim_pass_cards());
-  ui->opt_anim_arrow->setChecked(config->is_animated_arrow());
+
+  enabled = config->is_animated_arrow();
+  ui->opt_anim_arrow->setChecked(enabled);
+  on_opt_anim_arrow_clicked(enabled);
+
   ui->opt_anim_triangle->setChecked(config->is_anim_turn_indicator());
 
 // TODO: apply all languages changes
@@ -1528,12 +1534,11 @@ void MainWindow::create_arrows()
 
     arrowMovie = new QMovie(":/icons/arrow-11610_128.gif", QByteArray(), arrowLabel);
     arrowMovie->setSpeed(150);
+    arrowMovie->setCacheMode(QMovie::CacheAll);
 
     if (arrowMovie->isValid()) {
        arrowLabel->setMovie(arrowMovie);
-
-    arrowLabel->setAlignment(Qt::AlignCenter);
-    arrowMovie->start();
+       arrowLabel->setAlignment(Qt::AlignCenter);
     } else {
         arrowLabel->setText("→");  // Fallback
       }
@@ -1799,7 +1804,6 @@ void MainWindow::showTurnArrow(int direction)
 
     // set visibility to false, if direction = PASS_HOLD or invalid direction
     arrowProxy->setVisible((direction == PASS_LEFT) || (direction == PASS_RIGHT) || (direction == PASS_ACROSS));
-    arrowMovie->start();
 
     updateTurnArrow();
 }
@@ -2798,3 +2802,23 @@ void MainWindow::on_pushButton_score_clicked()
   m_scoreGroup->setVisible(checked);
 }
 
+void MainWindow::on_opt_anim_arrow_clicked(bool checked)
+{
+  if (!arrowMovie || !arrowMovie->isValid()) {
+   return;
+  }
+
+  int totalFrames = arrowMovie->frameCount();
+  if (totalFrames <= 0) {
+    return;
+  }
+
+  if (!checked) {
+    arrowMovie->jumpToFrame(totalFrames - 1);
+    arrowMovie->setPaused(true);
+    updateTurnArrow();
+  } else {
+      arrowMovie->jumpToFrame(0);
+      arrowMovie->start();
+    }
+}

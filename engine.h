@@ -148,6 +148,14 @@ private:
     bool AI_select_Diamonds(PLAYER player);
     bool AI_select_Hearts(PLAYER player);
     bool AI_select_Randoms(PLAYER player);
+    bool is_moon_an_option();
+    int  AI_eval_lead_hearts(DECK_INDEX cardId);
+    int  AI_eval_lead_spade(DECK_INDEX cardId);
+    int  AI_eval_lead_diamond(DECK_INDEX cardId);
+    int  AI_eval_lead_freesuit(DECK_INDEX cardId);
+    int  AI_get_cpu_move();
+    int  eval_card_strength(PLAYER player, DECK_INDEX cardId);
+
     bool can_play_qs_first_hand(PLAYER player);
     bool is_it_draw();
     bool is_game_over();

@@ -118,6 +118,8 @@ private slots:
     void onRefreshCardsPlayed();
     void onCardPlayed(int cardId);
 
+    void on_opt_anim_arrow_clicked(bool checked);
+
 private:
 /*
     QSize lastViewSize = QSize(0, 0);

@@ -3067,7 +3067,7 @@ QGroupBox QLabel {
           </rect>
          </property>
          <property name="text">
-          <string>Queen spade break heart</string>
+          <string>Queen spade break hearts</string>
          </property>
         </widget>
         <widget class="QCheckBox" name="opt_perfect_100">

@@ -280,47 +280,6 @@ void Engine::completePassCards(const QList<int> Cards[4], DIRECTION d)
   completePassCards();
 }
 
-
-bool Engine::AI_select_Randoms(PLAYER player)
-{
-    QList<int> &hand = playerHandsById[player];
-    QList<int> &passed = passedCards[player];
-
-    if (hand.isEmpty() || passed.size() >= 3) {
-        return passed.size() == 3;
-    }
-
-    // Crée une copie temporaire des cartes disponibles
-    QList<int> available = hand;
-
-    // Retire celles déjà passées
-    for (int c : passed) {
-        available.removeAll(c);
-    }
-
-    if (available.isEmpty()) {
-        return false;
-    }
-
-    // Tire une carte aléatoire parmi les restantes
-    int r = std::uniform_int_distribution<int>(0, available.size() - 1)(gen);
-    int cardId = available.at(r);
-
-    passed.append(cardId);
-    qDebug() << "AI" << player << "a choisi carte" << cardId;
-
-    return passed.size() == 3;
-}
-
-void Engine::cpus_select_cards()
-{
-  for (int p = 1; p < 4; p++) {
-    for (int c = 0; c < 3; c++) {
-      if (AI_select_Randoms((PLAYER)p)) break;
-    }
-  }
-}
-
 void Engine::Loop()
 {
   bool tram;
@@ -399,8 +358,8 @@ void Engine::Loop()
                           qDebug() << "current_suit: " << currentSuit;
                           filterValidMoves(turn);
                           if ((turn != PLAYER_SOUTH) && (turn != PLAYER_NOBODY)) {
-                             cardId = validHandsById[turn].at(0);
-
+                          //   cardId = validHandsById[turn].at(0);
+                             cardId = AI_get_cpu_move();
                              qDebug() << "Player: " << turn << "ValidHand: " << validHandsById[turn] << "cardId: " << cardId << "Full hand: " << playerHandsById[turn];
                              Play(cardId, turn);
                              qDebug() << "Remove from: " << turn << "CardId: " << cardId;
@@ -1534,4 +1493,356 @@ QString Engine::errorMessage(GAME_ERROR err)
         case ERRCORRUPTED: return tr("The saved game file is corrupted! Deleted!");
         default:           return tr("Unknown error.");
     }
+}
+
+// *****************************************************************************************************************************************************
+// **************************************************************** [ AI Section ] *********************************************************************
+// *****************************************************************************************************************************************************
+bool Engine::is_moon_an_option()
+{
+  if (!(AI_CPU_flags[turn] & AI_flags_try_moon))
+    return false;
+
+  if ((turn != PLAYER_SOUTH) && (hand_score[PLAYER_SOUTH] || (variant_omnibus && (jack_diamond_owner == PLAYER_SOUTH)))) return false;
+  if ((turn != PLAYER_WEST) && (hand_score[PLAYER_WEST] || (variant_omnibus && (jack_diamond_owner == PLAYER_WEST)))) return false;
+  if ((turn != PLAYER_NORTH) && (hand_score[PLAYER_NORTH] || (variant_omnibus && (jack_diamond_owner == PLAYER_NORTH)))) return false;
+  if ((turn != PLAYER_EAST) && (hand_score[PLAYER_EAST] || (variant_omnibus && (jack_diamond_owner == PLAYER_EAST)))) return false;
+
+  if (countCardsInSuit(turn, HEARTS) && (Owner(HEARTS_ACE) != turn) && !cardPlayed[HEARTS_ACE])
+    return false;
+
+  return true;
+}
+
+int Engine::eval_card_strength(PLAYER player, DECK_INDEX cardId)
+{
+  SUIT suit = (SUIT)(cardId / 13);
+
+  if (!countCardsInSuit(player, suit))
+   return 0;
+
+  DECK_INDEX first, last;
+  switch (suit) {
+    case CLUBS:    first = CLUBS_TWO;
+                   last = CLUBS_ACE;
+                   break;
+    case SPADES:   first = SPADES_TWO;
+                   last = SPADES_ACE;
+                   break;
+    case DIAMONDS: first = DIAMONDS_TWO;
+                   last = DIAMONDS_ACE;
+                   break;
+    case HEARTS:   first = HEARTS_TWO;
+                   last = HEARTS_ACE;
+                   break;
+    case SUIT_ALL:
+    case SUIT_COUNT: return 0;
+                     break;
+  }
+
+  int cpt = 0;
+  for (int i = first; i <= last; i++) {
+     if (!cardPlayed[i] && (Owner(i) != player)) {
+       if (cardId > i)
+         cpt++;
+     }
+  }
+
+ int value = cpt / std::max(1, leftInSuit(suit)) * 100;
+
+ return value;
+}
+
+int Engine::AI_eval_lead_hearts(DECK_INDEX cardId)
+{
+  if (is_moon_an_option()) {
+    if ((cardId == SPADES_QUEEN) || (variant_omnibus && (cardId == DIAMONDS_JACK)))
+      return -50;
+    else {
+       if (cardId > best_hand)
+         return -cardId + 30;
+       else
+         return -30;
+    }
+  }
+  else {
+     if (cardId < best_hand)
+       return cardId - best_hand + 30;
+     else
+       return -30;
+  }
+}
+
+int Engine::AI_eval_lead_spade(DECK_INDEX cardId)
+{
+  bool spades_queen_table = currentTrick.indexOf(SPADES_QUEEN) != -1;
+  bool spades_king_table  = currentTrick.indexOf(SPADES_KING) != -1;
+  bool spades_ace_table   = currentTrick.indexOf(SPADES_ACE) != -1;
+
+ // the lead is spade and the ace/king is in the trick? play the queen otherwise don't.
+ if (cardId == SPADES_QUEEN) {
+   if ((spades_ace_table || spades_king_table) && !is_moon_an_option())
+     return 104;
+   else
+     return -104;
+ }
+
+ // avoid giving the jack of diamond
+  if (variant_omnibus && (cardId == DIAMONDS_JACK))
+    return -62;
+
+  // last to talk, the queen is not in the trick.. throw your ace/king.
+   if (!is_moon_an_option()) {
+     if ((game_status == PLAY_A_CARD_4) && !spades_queen_table && ((cardId == SPADES_ACE) || (cardId == SPADES_KING)))
+       return 40;
+   }
+
+ // if the ace is in the trick throw away our king
+  if ((cardId == SPADES_KING) && spades_ace_table && !is_moon_an_option())
+    return 75;
+  else
+    return -25;
+}
+
+int Engine::AI_eval_lead_diamond(DECK_INDEX cardId)
+{
+  bool spades_queen_table = currentTrick.indexOf(SPADES_QUEEN) != -1;
+  bool diamonds_jack_table = currentTrick.indexOf(DIAMONDS_JACK) != -1;
+  bool diamonds_queen_table = currentTrick.indexOf(DIAMONDS_QUEEN) != -1;
+  bool diamonds_king_table = currentTrick.indexOf(DIAMONDS_KING) != -1;
+  bool diamonds_ace_table = currentTrick.indexOf(DIAMONDS_ACE) != -1;
+
+  if (variant_omnibus) {
+  // If the jack of diamond is on the table, try to grab it with the ace/king/queen. (if it's safe).
+    if (((cardId == DIAMONDS_ACE) || (cardId == DIAMONDS_KING) || (cardId == DIAMONDS_QUEEN)) && diamonds_jack_table) {
+      if (spades_queen_table)
+        return -65;
+      else
+      if (cardPlayed[SPADES_QUEEN] || (Owner(SPADES_QUEEN) == turn) ||
+         (game_status == PLAY_A_CARD_4) || is_moon_an_option())
+        return 25 + (cardId % 13);
+     }
+
+  // will we win this hand?
+     if (cardId == DIAMONDS_JACK) {
+       if (((cardPlayed[SPADES_QUEEN] && !spades_queen_table) || (Owner(SPADES_QUEEN) == turn)) &&
+           ((cardPlayed[DIAMONDS_ACE] && !diamonds_ace_table) || (Owner(DIAMONDS_ACE) == turn)) &&
+           ((cardPlayed[DIAMONDS_KING] && !diamonds_king_table) || (Owner(DIAMONDS_KING) == turn)) &&
+           ((cardPlayed[DIAMONDS_QUEEN] && !diamonds_queen_table) || (Owner(DIAMONDS_QUEEN) == turn)))
+         return  62;
+
+  // You are the last one to play in the trick, try to use your Jack of diamond:
+  // if it the strongest card of the trick.
+       if ((game_status == PLAY_A_CARD_4) && !spades_queen_table &&
+                                         !diamonds_ace_table &&
+                                         !diamonds_king_table &&
+                                         !diamonds_queen_table)
+         return 30;
+
+       // don't play the jack of diamond
+       return -65;
+     }
+  }
+
+  return 0;
+}
+
+int Engine::AI_eval_lead_freesuit(DECK_INDEX cardId)
+{
+  SUIT suit = (SUIT)(cardId / 13);
+
+  // try to catch someone with the queen of spade.
+  if (cardId == SPADES_QUEEN) {
+    int diff_spade = leftInSuit(SPADES) - countCardsInSuit(turn, SPADES);
+
+    if ((AI_CPU_flags[turn] & AI_flags_count_spade) && !is_moon_an_option()) {
+      if ((diff_spade == 1) && (Owner(SPADES_ACE) != turn) && !cardPlayed[SPADES_ACE])
+        return 100;
+
+      if ((diff_spade == 1) && (Owner(SPADES_KING) != turn) && !cardPlayed[SPADES_KING])
+        return 101;
+
+      if ((diff_spade == 2) && (Owner(SPADES_ACE) != turn) && (Owner(SPADES_KING) != turn) &&
+                               !cardPlayed[SPADES_ACE] && !cardPlayed[SPADES_KING])
+        return 102;
+    }
+
+    // don't lead the queen of spade
+    if (!is_moon_an_option())
+      return -100;
+  }
+
+  // don't lead in a suit where there is no cards left beside ours.
+  if (!is_moon_an_option()) {
+    if (leftInSuit(suit) == countCardsInSuit(turn, suit))
+      return -80;
+  }
+
+  // avoid leading the ace/king of spade, if the queen hasn't been played and we don't own it
+  // otherwise, let's try to elimitate some spade.
+  if (((cardId == SPADES_ACE) || (cardId == SPADES_KING)) && !cardPlayed[SPADES_QUEEN]) {
+    if ((Owner(SPADES_QUEEN) == turn) && ((countCardsInSuit(turn, SPADES) > 4) || is_moon_an_option()))
+      return 70;
+    else
+      return -90;
+  }
+
+ // avoid leading in spade if the queen of spade is not played yet and the ace/king/queen spade is in your hand,
+  // and you got less than 5 spades... otherwise lead in spade.
+  if (suit == SPADES) {
+    if (!cardPlayed[SPADES_QUEEN]) {
+      if (((Owner(SPADES_QUEEN) == turn) || (Owner(SPADES_ACE) == turn) || (Owner(SPADES_KING) == turn)) &&
+          (countCardsInSuit(turn, SPADES) < 4))
+        return -70;
+      else
+        return 60;
+    }
+  }
+
+  // play the jack of diamond (omnibus) only if your sure to wins the trick
+  // but, not the queen of spade.
+  if (variant_omnibus && (cardId == DIAMONDS_JACK)) {
+    if ((cardPlayed[DIAMONDS_ACE] || (Owner(DIAMONDS_ACE) == turn)) &&
+        (cardPlayed[DIAMONDS_KING] || (Owner(DIAMONDS_KING) == turn)) &&
+        (cardPlayed[DIAMONDS_QUEEN] || (Owner(DIAMONDS_QUEEN) == turn))
+     && (cardPlayed[SPADES_QUEEN] || (Owner(SPADES_QUEEN) == turn)))
+      return 64;
+    else
+      return -64;
+  }
+
+  // try to catch the jack of diamond with a/k/q if the queen of spade has been played.
+  if (variant_omnibus && (cardPlayed[SPADES_QUEEN] || (Owner(SPADES_QUEEN) == turn)) &&
+                 !cardPlayed[DIAMONDS_JACK] && (Owner(DIAMONDS_JACK) != turn) &&
+                ((cardId == DIAMONDS_ACE) || (cardId == DIAMONDS_KING) || (cardId == DIAMONDS_QUEEN)))
+    return 63;
+
+  // the stronger that card is, the worst it is to play.
+  if (is_moon_an_option())
+    return eval_card_strength(turn, cardId);
+  else
+    return -eval_card_strength(turn, cardId);
+}
+
+int Engine::AI_get_cpu_move()
+{
+  int eval[13] = {-32768, -32768, -32768, -32768, -32768, -32768, -32768, -32768, -32768, -32768, -32768, -32768, -32768};
+
+  for (int i = 0; i < validHandsById[turn].size(); i++) {
+     DECK_INDEX cardId = (DECK_INDEX)validHandsById[turn].at(i);
+
+     switch (currentSuit) {
+       case SUIT_ALL:   eval[i] = AI_eval_lead_freesuit(cardId);
+                        break;
+
+       case SPADES:     eval[i] = AI_eval_lead_spade(cardId);
+                        break;
+
+       case DIAMONDS:   eval[i] = AI_eval_lead_diamond(cardId);
+                        break;
+
+       case HEARTS:     eval[i] = AI_eval_lead_hearts(cardId);
+                        break;
+       case CLUBS:
+       case SUIT_COUNT: break;
+      }
+
+      if ((currentSuit != SUIT_ALL) && (currentSuit != SPADES)) {
+        // give away the queen of spade
+        if (!is_moon_an_option()) {
+          if (cardId == SPADES_QUEEN)
+            eval[i] = 105;
+          else
+          // the queen of spade has not been played yet, let's throw our ace/king spade away.
+          if (((cardId == SPADES_ACE) || (cardId == SPADES_KING)) && !cardPlayed[SPADES_QUEEN])
+            eval[i] = 61;
+        }
+      }
+
+      // if we didn't hit a specific evaluation in previous section, let's try those evaluations.
+      if (eval[i] == -32768) {
+        bool spades_queen_table = currentTrick.indexOf(SPADES_QUEEN) != -1;
+
+        // don't give away the jack of diamond.
+        if ((currentSuit != DIAMONDS) && variant_omnibus && (cardId == DIAMONDS_JACK))
+         eval[i] = -63;
+        else
+        // we are the last one of the trick: play our bigger cards, but not in hearts, and not if queen spade is in
+         if ((game_status == PLAY_A_CARD_4) && (currentSuit != HEARTS) && !spades_queen_table)
+           eval[i] = cardId % 13 + 2;
+        else
+        if (!is_moon_an_option() && (currentSuit != SUIT_ALL)) {
+           // throw away our big hearts cards
+           if ((currentSuit != HEARTS) && (cardId / 13 == HEARTS))
+             eval[i] = (cardId % 13) + 30;
+           else
+           // not in the suit, throw the bigest cards
+           if (currentSuit != cardId / 13)
+             eval[i] = (cardId % 13) + 15;
+           else {
+           // in the suit, throw our bigest cards under the best cards on the table
+              if (cardId < best_hand)
+                eval[i] = -(cardId - best_hand);
+           }
+        }
+        else
+        // play the lowest card.
+          eval[i] = -(cardId % 13 + 2);
+      }
+  }
+
+ // search for the best move.
+ int best_eval = -32768, best_cardId = INVALID_CARD;
+
+ for (int i = 0; i < validHandsById[turn].size(); i++)
+   if (eval[i] > best_eval) {
+     best_eval = eval[i];
+     best_cardId = validHandsById[turn].at(i);
+    }
+
+ if (best_cardId == INVALID_CARD) {
+   return validHandsById[turn].at(0);
+   qDebug() << "CPU choose had to choose a default card to play!";
+ } else
+    return best_cardId;
+}
+
+bool Engine::AI_select_Randoms(PLAYER player)
+{
+    QList<int> &hand = playerHandsById[player];
+    QList<int> &passed = passedCards[player];
+
+    if (hand.isEmpty() || passed.size() >= 3) {
+        return passed.size() == 3;
+    }
+
+    // Crée une copie temporaire des cartes disponibles
+    QList<int> available = hand;
+
+    // Retire celles déjà passées
+    for (int c : passed) {
+        available.removeAll(c);
+    }
+
+    if (available.isEmpty()) {
+        return false;
+    }
+
+    // Tire une carte aléatoire parmi les restantes
+    int r = std::uniform_int_distribution<int>(0, available.size() - 1)(gen);
+    int cardId = available.at(r);
+
+    passed.append(cardId);
+    qDebug() << "AI" << player << "a choisi carte" << cardId;
+
+    return passed.size() == 3;
+}
+
+void Engine::cpus_select_cards()
+{
+  for (int p = 1; p < 4; p++) {
+    for (int c = 0; c < 3; c++) {
+      if (AI_select_Randoms((PLAYER)p)) break;
+    }
+  }
 }
