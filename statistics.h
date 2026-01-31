@@ -5,6 +5,7 @@
 #include <QTableWidgetItem>
 
 #include "cpus.h"
+#include "define.h"
 
 constexpr int FNOERR     =  0;
 constexpr int FCORRUPTED =  1;
@@ -44,7 +45,7 @@ public:
     ~Statistics();
 
 signals:
-    void sig_message(const QString &message);
+    void sig_message(const QString &message, MESSAGE msgType);
 
 private:
     Ui::Statistics *ui;

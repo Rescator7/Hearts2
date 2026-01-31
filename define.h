@@ -10,6 +10,12 @@ constexpr const char FOLDER[] = "/DEV/Hearts2/";
 constexpr int MIN_APPL_WIDTH = 500;
 constexpr int MIN_APPL_HEIGHT = 460;
 
+enum MESSAGE {
+  MESSAGE_ERROR  = 0,
+  MESSAGE_SYSTEM = 1,
+  MESSAGE_INFO   = 2
+};
+
 enum TABS {
    TAB_BOARD        = 0,
    TAB_CHANNEL      = 1,

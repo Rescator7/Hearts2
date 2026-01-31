@@ -38,7 +38,7 @@ Statistics::Statistics(QWidget *parent) :
        QMessageBox::No);
        if (reply == QMessageBox::Yes) {
          reset();
-         emit sig_message(tr("You have reset the statistics!"));
+         emit sig_message(tr("You have reset the statistics!"), MESSAGE_SYSTEM);
        }
   });
 }

@@ -27,7 +27,7 @@ void Engine::Start()
   QFile file(QDir::homePath() + SAVEDGAME_FILENAME);
   if (file.exists()) {
     if (load_game()) {
-      emit sig_message(tr("Previous saved game has been loaded!"));
+      emit sig_message(tr("Previous saved game has been loaded!"), MESSAGE_SYSTEM);
       file.remove();
     } else {
       // Remove any previous backup of saved game file.
@@ -39,7 +39,7 @@ void Engine::Start()
 
       // Make a backup of the current corrupted game. (for analyze)
       file.rename(QDir::homePath() + SAVEDGAME_CORRUPTED);
-      emit sig_message(errorMessage(ERRCORRUPTED));
+      emit sig_message(errorMessage(ERRCORRUPTED), MESSAGE_ERROR);
       start_new_game();
     }
   } else {
@@ -124,8 +124,7 @@ void Engine::init_variables()
 
 GAME_ERROR Engine::start_new_game()
 {
-  if (locked) {
-  //  emit sig_error(errorMessage(ERRLOCKED));
+  if (isBusy()) {
     return ERRLOCKED;
   }
 
@@ -139,7 +138,7 @@ GAME_ERROR Engine::start_new_game()
   }
 
   generate_players_name();
-  emit sig_message(tr("Starting a new game."));
+  emit sig_message(tr("Starting a new game."), MESSAGE_SYSTEM);
   emit sig_new_players();
   emit sig_update_stat(0, STATS_GAME_STARTED);
   emit sig_update_scores_board(playersName, hand_score, total_score);
@@ -148,18 +147,23 @@ GAME_ERROR Engine::start_new_game()
   return NOERROR;
 }
 
-bool Engine::undo()
+bool Engine::Undo()
 {
-  if (!isMyTurn()) {
+  if (isBusy()) {
+    emit sig_message(errorMessage(ERRLOCKED), MESSAGE_ERROR);
     return false;
   }
 
   if (undoStack.available) {
     popUndo();
+    emit sig_message(tr("The cancellation was successful!"), MESSAGE_INFO);
+
     return true;
   }
 
- return false;
+  emit sig_message(tr("There is no undo available!"), MESSAGE_ERROR);
+
+  return false;
 }
 
 void Engine::sort_players_hand()
@@ -496,7 +500,7 @@ void Engine::advance_direction()
                       break;
   }
 
-  emit sig_message(mesg);
+  emit sig_message(mesg, MESSAGE_INFO);
 }
 
 void Engine::check_for_best_hand(PLAYER player, int cardId)
@@ -545,7 +549,7 @@ void Engine::Play(int cardId, PLAYER player)
     trick_value++;
     if (!hearts_broken) {
       hearts_broken = true;
-      emit sig_message(tr("Hearts has been broken!"));
+      emit sig_message(tr("Hearts has been broken!"), MESSAGE_INFO);
       emit sig_play_sound(SOUND_BREAKING_HEARTS);
     }
   } else
@@ -554,7 +558,7 @@ void Engine::Play(int cardId, PLAYER player)
     queen_spade_in_trick = true;
     if (variant_queen_spade) {
       hearts_broken = true;
-      emit sig_message(tr("Hearts has been broken!"));
+      emit sig_message(tr("Hearts has been broken!"), MESSAGE_INFO);
       emit sig_play_sound(SOUND_BREAKING_HEARTS);
     }
     emit sig_play_sound(SOUND_QUEEN_SPADE);
@@ -634,7 +638,7 @@ void Engine::shoot_moon(int player)
       }
   }
 
-  emit sig_message(mesg);
+  emit sig_message(mesg, MESSAGE_INFO);
 }
 
 void Engine::update_total_scores()
@@ -651,7 +655,7 @@ void Engine::update_total_scores()
       } else {
         mesg = tr("Player '") + playersName[p] + tr("' shoot the moon!");
       }
-      emit sig_message(mesg);
+      emit sig_message(mesg, MESSAGE_INFO);
 
       shoot_moon(p);
       moon = true;
@@ -677,7 +681,7 @@ void Engine::update_total_scores()
             mesg = tr("Player '") + playersName[p] + tr("' receive the bonus: no tricks bonus ") + QString::number(bonus) + tr(" point(s)");
           }
           emit sig_update_stat(playersIndex[p], STATS_NO_TRICKS);
-          emit sig_message(mesg);
+          emit sig_message(mesg, MESSAGE_INFO);
         }
       }
 
@@ -693,7 +697,7 @@ void Engine::update_total_scores()
             mesg = tr("Player '") + playersName[p] + tr("' receive the bonus: omnibus ") + QString::number(bonus) + tr(" point(s)");
           }
           emit sig_update_stat(playersIndex[p], STATS_OMNIBUS);
-          emit sig_message(mesg);
+          emit sig_message(mesg, MESSAGE_INFO);
         }
       }
     }
@@ -708,7 +712,7 @@ void Engine::update_total_scores()
                                   playersName[p] + tr("' score has been set to 50.");
         }
 
-      emit sig_message(mesg);
+      emit sig_message(mesg, MESSAGE_INFO);
       emit sig_update_stat(playersIndex[p], STATS_PERFECT_100);
       emit sig_play_sound(SOUND_PERFECT_100);
     }
@@ -728,7 +732,7 @@ void Engine::update_total_scores()
                                    playersName[PLAYER_EAST] + ": " +
           QString::number(total_score[PLAYER_EAST]) + " (" + QString::number(hand_score[PLAYER_EAST]) + ")'";
 
-  emit sig_message(mesg);
+  emit sig_message(mesg, MESSAGE_INFO);
 
   for (int p = 0; p < 4; p++) {
     hand_score[p] = 0;
@@ -911,7 +915,7 @@ bool Engine::is_it_TRAM(PLAYER player)
   else
     mesg = tr("Player '") + playersName[player] + tr("' takes the rest!");
 
-  emit sig_message(mesg);
+  emit sig_message(mesg, MESSAGE_INFO);
   emit sig_play_sound(SOUND_TRAM);
 
   return true;
@@ -995,7 +999,7 @@ void Engine::sendGameResult()
         tr("\n[Info]: Player '")                    + playersName[PLAYER_EAST] + "': " +
          QString::number(total_score[PLAYER_EAST]) + tr(" point(s) ") + (total_score[PLAYER_EAST] == lowest ? result : "");
 
-  emit sig_message(mesg);
+  emit sig_message(mesg, MESSAGE_INFO);
 }
 
 int Engine::lowestCardInSuitForPlayer(PLAYER player, SUIT suit) const
@@ -1548,7 +1552,7 @@ int Engine::eval_card_strength(PLAYER player, DECK_INDEX cardId)
      }
   }
 
- int value = cpt / std::max(1, leftInSuit(suit)) * 100;
+ int value = (cpt / std::max(1, leftInSuit(suit))) * 100;
 
  return value;
 }

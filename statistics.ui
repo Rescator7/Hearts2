@@ -443,19 +443,6 @@
    <string>Statistics</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="3">
-    <widget class="QLabel" name="label_5">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
-   </item>
    <item row="0" column="2">
     <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
@@ -1230,6 +1217,12 @@
      </item>
      <item>
       <widget class="QLabel" name="label_undos">
+       <property name="minimumSize">
+        <size>
+         <width>60</width>
+         <height>0</height>
+        </size>
+       </property>
        <property name="maximumSize">
         <size>
          <width>200</width>
@@ -1262,7 +1255,7 @@
           </size>
          </property>
          <property name="text">
-          <string>Games Started:</string>
+          <string>Games Started: </string>
          </property>
          <property name="alignment">
           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -1273,7 +1266,7 @@
         <widget class="QLabel" name="label_games_started">
          <property name="minimumSize">
           <size>
-           <width>60</width>
+           <width>100</width>
            <height>0</height>
           </size>
          </property>
@@ -1295,7 +1288,7 @@
           </size>
          </property>
          <property name="text">
-          <string>Games Finished:</string>
+          <string>Games Finished: </string>
          </property>
          <property name="alignment">
           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -1306,7 +1299,7 @@
         <widget class="QLabel" name="label_games_finished">
          <property name="minimumSize">
           <size>
-           <width>60</width>
+           <width>100</width>
            <height>0</height>
           </size>
          </property>
@@ -1342,7 +1335,7 @@
         <widget class="QLabel" name="label_hands_played">
          <property name="minimumSize">
           <size>
-           <width>60</width>
+           <width>100</width>
            <height>0</height>
           </size>
          </property>
@@ -1354,6 +1347,19 @@
       </layout>
      </item>
     </layout>
+   </item>
+   <item row="0" column="3">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>

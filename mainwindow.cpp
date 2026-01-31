@@ -166,17 +166,7 @@ MainWindow::MainWindow(QWidget *parent)
     });
 
     connect(ui->pushButton_new, &QPushButton::clicked, this, &MainWindow::onNewGame);
-
-    connect(ui->pushButton_undo, &QPushButton::clicked, this, [this]() {
-      bool success = engine->undo();
-      if (success) {
-        sounds->play(SOUND_UNDO);
-        statistics->increase_stats(PLAYER_SOUTH, STATS_UNDO);
-        message(tr("The cancellation was successful!"), MESSAGE_INFO);
-      } else {
-          message(tr("There is no undo available!"), MESSAGE_ERROR);
-        }
-    });
+    connect(ui->pushButton_undo, &QPushButton::clicked, engine, &Engine::Undo);
 
     connect(ui->checkBox_new_game, &QCheckBox::clicked, this, [this](bool checked) {
       config->set_config_file(CONFIG_COMFIRM_NEW_GAME, checked);
@@ -191,22 +181,13 @@ MainWindow::MainWindow(QWidget *parent)
         }
     });
 
-    connect(statistics, &Statistics::sig_message, this, [this](const QString mesg) {
-      message(mesg, MESSAGE_SYSTEM);
-    });
+    connect(statistics, &Statistics::sig_message, this, &MainWindow::message);
 
-/*
-    connect(engine, &Engine::sig_error, this, [this](QString err) {
-      sounds->play(SOUND_ERROR);
-      message(err);
-    });
-*/
- // connect(engine, &Engine::sig_setCurrentSuit, this, &MainWindow::setCurrentSuit);
     connect(engine, &Engine::sig_your_turn, this, &MainWindow::onYourTurn);
     connect(engine, &Engine::sig_play_sound, this, &MainWindow::onPlaySound);
     connect(engine, &Engine::sig_update_stat, this, &MainWindow::onUpdateStat);
     connect(engine, &Engine::sig_update_stat_score, this, &MainWindow::onUpdateStatScore);
-    connect(engine, &Engine::sig_message, this, &MainWindow::onEngineMessage);
+    connect(engine, &Engine::sig_message, this, &MainWindow::message);
     connect(engine, &Engine::sig_setTrickPile, this, &MainWindow::onSetTrickPile);
     connect(engine, &Engine::sig_enableAllCards, this, &MainWindow::enableAllCards);
     connect(engine, &Engine::sig_refresh_deck, this, &MainWindow::refresh_deck);
@@ -280,6 +261,7 @@ void MainWindow::loadHelpFile()
                                  {"2. Game settings", "settings", false },
                                  {"2.1 Game variants", "variants", true },
                                  {"2.2 Miscellaneous", "miscellaneous", true },
+                                 {"2.3 Scoreboard", "scoreboard", true },
                                  {"3. Game shortcuts", "shortcuts", false },
                                  {"4. Playing online", "online", false },
                                  {"5. Credits", "credits", false },
@@ -879,10 +861,6 @@ void MainWindow::onPlaySound(SOUNDS soundId) {
 
 void MainWindow::onUpdateStat(int player, STATS stat) {
   statistics->increase_stats(player, stat);
-}
-
-void MainWindow::onEngineMessage(const QString &msg) {
-  message(msg, MESSAGE_INFO);
 }
 
 void MainWindow::onSetTrickPile(const QList<int> &pile) {
@@ -1779,9 +1757,8 @@ void MainWindow::setAnimationUnlock()
         ui->pushButton_undo->setDisabled(false);
         ui->pushButton_new->setDisabled(false);
 
-      //  ui->graphicsView->unsetCursor();
+        // ui->graphicsView->unsetCursor();
         QApplication::restoreOverrideCursor();
-
 
         // Restore full resizability
         setMinimumSize(QSize(MIN_APPL_WIDTH, MIN_APPL_HEIGHT));
@@ -1813,7 +1790,7 @@ void MainWindow::showTurnIndicator()
 {
     sounds->play(SOUND_YOUR_TURN);
 
-    if (ui->opt_anim_triangle->isChecked()) {
+    if (ui->opt_animations->isChecked() && ui->opt_anim_triangle->isChecked()) {
       yourTurnIndicator->show();
       animateYourTurnIndicator();
     } else
@@ -2162,9 +2139,6 @@ QParallelAnimationGroup *MainWindow::animateCardsOffBoard(const QList<int> &card
         for (int cardId : cardsId) {
             QGraphicsItem *card = deck->get_card_item(cardId, true);
             card->hide();
-//                scene->removeItem(card);
-//                delete card;  // Safe if not parented elsewhere
-
         }
         offGroup->deleteLater();
     });
@@ -2794,6 +2768,7 @@ void MainWindow::on_opt_animations_clicked()
 
   config->set_config_file(CONFIG_ANIMATED_PLAY, enabled);
   setAnimationButtons(enabled);
+  on_opt_anim_arrow_clicked(enabled);
 }
 
 void MainWindow::on_pushButton_score_clicked()
@@ -2813,7 +2788,7 @@ void MainWindow::on_opt_anim_arrow_clicked(bool checked)
     return;
   }
 
-  if (!checked) {
+  if (!checked || !ui->opt_animations->isChecked()) {
     arrowMovie->jumpToFrame(totalFrames - 1);
     arrowMovie->setPaused(true);
     updateTurnArrow();

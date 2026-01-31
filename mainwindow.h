@@ -50,12 +50,6 @@ enum ScoreAnchorSide {
 };
 */
 
-enum MESSAGE {
-  MESSAGE_ERROR  = 0,
-  MESSAGE_SYSTEM = 1,
-  MESSAGE_INFO   = 2
-};
-
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -99,7 +93,6 @@ private slots:
     void onYourTurn();
     void onPlaySound(SOUNDS soundId);
     void onUpdateStat(int player, STATS stat);
-    void onEngineMessage(const QString &msg);
     void onSetTrickPile(const QList<int> &pile);
     void onClearDeck();
     void onCollectTricks(PLAYER winner, bool tram);
@@ -117,6 +110,7 @@ private slots:
     void onAnimationToggled(int id, bool checked);
     void onRefreshCardsPlayed();
     void onCardPlayed(int cardId);
+    void message(QString mesg, MESSAGE type);
 
     void on_opt_anim_arrow_clicked(bool checked);
 
@@ -181,7 +175,6 @@ private:
 
 public:
 //    void saveDragPosition(QPointF pos) {savedScorePos = pos; };
-    void message(QString mesg, MESSAGE type);
     void updateBackground();
     void updateTrickPile();
     void updateYourTurnIndicator();

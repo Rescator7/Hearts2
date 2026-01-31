@@ -197,12 +197,11 @@ signals:
     void sig_update_stat(int player, STATS stat);
     void sig_update_stat_score(int player, int score);
     void sig_play_sound(SOUNDS soundId);
-    void sig_message(QString message);
+    void sig_message(QString message, MESSAGE msgType);
     void sig_setTrickPile(QList<int> pile);
     void sig_busy(bool b);
     void sig_refresh_cards_played();
     void sig_card_played(int cardId);
- //   void sig_error(QString err);
 
 public:
     void set_variant(int variant, bool enabled);
@@ -214,7 +213,7 @@ public:
     void LockedLoop();
     bool load_game();
     bool save_game();
-    bool undo();
+    bool Undo();
     bool isPlaying() { return (game_status == PLAY_A_CARD_1) || (game_status == PLAY_A_CARD_2) ||
                               (game_status == PLAY_A_CARD_3) || (game_status == PLAY_A_CARD_4) ||
                               (game_status == PLAY_TWO_CLUBS); };
