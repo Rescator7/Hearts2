@@ -111,8 +111,8 @@ private slots:
     void onRefreshCardsPlayed();
     void onCardPlayed(int cardId);
     void message(QString mesg, MESSAGE type);
-
     void on_opt_anim_arrow_clicked(bool checked);
+    void on_pushButton_undo_clicked();
 
 private:
 /*
@@ -212,6 +212,7 @@ public:
     void loadHelpFile();
     void setCheatMode(bool enabled);
     void loadCardsPlayed();
+    void createTOC();
 
     // Setters (publics)
     /*

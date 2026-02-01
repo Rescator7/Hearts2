@@ -148,7 +148,12 @@ private:
     bool AI_select_Diamonds(PLAYER player);
     bool AI_select_Hearts(PLAYER player);
     bool AI_select_Randoms(PLAYER player);
+    bool AI_elim_suit(PLAYER player, SUIT suit);
+    bool AI_Ready(PLAYER player) { return passedCards[player].size() >= 3; };
     bool is_moon_an_option();
+    bool is_prepass_to_moon(PLAYER player);
+    bool AI_pass_friendly(PLAYER player);
+    bool trySelectCardId(PLAYER player, int cardId);
     int  AI_eval_lead_hearts(DECK_INDEX cardId);
     int  AI_eval_lead_spade(DECK_INDEX cardId);
     int  AI_eval_lead_diamond(DECK_INDEX cardId);

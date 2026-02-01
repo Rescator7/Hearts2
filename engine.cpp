@@ -602,10 +602,10 @@ bool Engine::getNewMoonChoice()
     msgBox.setText("<font size='+2' color='#FFD700'><b>Congratulations!</b></font><br>"
                    "<font color='#FF69B4'>You have taken all the hearts!</font>");
 
-    msgBox.setInformativeText("What would you like to do?");
+    msgBox.setInformativeText(tr("What would you like to do?"));
 
-    QPushButton *addButton = msgBox.addButton("➕ 26 to opponents", QMessageBox::AcceptRole);
-    QPushButton *subButton = msgBox.addButton("➖ 26 to myself", QMessageBox::RejectRole);
+    QPushButton *addButton = msgBox.addButton(tr("➕ 26 to opponents"), QMessageBox::AcceptRole);
+    QPushButton *subButton = msgBox.addButton(tr("➖ 26 to myself"), QMessageBox::RejectRole);
 
     addButton->setStyleSheet("QPushButton { background-color: #FF4444; color: white; padding: 12px 18px; border-radius: 8px; font-weight: bold; }");
     subButton->setStyleSheet("QPushButton { background-color: #44AA44; color: white; padding: 12px 18px; border-radius: 8px; font-weight: bold; }");
@@ -1395,8 +1395,6 @@ qDebug() << "Step select";
       return false;
   }
 
- // emit sig_clear_deck();
- // emit sig_enableAllCards();
   firstTime = false;
 
   emit sig_refresh_cards_played();
@@ -1837,15 +1835,387 @@ bool Engine::AI_select_Randoms(PLAYER player)
     int cardId = available.at(r);
 
     passed.append(cardId);
-    qDebug() << "AI" << player << "a choisi carte" << cardId;
 
     return passed.size() == 3;
+}
+
+bool Engine::is_prepass_to_moon(PLAYER player)
+{
+  const int aces[4] = {CLUBS_ACE, SPADES_ACE, DIAMONDS_ACE, HEARTS_ACE};
+
+  int bonus = 0;
+  int discard = 0;
+
+  for (int i = 0; i < 4; i++) {
+     int cpt_suit = countCardsInSuit(player, (SUIT)i);
+
+     if (cpt_suit) {
+       if (cpt_suit > 8)
+         bonus = 2;
+       else
+       if (cpt_suit > 6)
+         bonus = 1;
+
+
+       if ((Owner(aces[i]) != player) && ((i == HEARTS) || ((cpt_suit >= 3) && (cpt_suit <= 6))))
+         discard += cpt_suit;
+     }
+
+     if (discard > 3)
+       return false;
+  }
+
+  int card_value;
+  int low1 = 65535;
+  int low2 = 65535;
+  int low3 = 65535;
+
+  double total = 0;
+  for (int i = 0; i < playerHandsById[player].size(); i++) {
+    card_value = (playerHandsById[player].at(i) % 13) + 2;
+
+    if (card_value < low1) {
+      if (low1 < low2) {
+        if (low2 < low3)
+          low3 = low2;
+        low2 = low1;
+      }
+      low1 = card_value;
+    }
+    else
+    if (card_value < low2) {
+      if (low2 < low3)
+        low3 = low2;
+      low2 = card_value;
+    }
+    else
+    if (card_value < low3)
+      low3 = card_value;
+
+    total += card_value;
+  }
+
+  total = (total - low1 - low2 - low3) / 10 + bonus;
+
+  if (total < 10)                                     // although, some hands with a total of 7 are promising and
+    return false;                                     // some with total of 11 aren't, it's usually better to
+                                                      // have total above 10.
+  return true;
+}
+
+bool Engine::AI_select_To_Moon(PLAYER player)
+{
+  if (Owner(HEARTS_ACE) != player)
+    return false;
+
+  int heart_count = countCardsInSuit(player, HEARTS);
+
+  // if we're having heart, we needs to eliminate heart absolutely.
+  if (heart_count && (heart_count < 9)) {
+    int high_cards = 0;
+    if (Owner(HEARTS_KING) == player) high_cards++;
+    if (Owner(HEARTS_QUEEN) == player) high_cards++;
+    if (Owner(HEARTS_JACK) == player) high_cards++;
+
+    for (int cardId : playerHandsById[player]) {
+      int suit = cardId / 13;  // 0 = club, 1 = spade, 2 = diamond, 3 = heart
+      if (suit != HEARTS) continue;
+      if (cardId < HEARTS_JACK - high_cards) {
+        if (trySelectCardId(player, cardId) && AI_Ready(player)) {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+}
+
+bool Engine::AI_select_Spades(PLAYER player)
+{
+  int spade_count = countCardsInSuit(player, SPADES);
+
+  if (!spade_count)
+    return false;
+
+  bool qs_passed = false;
+
+  // if AI_flags_safe_keep_qs is not set, or it's not safe to keep -> pass the queen of spade.
+  if (!(AI_CPU_flags[player] & AI_flags_safe_keep_qs) || (spade_count < 5)) {
+    if (Owner(SPADES_QUEEN) == player) {
+      if (trySelectCardId(player, SPADES_QUEEN) && AI_Ready(player)) {
+        return true;
+      }
+      qs_passed = true;
+     }
+  }
+
+  // if we kept the queen of spade then don't pass either ace or king of spade, otherwise try to pass them.
+  if ((Owner(SPADES_QUEEN) != player) || qs_passed) {
+    if (trySelectCardId(player, SPADES_ACE) && AI_Ready(player)) {
+      return true;
+    }
+    if (trySelectCardId(player, SPADES_KING) && AI_Ready(player)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+bool Engine::AI_select_Hearts(PLAYER player)
+{
+  int heart_count = countCardsInSuit(player, HEARTS);
+
+  if (!heart_count)
+    return false;
+
+  // if AI_flags_pass_hearts_zero is set, let's roll the dice so 70% of the time we don't pass.
+  int chance = std::uniform_int_distribution<int>(0, 100)(gen);
+  if ((AI_CPU_flags[player] & AI_flags_pass_hearts_zero) && (chance < 70))
+    return false;
+
+  bool passed_hearts = false;
+  for (int cardId : passedCards[player]) {
+    if ((cardId / 13) == HEARTS) {
+      passed_hearts = true;
+      break;
+    }
+  }
+
+  bool select_low = (AI_CPU_flags[player] & AI_flags_pass_hearts_low) || (chance >= 70);
+  bool select_high = AI_CPU_flags[player] & AI_flags_pass_hearts_high;
+
+  int low_position = heart_count > 1 ? 1 : 0;
+  int high_position = heart_count > 2 ? heart_count - 2 : heart_count - 1;
+
+  int cpt = 0;
+
+  if (select_low | select_high) {
+    for (int cardId : playerHandsById[player]) {
+      int suit = cardId / 13;
+       if (suit == HEARTS) {
+         if (passedCards[player].indexOf(cardId) != -1) continue;
+
+         if ((cpt == low_position) && select_low && !passed_hearts && (cardId != HEARTS_ACE)) {
+           if (trySelectCardId(player, cardId) && AI_Ready(player)) {
+             return true;
+           }
+           cpt++;
+           continue;
+         }
+
+         if ((cpt == high_position) && select_high && (cardId >= HEARTS_JACK)) {
+           if (trySelectCardId(player, cardId) && AI_Ready(player)) {
+             return true;
+           }
+         }
+         cpt++;
+       }
+    }
+  }
+
+  return false;
+}
+
+bool Engine::AI_pass_friendly(PLAYER player)
+{
+  if (!variant_omnibus) {
+    return false;
+  }
+
+  if (!(AI_CPU_flags[player] & AI_flags_friendly)) {
+    return false;
+  }
+
+  int cpt = 0;
+  for (int i = 0; i < 4; i++) {
+    if (player == i) continue;
+    if (total_score[player] > total_score[i]) {
+      cpt++;
+    }
+  }
+
+  if ((cpt == 0) || (cpt == 3)) { // If it has the best or the worst score, don't pass friendly.
+    return false;
+  }
+
+  PLAYER receiver = PLAYER_SOUTH; // just a default initialisation
+  switch (direction) {
+    case PASS_LEFT: if (player == PLAYER_WEST) {
+                      receiver = PLAYER_NORTH;
+                      break;
+                    }
+                    if (player == PLAYER_NORTH) {
+                      receiver = PLAYER_EAST;
+                      break;
+                    }
+                    if (player == PLAYER_EAST) {
+                      receiver = PLAYER_SOUTH;
+                      break;
+                    }
+                    break;
+    case PASS_RIGHT: if (player == PLAYER_WEST) {
+                       receiver = PLAYER_SOUTH;
+                       break;
+                     }
+                     if (player == PLAYER_NORTH) {
+                       receiver = PLAYER_WEST;
+                       break;
+                     }
+                     if (player == PLAYER_EAST) {
+                       receiver = PLAYER_NORTH;
+                       break;
+                     }
+                     break;
+    case PASS_ACROSS: if (player == PLAYER_WEST) {
+                        receiver = PLAYER_EAST;
+                        break;
+                      }
+                      if (player == PLAYER_NORTH) {
+                        receiver = PLAYER_SOUTH;
+                        break;
+                      }
+                      if (player == PLAYER_EAST) {
+                        receiver = PLAYER_WEST;
+                      }
+                      break;
+    case PASS_HOLD: break;
+  }
+
+  if ((total_score[receiver] - OMNIBUS_VALUE) < total_score[player]) {
+    return false;
+  }
+
+  return true;
+}
+
+bool Engine::AI_elim_suit(PLAYER player, SUIT suit)
+{
+  int count_suit = countCardsInSuit(player, suit);
+
+  if (!count_suit) {
+    return false;
+  }
+
+  // if AI_flags_elim_suit is set, try to eliminate our clubs.
+  if (AI_CPU_flags[player] & AI_flags_pass_elim_suit) {
+    if (count_suit <= 3) {
+      for (auto cardId = playerHandsById[player].crbegin(); cardId != playerHandsById[player].crend(); ++cardId) {
+         if ((*cardId / 13) != suit) continue;
+         if (trySelectCardId(player, *cardId) && AI_Ready(player)) {
+           return true;
+         }
+      }
+    }
+  }
+
+  return false;
+}
+
+bool Engine::trySelectCardId(PLAYER player, int cardId)
+{
+  if (Owner(cardId) != player) {
+    return false;
+  } // not the owner
+
+  if (passedCards[player].indexOf(cardId) != -1) {
+    return false;
+  } // already selected
+
+  if (passedCards[player].size() >= 3) {
+    return false;
+  } // 3 cards already selected
+
+  passedCards[player].append(cardId);
+  return true;
+}
+
+bool Engine::AI_select_Clubs(PLAYER player)
+{
+  int count_clubs = countCardsInSuit(player, CLUBS);
+
+  if (!count_clubs) {
+    return false;
+  }
+
+  if (AI_elim_suit(player, CLUBS)) {
+    return true;
+  }
+
+  int cardId;
+  // if AI_flags_try_moon is set, pass our lowest cards, otherwise pass the highest.
+  if ((AI_CPU_flags[player] & AI_flags_try_moon) && is_prepass_to_moon(player)) {
+    cardId = lowestCardInSuitForPlayer(player, CLUBS);
+    if (trySelectCardId(player, cardId) && AI_Ready(player)) {
+      return true;
+    }
+  } else {
+      cardId = highestCardInSuitForPlayer(player, CLUBS);
+      if (trySelectCardId(player, cardId) && AI_Ready(player)) {
+        return true;
+      }
+    }
+
+  return false;
+}
+
+bool Engine::AI_select_Diamonds(PLAYER player)
+{
+  int count_diamonds = countCardsInSuit(player, DIAMONDS);
+
+  if (!count_diamonds) {
+    return false;
+  }
+
+  // check for omnibus friendly pass. only 1 friendly pass.
+  // trySelectCardId check the Owner of the card, but this way we'll pass only 1 top card not 3 of them
+  if (variant_omnibus && AI_pass_friendly(player)) {
+    if (Owner(DIAMONDS_JACK) == player) {
+      if (trySelectCardId(player, DIAMONDS_JACK) && AI_Ready(player)) {
+        return true;
+      }
+    }
+    else
+    if (Owner(DIAMONDS_ACE) == player) {
+      if (trySelectCardId(player, DIAMONDS_ACE) && AI_Ready(player)) {
+        return true;
+      }
+    }
+    else
+    if (Owner(DIAMONDS_KING) == player) {
+      if (trySelectCardId(player, DIAMONDS_KING) && AI_Ready(player)) {
+        return true;
+      }
+    }
+  }
+
+  // if AI_flags_elim_suit is set, try to eliminate our diamond.
+  if (AI_elim_suit(player, DIAMONDS)) {
+    return true;
+  }
+
+  // if not omnibus pass highest diamond, but not in try to moon
+  if (!variant_omnibus && (!(AI_CPU_flags[player] & AI_flags_try_moon) || !is_prepass_to_moon(player))) {
+    int highest = highestCardInSuitForPlayer(player, DIAMONDS);
+    if (trySelectCardId(player, highest) && AI_Ready(player)) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 void Engine::cpus_select_cards()
 {
   for (int p = 1; p < 4; p++) {
     for (int c = 0; c < 3; c++) {
+      if ((AI_CPU_flags[p] & AI_flags_try_moon) && is_prepass_to_moon((PLAYER)p)) {
+        if (AI_select_To_Moon((PLAYER)p)) break;
+      }
+      if (AI_select_Spades((PLAYER)p)) break;
+      if (AI_select_Hearts((PLAYER)p)) break;
+      if (AI_select_Clubs((PLAYER)p)) break;
+      if (AI_select_Diamonds((PLAYER)p)) break;
       if (AI_select_Randoms((PLAYER)p)) break;
     }
   }

@@ -59,13 +59,13 @@ MainWindow::MainWindow(QWidget *parent)
     background = new Background(scene, this);
     scene->protectItem(background);
 
-    loadHelpFile();
-
     createButtonsGroups();
 
     create_arrows();
 
     createPlayerNames();
+
+    createTOC();
 
     applyAllSettings();
 
@@ -166,7 +166,6 @@ MainWindow::MainWindow(QWidget *parent)
     });
 
     connect(ui->pushButton_new, &QPushButton::clicked, this, &MainWindow::onNewGame);
-    connect(ui->pushButton_undo, &QPushButton::clicked, engine, &Engine::Undo);
 
     connect(ui->checkBox_new_game, &QCheckBox::clicked, this, [this](bool checked) {
       config->set_config_file(CONFIG_COMFIRM_NEW_GAME, checked);
@@ -250,29 +249,18 @@ void MainWindow::aboutToQuit()
 
 void MainWindow::loadHelpFile()
 {
-  struct tocEntry {
-    QString title;
-    QString anchor;
-    bool isSubsection;
-  };
+  QFile file; // (":/help.html");
+  if (ui->opt_english->isChecked()) {
+    file.setFileName(":/help.html");
+  } else
+    if (ui->opt_french->isChecked()) {
+      qDebug() << "Set french help.";
+      file.setFileName(":/help_fr.html");
+    } else
+      if (ui->opt_russian->isChecked()) {
+        file.setFileName(":/help_ru.html");
+      }
 
-  static const tocEntry TOC[] =  {
-                                 {"1. Basic rules of the game", "rules", false },
-                                 {"2. Game settings", "settings", false },
-                                 {"2.1 Game variants", "variants", true },
-                                 {"2.2 Miscellaneous", "miscellaneous", true },
-                                 {"2.3 Scoreboard", "scoreboard", true },
-                                 {"3. Game shortcuts", "shortcuts", false },
-                                 {"4. Playing online", "online", false },
-                                 {"5. Credits", "credits", false },
-                                 {"5.1 Playing card decks", "decks", true },
-                                 {"5.2 Icons", "icons", true },
-                                 {"5.3 Backgrounds Images", "backgrounds", true },
-                                 {"5.4 Sounds", "sounds", true },
-                                 {"5.5 Special thanks", "special", true}
-                                 };
-
-  QFile file(":/help.html");
   if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
     QTextStream in(&file);
     QString html = in.readAll();
@@ -280,8 +268,35 @@ void MainWindow::loadHelpFile()
     file.close();
   } else {
       qWarning() << "Impossible de charger help.html";
-      ui->textHelpContent->setPlainText("Erreur : fichier d'aide non trouvé.");
+      ui->textHelpContent->setPlainText(tr("Error : help file not found."));
     }
+  ui->textHelpContent->setOpenExternalLinks(true);
+  ui->textHelpContent->setOpenLinks(true);
+}
+
+void MainWindow::createTOC()
+{  
+  struct tocEntry {
+    QString title;
+    QString anchor;
+    bool isSubsection;
+  };
+
+  static const tocEntry TOC[] =  {
+                                 {tr("1. Basic rules of the game"), "rules", false },
+                                 {tr("2. Game settings"), "settings", false },
+                                 {tr("2.1 Game variants"), "variants", true },
+                                 {tr("2.2 Miscellaneous"), "miscellaneous", true },
+                                 {tr("2.3 Scoreboard"), "scoreboard", true },
+                                 {tr("3. Game shortcuts"), "shortcuts", false },
+                                 {tr("4. Playing online"), "online", false },
+                                 {tr("5. Credits"), "credits", false },
+                                 {tr("5.1 Playing card decks"), "decks", true },
+                                 {tr("5.2 Icons"), "icons", true },
+                                 {tr("5.3 Backgrounds Images"), "backgrounds", true },
+                                 {tr("5.4 Sounds"), "sounds", true },
+                                 {tr("5.5 Special thanks"), "special", true}
+                                 };
 
   ui->treeHelpTOC->setHeaderHidden(true);  // pas de header
   ui->treeHelpTOC->setColumnCount(1);
@@ -289,8 +304,6 @@ void MainWindow::loadHelpFile()
                                  "QTreeWidget::item { padding: 8px; }"
                                  "QTreeWidget::item:selected { background: #5a9f5a; color: white; }"
   );
-  ui->textHelpContent->setOpenExternalLinks(true);
-  ui->textHelpContent->setOpenLinks(true);
 
   QTreeWidgetItem *lastParent = nullptr;
 
@@ -514,6 +527,7 @@ void MainWindow::applyAllSettings()
     case LANG_FRENCH: ui->opt_french->setChecked(true); break;
     case LANG_RUSSIAN: ui->opt_russian->setChecked(true); break;  
   }
+  loadHelpFile();
 
   QSize savedSize(config->width(), config->height());
   QPoint savedPos(config->posX(), config->posY());
@@ -828,7 +842,6 @@ void MainWindow::onCardClicked(QGraphicsItem *item)
 qDebug() << "We clicked to play a card";
           removeInvalidCardsEffect();
           playCard(cardId, PLAYER_SOUTH);
-  //        engine->Step();
         }
       }
     if (player == PLAYER_NOBODY) {
@@ -1595,6 +1608,7 @@ void MainWindow::createButtonsGroups()
    languageGroup->setExclusive(true);
 
     connect(languageGroup, QOverload<int>::of(&QButtonGroup::idClicked), this, [this](int id) {
+      loadHelpFile();
       config->set_language(id);
     });
 
@@ -2797,3 +2811,12 @@ void MainWindow::on_opt_anim_arrow_clicked(bool checked)
       arrowMovie->start();
     }
 }
+
+void MainWindow::on_pushButton_undo_clicked()
+{
+  if (engine->Undo()) {
+    sounds->play(SOUND_UNDO);
+    statistics->increase_stats(PLAYER_SOUTH, STATS_UNDO);
+  }
+}
+

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+
+<style>
+    body { font-family: Noto, sans-regular; line-height: 1.15; }
+    p, li { line-height: 1.1; }
+    .aere { line-height: 1.3; }
+    h1, h2 { line-height: 1.1; margin: 1em 0 0.5em 0; }
+    a { color: #B0E0E6; text-decoration: underline; }
+    a:hover { color: #FFFFFF; background: rgba(255,255,255,0.15); }
+    a:visited { color: #A0D0D8; }
+</style
+</style>
+</head>
+<body>
+<h1>Aide - Hearts 2.0</h1>
+<h2 id="rules">1. Règles de base du jeu</h2>
+<p>Hearts est un jeu de cartes à pénalités. Cette variante se joue à 4 joueurs avec un jeu complet de 52 cartes.
+Le but du jeu est d&quot;atteindre la fin de la partie avec le score le plus bas.
+Au début de chaque manche, chaque joueur reçoit 13 cartes. Il doit en choisir 3 à passer, puis cliquer sur la flèche indiquant la direction du passage.
+En échange, chaque joueur reçoit 3 cartes.</p>
+<p>Le sens du passage alterne à chaque tour : joueur à votre gauche, à votre droite, en face, puis les joueurs gardent leurs cartes. Ce système se répète jusqu&quot;à la fin de la partie.</p>
+<p>Le joueur qui détient le 2 de trèfle commence automatiquement. La première couleur jouée est le trèfle. Chaque joueur doit jouer un trèfle, sauf s&quot;il n'en a pas; dans ce cas, il peut jouer n&quot;importe quelle carte (voir règle n° 1). Le joueur qui joue la carte la plus forte de la couleur correspondante remporte le pli.</p>
+La carte la plus forte est l&quot;as, suivie du roi, de la dame, du valet, du 10, du 9, du 8, du 7, du 6, du 5, du 4, du 3, et le 2 est la plus faible.<br>
+Le gagnant du pli choisit une carte à jouer, mais pas une carte de cœur tant que les cœurs n&quot;ont pas été brisés (voir règle n° 2).<br>
+Chaque joueur doit jouer la couleur indiquée. Si un joueur n&quot;a plus de cartes de cette couleur, il peut jouer n&quot;importe quelle carte. On répète jusqu&quot;à ce qu'il n&quot;y ait plus de cartes.
+<p>À ce stade, les points de pénalité sont comptabilisés. Le joueur qui a remporté le pli contenant la dame de pique voit son score augmenter de 13 points. Chaque cœur remporté dans un pli augmente le score du joueur d&quot;un point.</p>
+Si un joueur « Volte (ou Shoot the moon)  » (voir règle n° 3), le score de tous les autres joueurs est augmenté de 26 points.<br>
+Les tours se poursuivent jusqu&quot;à ce qu&quot;un joueur atteigne la limite de 100 points.<br><br>
+Le ou les gagnants sont ceux qui ont obtenu le score le plus bas.<br><br>
+<b>Règle n° 1:</b> Au début d&quot;un tour, vous ne pouvez pas jouer la dame de pique ni aucune carte de cœur, SAUF si ce sont les seules cartes qui vous restent. Dans ce cas, vous devez jouer la dame de pique.
+<b>Règle n° 2 :</b> Les cœurs sont brisés lorsqu&quot;un joueur joue un cœur.
+		<ul>
+                        <li>Un joueur qui remporte le pli peut jouer une carte de cœur s&quot;il ne lui reste plus que des cœurs. </li>
+                        <li>Un joueur peut casser les cœurs s&quot;il ne peut pas suivre la couleur en cours (sauf au premier tour, voir règle 1).</li>
+                        <li>Remarque : la dame de pique peut casser les cœurs si l&quot;option « La dame de pique casse les cœurs » est activée. </li>
+                </ul>
+<b>Règle n° 3 :</b> « Volte (ou Shoot the moon) ».
+<ul><li>Un joueur « Shoot the moon » en prenant tous les points de pénalité (il doit prendre tous les cœurs et la dame de pique).
+		<li>Remarque : le valet de carreau doit être pris si l&quot;option « omnibus » est activée. (Voir Omnibus [Options])</li></ul>
+<h2 id="settings">2. Les options du jeu</h2>
+Les options suivantes peuvent être activées ou désactivées dans l&quot;onglet [Paramètres] :
+<h2 id="variants">2.1 Les Variantes du jeu</h2>
+<p>À la fin d&quot;un tour, les bonus suivants s&quot;appliquent (s&quot;ils sont activés dans [Paramètres]) :</p>
+<h3>100 Parfait</h3>
+<p>Si un joueur atteint le score de 100, son score est ramené à 50.</p>
+<h3>Omnibus(*)</h3>
+<p>Le joueur qui remporte le valet de carreau voit son score réduit de 10 points.
+Le valet de carreau devient une condition pour « Shoot the moon ».</p>
+<h3>Aucune pénalité(*)</h3>
+<p>Si un joueur ne reçoit aucun point de pénalité au cours d&quot;un tour, il recevra un bonus de 5 points qui sera déduit de son score.</p>
+<h3>Nouvelle Lune(*)</h3>
+<p>Si vous « Shoot the moon » et que votre score dépasse 25 points, vous aurez la possibilité de le réduire de 26 points.</p><br>
+<b>Note:</b> Si un bonus (*) ou une combinaison de bonus donne un score inférieur à zéro, le score est fixé à zéro.<br>
+	** Les bonus « Omnibus » et « Aucune pénalité » ne s&quot;appliquent pas si un joueur « Shoot the moon ».<br>
+<h3>La reine de pique casse les cœurs</h3>
+<p>Un joueur brise le « cœur » en jouant la reine de pique.</p>
+<h3>Pas de matchs nuls</h3>
+<p>Si plusieurs joueurs ont le score le plus bas à la fin du jeu, le jeu se poursuit jusqu&quot;à ce qu&quot;il ne reste plus qu&quot;un seul gagnant.</p>
+<h2 id="miscellaneous">2.2 Divers</h2>
+<h3>Confirmer [Quitter]</h3>
+<p>Vous pouvez activer la confirmation de sortie du jeu pour éviter les clics accidentels, ou la désactiver.</p>
+<h3>Confirmer [Nouvelle partie]</h3>
+<p>Vous pouvez activer la confirmation d'une nouvelle partie pour éviter les clics accidentels, ou la désactiver.
+<h3>Détecter la fin des rondes: (*)</h3>
+<p>   Si cette option est activée, le système détectera lorsqu'un joueur remportera tous les plis suivants du tour en cours, et toutes les cartes non jouées iront à ce joueur. Le tour prendra également fin. (**)</p>
+<p>Le système détectera également la fin d'une ronde lorsque toutes les cartes de pénalité auront été prises. (Le valet de carreau doit être joué [Variante Omnibus]).</p>
+<ul> <li>  * Le système de détection n'est pas actif lors du dernier tour d'une manche.</li></ul>
+<h3>Mode triche</h3>
+<p>Si le mode triche est activé, un nouveau bouton <révéler> apparaîtra dans l'onglet du plateau de jeu. Ce bouton vous permettra d'afficher ou de masquer les cartes de vos adversaires. Un nouvel onglet « ! » contenant la liste des cartes jouées sera également ajouté pour vous donner un aperçu des cartes déjà jouées.</p>
+<h3>Style de jeu de cartes</h3>
+<p>Vous pouvez choisir parmi 8 styles de jeux de cartes différents inclus dans le logiciel.</p>
+<ul><li>Standard</li>
+	<li>Nicu (white)</li>
+	<li>English</li>
+	<li>Russian</li>
+	<li>Kaiser jubilaum</li>
+	<li>Tigullio (international)</li>
+	<li>Mittelalter</li>
+	<li>Neo classical</li></ul>
+<h3>Langue</h3>
+<p>Le jeu prend en charge ces 3 langues :</p>
+<ul><li>Anglais</li>
+	<li>Français</li>
+	<li>Russe</li></ul>
+<h3>Animations</h3>
+<p>Vous pouvez activer ou désactiver chacune des animations suivantes. Vous pouvez également cocher la case « Tout désactiver ».</p>
+<ul><li>Deal cards</li>
+	<li>Jouer une carte<br>
+		« L'animation de la distribution des cartes peut être désactivée si elle est jugée trop longue. »</li>
+	<li>Prendre les cartes et pénalités accumulées</li>
+	<li>Passer les 3 cartes a son voisin<br>
+	<li>Flèche animée.<br> 
+		« Si la flèche est désactivée, elle restera visible, mais son animation sera mise en pause. »</li>
+	<li>Indication de votre tour à jouer<br>
+		« Si l'indicateur triangulaire est désactivé, il sera complètement absent. »</li></ul>
+<h3>Arrière-plan</h3>
+<p>Vous pouvez choisir n'importe quelle image comme arrière-plan dans le répertoire d'arrière-plans du logiciel. Les formats d'image courants sont pris en charge : JPEG, GIF, PNG, BMP et SVG. Il est possible de choisir une image en dehors du dossier du logiciel, mais cette fonctionnalité peut ne pas fonctionner avec la version packagée de Hearts, car ces formats, tels que Snap, AppImage et Flatpak, sont sécurisés dans un environnement isolé (« sandbox ») — un environnement simulé qui n'accède pas directement aux données de votre ordinateur.</p>
+<h2 id="scoreboard">2.3 Tableau des pointages</h2>
+<p>Vous pouvez déplacer le tableau d'affichage où vous le souhaitez dans la zone de jeu. Il suffit de cliquer dessus avec le bouton droit de la souris, de maintenir le clic enfoncé et de le faire glisser.<br>
+<b>Remarque :</b> la nouvelle position n'est pas permanente. Quelle que soit la taille de la fenêtre, le tableau d'affichage réapparaîtra dans le coin inférieur gauche.</p>
+<p>Sur le tableau d'affichage, une icône représentant une personne à côté d'un nom indique un joueur humain, tandis qu'une icône représentant un ordinateur indique un bot. </p>
+<h2 id="shortcuts">3. Raccourcis de jeu</h2>
+<ul><li>Ctrl-Q pour quitter le jeu sans confirmation.</li>
+	<li>Ctrl-N pour commencer une nouvelle partie.</li>
+	<li>Ctrl-U pour annuler le jeu de sa carte précédente.</li>
+	<li>Ctrl-R pour révéler les cartes de ses adversaires.</li>
+	<li>Ctrl-S pour activer ou désactiver les sons.</li>
+	<li>Ctrl-C pour activer ou désactiver l'affichage du tableau des pointages.</li>
+	<li>Ctrl-Tab pour passer d'un onglet à l'autre.</li></ul>
+<h2 id="online">4. Jouer en ligne</h2>
+<p>Cette fonctionnalité devrait être incluse dans la prochaine version 2.1 de Hearts.</p>
+<h2 id="credits">5. Crédits</h2>
+<p>Auteur du logiciel: Bob <a href="mailto:castillo7@hotmail.com">castillo7@hotmail.com</a><br><br>
+Version 2.0 Qt6 Dev / Unstable<br>
+Code Source: <a href="https://github.com/Rescator7/Hearts2">https://github.com/Rescator7/Hearts2</a></p>
+<h2 id="decks">5.1 Jeux de cartes</h2>
+Style: <a href="https://nicubunu.ro/graphics:playingcards:white">Nicu (white)</a><br>
+Licence: <a href="https://creativecommons.org/public-domain/">Public Domain</a><br><br>
+Style: <a href="https://commons.wikimedia.org/wiki/File:English_pattern_playing_cards_deck.svg">English</a><br>
+Licence: <a href="https://creativecommons.org/publicdomain/zero/1.0/deed.en"> CC0 1.0 Universal Deed</a><br><br>
+Autre: &quot;English&quot; <a href="https://commons.wikimedia.org/wiki/File:Card_back_05.svg">Back card</a><br>
+Licence: <a href="https://en.wikipedia.org/wiki/GNU_Lesser_General_Public_License">GNU Lesser General Public License</a><br><br>
+Style: <a href="https://commons.wikimedia.org/wiki/File:Atlasnye_playing_cards_deck_2.svg">Russian</a><br>
+Licence: <a href="https://creativecommons.org/publicdomain/zero/1.0/deed.en"> CC0 1.0 Universal Deed</a><br><br>
+Autre: <a href="https://commons.wikimedia.org/wiki/File:Russian_style_card_back.jpg">Russian Back card</a><br>
+Licence: <a href="https://en.wikipedia.org/wiki/Public_domain">Public Domain</a><br><br>
+Style: <a href="https://gitlab.gnome.org/GNOME/aisleriot/-/blob/master/cards/README.mittelalter">mittelalter</a><br>
+Licence: <a href="https://www.gnu.org/licenses/lgpl-3.0.html">GNU Lesser General Public License 3.0</a><br><br>
+Style: <a href="https://gitlab.gnome.org/GNOME/aisleriot/-/blob/master/cards/README.neoclassical">neo classical</a><br>
+Licence: <a href="https://www.gnu.org/licenses/lgpl-3.0.html">GNU Lesser General Public License 3.0</a><br><br>
+Style: <a href="https://gitlab.gnome.org/GNOME/aisleriot/-/blob/master/cards/README.tigullio">tigullio international</a><br>
+Licence: <a href="https://www.gnu.org/licenses/lgpl-3.0.html">GNU Lesser General Public License 3.0</a><br><br>
+Style: <a href="https://www.pling.com/p/2052182/">kaiser-jubilaum</a><br>
+Licence: <a href="https://creativecommons.org/public-domain/cc0/">Public Domain</a><br><br>
+Style: &quot;Standard&quot; <a href="https://www.pling.com/p/2052185/">Ramino</a><br>
+Licence: <a href="https://creativecommons.org/public-domain/cc0/">Public Domain</a><br>
+<h2 id="icons">5.2 Icônes</h2>
+Jeu d'icônes: <a href="https://phosphoricons.com/">Phosphor icons</a><br>
+Licence: <a href="https://raw.githubusercontent.com/phosphor-icons/homepage/master/LICENSE">Mit</a><br>
+<p><span style="background-color: #b0b0b0; padding: 4px 6px; border-radius: 4px; display: inline-block;">
+<img src="qrc:/icons/arrow-counter-clockwise.svg" alt="arrow-counter-clockwisea" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/calculator-slash.svg" alt="calculator-slash" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/calculator.svg" alt="calculator" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/chart-line.svg" alt="chat-line" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/chat-duotone.svg" alt="chat-duotone" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/chat-slash-duotone.svg" alt="chat-slash=duotone" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/chat-text.svg" alt="chat-text" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/desktop.svg" alt="desktop" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/escalator-down-duotone.svg" alt="escalator-down-duotone" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/eye-slash.svg" alt="eye-slsh" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/eye.svg" alt="eye" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/file-plus.svg" alt="file-plus" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/gear.svg" alt="gear" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/play-duotone.svg" alt="plus-duotone" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/plus-circle-duotone.svg" alt="plus-circle-duotone" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/question.svg" alt="question" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/sign-out-duotone.svg" alt="sign-out-duotone" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/sign-out.svg" alt="sign-out" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/speaker-high-duotone.svg" alt="speaker-high-duotone" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/speaker-slash-duotone.svg" alt="speaker-slash-duotone" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/exclamation-mark.svg" alt="exclamation-mark" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/table-duotone.svg" alt="table-duotone" style="width: 20px; height: 20px;"></img></p><br>
+</span>
+Icône de personne par: <a href="https://openclipart.org/detail/275133/person-generic">Cheeseness</a><br>
+Icône d'ordinateur par: <a href="https://openclipart.org/detail/89275/computer-icon">kuba</a><br>
+Licence: <a href="https://creativecommons.org/publicdomain/zero/1.0/">Creative Commons Zero 1.0 License</a><br><br>
+<img src="qrc:/icons/persongeneric.svg" alt="persongeneric" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/computer-icon.png" alt="computer-icon" style="width: 20px; height: 20px;"></img><br>
+Flèche animée par : <a href="https://pixabay.com/gifs/arrow-green-upload-11610/">u_d9e9zl5kpt</a><br>
+Licence: <a href="https://pixabay.com/service/license-summary/">Pixabay</a><br>
+<h2 id="backgrounds">5.3 Images d&quot;arrière-plan</h2>
+<p>Univers: <a href="https://www.eso.org/public/images/eso1723a/">Photo by ESO/G. Beccarii</a><br>
+Licence: <a href="https://www.eso.org/public/copyright/">Creative Commons Attribution 4.0 International License</a><br><br>
+Everest: <a href="https://commons.wikimedia.org/wiki/File:8,848m_Everest_8,516m_Lhotse_Himalaya_Mountain_Flights_Nepal_-_panoramio_(2).jpg">Photo by Hiroki Ogawai</a><br>
+Licence: <a href="https://creativecommons.org/licenses/by/3.0/deed.en">Creative Commons Attribution 3.0 Unported</a><br><br>
+Mt.Fuji: <a href="https://commons.wikimedia.org/wiki/File:Mount._Fuji_early_in_the_morning_%E6%97%A9%E6%9C%9D%E3%81%AE%E5%AF%8C%E5%A3%AB%E5%B1%B1_-_panoramio.jpg">Photo by Jack Somai</a><br>
+Licence: <a href="https://creativecommons.org/licenses/by/3.0/deed.en">Creative Commons Attribution 3.0 Unported</a><br><br>
+Désert: <a href="https://commons.wikimedia.org/wiki/File:Wadi_rum_desert.jpg">Photo by Peter Chisholmi</a><br>
+Licence: <a href="https://creativecommons.org/publicdomain/zero/1.0/deed.en">CC0 1.0 Universal Public Domain Dedication</a><br><br>
+Océan: <a href="https://commons.wikimedia.org/wiki/File:%22_Palm_%22_Beach._Port_Douglas._-_panoramio.jpg">Photo by grumpylumixuseri</a><br>
+Licence: <a href="https://creativecommons.org/licenses/by/3.0/deed.en">Creative Commons Attribution 3.0 Unported</a><br><br>
+Vert: <a href="https://github.com/Rescator7/Hearts/issues/4">Image by Attila Tóthi</a><br>
+Licence: Image créée pour ce logiciel.<br><br>
+Wood Texture: <a href="https://openclipart.org/detail/299936/wood-texture">Image by Firkini</a><br>
+Licence: <a href="https://creativecommons.org/publicdomain/zero/1.0/">Creative Commons Zero 1.0 License</a><br><br>
+Wooden Floor 2: <a href="https://openclipart.org/detail/267070/wooden-floor-2">Image by Firkin</a><br>
+Licence: <a href="https://creativecommons.org/publicdomain/zero/1.0/">Creative Commons Zero 1.0 License</a><br><br>
+Overlapping planks 5: <a href="https://openclipart.org/detail/269799/overlapping-planks-5">Image by Firkini</a><br>
+Licence: <a href="https://creativecommons.org/publicdomain/zero/1.0/">Creative Commons Zero 1.0 License</a><br><br>
+Wooden planks: <a href="https://openclipart.org/detail/269803/wooden-planks">Image by Firkin</a><br>
+Licence: <a href="https://creativecommons.org/publicdomain/zero/1.0/">Creative Commons Zero 1.0 License</a><br><br>
+Feuilles &amp; Marbre: Image créée à l&quot;aide de Gimp 2.10.18<br>
+Licence: <a href="https://creativecommons.org/publicdomain/zero/1.0/">Creative Commons Zero 1.0 License</a></p>
+<h2 id="sounds">5.4 Sounds</h2>
+Son: 34201__themfish__glass-house1.wav by <a href="https://freesound.org/people/themfish/sounds/34201/">themfish</a><br>
+Utilisé comme: sound_breaking_hearts<br>
+Licence: <a href="https://creativecommons.org/licenses/by/4.0/">Attribution 4.0 International Deed</a><br><br>
+Son: 240777__f4ngy__dealing-card.wav by <a href="https://freesound.org/people/f4ngy/sounds/240777/">f4ngy</a><br>
+Utilisé comme: sound_dealing_card<br>
+Licence: <a href="https://creativecommons.org/licenses/by/4.0/">Attribution 4.0 International Deed</a><br><br>
+Son: 253886__themusicalnomad__negative-beeps.wav by <a href="https://freesound.org/people/themusicalnomad/sounds/253886/">themusicalnomad</a><br>
+Utilisé comme: sound_error<br>
+Licence: <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0 1.0 Universal Deed</a><br><br>
+Son: 33283__fins__game-over.wav by <a href="https://freesound.org/people/Leszek_Szary/sounds/133283/">Leszek_Szary</a><br>
+Utilisé comme: sound_game_over<br>
+Licence: <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0 1.0 Universal Deed</a><br><br>
+Son: 171671__fins__success-1.wav by <a href="https://freesound.org/people/Leszek_Szary/sounds/171671/">Leszek_Szary</a><br>
+Utilisé comme: sound_shoot_moon<br>
+Licence: <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0 1.0 Universal Deed</a><br><br>
+Son: Soundwhich - Correct (LittleRainySeasons) [public].wav by <a href="https://freesound.org/people/LittleRainySeasons/sounds/335908/">LittleRainySeasons</a><br>
+Utilisé comme: sound_your_turn<br>
+Licence: <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0 1.0 Universal Deed</a><br><br>
+Son: 344013__reitanna__high-pitched-ah2.wav by <a href="https://freesound.org/people/Reitanna/sounds/344013/">Reitanna</a><br>
+Utilisé comme: sound_queen_spade<br>
+Licence: <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0 1.0 Universal Deed</a><br><br>
+Son: 6127__bmaczero__contact1.wav by <a href="https://freesound.org/people/BMacZero/sounds/96127/">BMacZero</a><br>
+Utilisé comme: sound_contact<br>
+Licence: <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0 1.0 Universal Deed</a><br><br>
+Son: 434472__dersuperanton__taking-card.wav by <a href="https://freesound.org/people/dersuperanton/sounds/434472/">dersuperanton</a><br>
+Utilisé comme: sound_passing_cards<br>
+Licence: <a href="https://creativecommons.org/licenses/by/4.0/">Attribution 4.0 International Deed</a><br><br>
+Son: 423767__someonecool14__card-shuffling.wav by <a href="https://freesound.org/people/SomeoneCool15/sounds/423767/">SomeoneCool15</a><br>
+Utilisé comme: sound_shuffling_cards<br>
+Licence: <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0 1.0 Universal Deed</a><br><br>
+Son: 400163__vitovsky1__fanfare-short.wav by <a href="https://freesound.org/people/vitovsky1/sounds/400163/">vitovsky1</a><br>
+Utilisé comme: sound_perfect_100<br>
+License: <a href="https://creativecommons.org/licenses/by/3.0/">Attribution 3.0 Unported Deed</a><br><br>
+Son: 322897__rhodesmas__connected-01.wav by <a href="https://freesound.org/people/rhodesmas/sounds/322897/">rhodesmas</a><br>
+Utilisé comme: sound_connected<br>
+Licence: <a href="https://creativecommons.org/licenses/by/4.0/">Attribution 4.0 International Deed</a><br><br>
+Son: 322895__rhodesmas__disconnected-01.wav by <a href="https://freesound.org/people/rhodesmas/sounds/322895/">rhodesmas</a><br>
+Utilisé comme: sound_disconnected<br>
+Licence: <a href="https://creativecommons.org/licenses/by/4.0/">Attribution 4.0 International Deed</a><br><br>
+Son: 493696__stib__bingbong.wav by <a href="https://freesound.org/people/stib/sounds/493696/">stib</a><br>
+Utilisé comme: sound_announcement<br>
+Licence: <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0 1.0 Universal Deed</a><br><br>
+Son: 403013__inspectorj__ui-confirmation-alert-b5.wav by <a href="https://freesound.org/people/InspectorJ/sounds/403013/">InspectorJ</a><br>
+Utilisé comme: sound_undo<br>
+Licence: <a href="https://creativecommons.org/licenses/by/4.0/">Attribution 4.0 International Deed</a><br><br>
+Son: 404553__inspectorj__clap-single-7_modified.wav by <a href="https://freesound.org/people/InspectorJ/sounds/404553/">InspectorJ</a><br>
+Utilisé comme: sound_tram<br>
+Remarque : la version fournie dans le logiciel est une version remixée (modifiée). Elle répète trois fois le son original.<br>
+License: <a href="https://creativecommons.org/licenses/by/4.0/">Attribution 4.0 International Deed</a><br>
+<h2 id="special">5.5 Remerciements spéciaux</h2>
+<p>Un immense merci à Grok de X. Bien que Hearts Version 2 soit basée sur la version 1.9.6, que j'ai entièrement développée moi-même, cette nouvelle version est une refonte complète et a été programmée avec l'aide de l'IA Grok. Il m'a permis de générer du code, en particulier pour les animations, de déboguer, d'obtenir des explications, de traduire certains textes et m'a fait de nombreuses suggestions précieuses. Cette version n'aurait jamais vu le jour sans Grok.</p><br>
+    <!-- Ajoute ici toutes tes sections -->
+</body>
+</html>

@@ -27,5 +27,6 @@
         <file>help.html</file>
         <file>icons/play-duotone.svg</file>
         <file>icons/exclamation-mark.svg</file>
+        <file>help_fr.html</file>
     </qresource>
 </RCC>
