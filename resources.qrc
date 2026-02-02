@@ -24,9 +24,10 @@
         <file>icons/computer-icon.png</file>
         <file>icons/calculator.svg</file>
         <file>icons/calculator-slash.svg</file>
-        <file>help.html</file>
         <file>icons/play-duotone.svg</file>
         <file>icons/exclamation-mark.svg</file>
-        <file>help_fr.html</file>
+        <file>translations/help.html</file>
+        <file>translations/help_fr.html</file>
+        <file>translations/help_ru.html</file>
     </qresource>
 </RCC>

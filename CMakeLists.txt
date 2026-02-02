@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.16)
 
 project(Hearts VERSION 2.0 LANGUAGES CXX)
 
@@ -9,88 +9,109 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT 6.4.2 NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools Multimedia Svg SvgWidgets)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools Multimedia Svg SvgWidgets)
-
-set(TS_FILES Hearts_en_CA.ts
-    Hearts_fr_CA.ts
-    Hearts_ru_RU.ts)
-
-set(PROJECT_SOURCES
-        main.cpp
-        mainwindow.cpp
-        mainwindow.h
-        mainwindow.ui
-        ${TS_FILES}
+find_package(Qt6 6.4 REQUIRED COMPONENTS
+    Widgets
+    LinguistTools
+    Multimedia
+    Svg
+    SvgWidgets
 )
 
-if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-    qt_add_executable(Hearts
-        MANUAL_FINALIZATION
-        ${PROJECT_SOURCES}
-        sounds.h sounds.cpp
-        deck.h deck.cpp
+set(PROJECT_SOURCES
+    main.cpp
+    mainwindow.cpp          mainwindow.h          mainwindow.ui
+    sounds.h                sounds.cpp
+    deck.h                  deck.cpp
+    cardscene.h             cardscene.cpp
+    define.h
+    turnarrow.h             turnarrow.cpp
+    background.h            background.cpp
+    config.h                config.cpp
+    engine.h                engine.cpp
+    cpus.h
+    draggablescoregroup.h   draggablescoregroup.cpp
+    statistics.cpp          statistics.h          statistics.ui
+    client.cpp              client.h
+    resources.qrc
+)
 
-        resources.qrc
-        cardscene.h cardscene.cpp
-        define.h
-        turnarrow.h
-        turnarrow.cpp
-        background.h background.cpp
-        config.h config.cpp
-        engine.h engine.cpp
-        cpus.h
-        draggablescoregroup.h draggablescoregroup.cpp
-        statistics.cpp
-        statistics.h
-        statistics.ui
+qt_add_executable(Hearts
+    MANUAL_FINALIZATION
+    ${PROJECT_SOURCES}
+)
 
-    )
-# Define target properties for Android with Qt 6 as:
-#    set_property(TARGET Hearts APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
-#                 ${CMAKE_CURRENT_SOURCE_DIR}/android)
-# For more information, see https://doc.qt.io/qt-6/qt-add-executable.html#target-creation
+# Traductions
+set(TS_FILES
+    translations/Hearts_en_CA.ts
+    translations/Hearts_fr_CA.ts
+    translations/Hearts_ru_RU.ts
+)
 
-    qt_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
-else()
-    if(ANDROID)
-        add_library(Hearts SHARED
-            ${PROJECT_SOURCES}
-        )
-# Define properties for Android with Qt 5 after find_package() calls as:
-#    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
-    else()
-        add_executable(Hearts
-            ${PROJECT_SOURCES}
-        )
-    endif()
+qt_add_translations(Hearts
+    TS_FILES ${TS_FILES}
+    RESOURCE_PREFIX "/translations"
+)
 
-    qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
-endif()
+target_link_libraries(Hearts PRIVATE
+    Qt6::Widgets
+    Qt6::Multimedia
+    Qt6::Svg
+    Qt6::SvgWidgets
+)
 
-target_link_libraries(Hearts PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt6::Multimedia Qt6::Svg Qt6::SvgWidgets)
-
-# Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
-# If you are developing for iOS or macOS you should consider setting an
-# explicit, fixed bundle identifier manually though.
-if(${QT_VERSION} VERSION_LESS 6.1.0)
-  set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.Hearts)
-endif()
+# Propriétés bundle (macOS / Windows)
 set_target_properties(Hearts PROPERTIES
-    ${BUNDLE_ID_OPTION}
-    MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
-    MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
+    MACOSX_BUNDLE_GUI_IDENTIFIER    com.example.Hearts
+    MACOSX_BUNDLE_BUNDLE_VERSION    ${PROJECT_VERSION}
+    MACOSX_BUNDLE_SHORT_VERSION_STRING "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}"
     MACOSX_BUNDLE TRUE
     WIN32_EXECUTABLE TRUE
 )
 
-include(GNUInstallDirs)
+# ────────────────────────────────────────────────
+# Installation
+# ────────────────────────────────────────────────
+
+# Exécutable → /usr/local/bin/hearts (ou /usr/bin si prefix changé)
 install(TARGETS Hearts
-    BUNDLE DESTINATION .
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
-if(QT_VERSION_MAJOR EQUAL 6)
-    qt_finalize_executable(Hearts)
-endif()
+# Ressources → /usr/local/share/hearts/
+install(DIRECTORY
+    "${CMAKE_CURRENT_SOURCE_DIR}/background/"
+    "${CMAKE_CURRENT_SOURCE_DIR}/icons/"
+    "${CMAKE_CURRENT_SOURCE_DIR}/sounds/"
+    "${CMAKE_CURRENT_SOURCE_DIR}/SVG-cards/"
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/hearts
+    FILES_MATCHING
+    PATTERN "*"   # tous les fichiers (png, jpg, svg, wav, mp3, ogg, etc.)
+)
+
+# Fichier .desktop
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/hearts.desktop.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/hearts.desktop"
+    @ONLY
+)
+
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/hearts.desktop"
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/applications
+)
+
+# Icônes (multi-tailles si tu les as)
+install(FILES
+    "${CMAKE_CURRENT_SOURCE_DIR}/icons/hearts-256.png"   # renomme si besoin
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/256x256/apps
+    RENAME hearts.png
+)
+
+# Optionnel : ajoute 48x48, 64x64, 128x128 si tu as ces tailles
+# install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/icons/hearts-48.png"
+#     DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/48x48/apps
+#     RENAME hearts.png
+# )
+
+include(GNUInstallDirs)
+
+qt_finalize_executable(Hearts)

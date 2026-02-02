@@ -58,6 +58,22 @@ enum SUIT {
    SUIT_ALL     = 5,
 };
 
+enum TocIndex {
+    TOC_Rules = 0,
+    TOC_Settings,
+    TOC_Variants,
+    TOC_Miscellaneous,
+    TOC_Scoreboard,
+    TOC_Shortcuts,
+    TOC_Online,
+    TOC_Credits,
+    TOC_Decks,
+    TOC_Icons,
+    TOC_Backgrounds,
+    TOC_Sounds,
+    TOC_Special
+};
+
 constexpr bool isValid(SUIT suit) {
     return (suit >= 0) && (suit < SUIT_COUNT);
 }

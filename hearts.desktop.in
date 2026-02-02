@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Hearts
+Comment=Hearts card game
+Exec=hearts
+Icon=hearts
+Terminal=false
+Type=Application
+Categories=Game;CardGame;
+StartupNotify=true

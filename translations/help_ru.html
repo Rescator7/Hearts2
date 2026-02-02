@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+
+<style>
+    body { font-family: Noto, sans-regular; line-height: 1.15; }
+    p, li { line-height: 1.1; }
+    .aere { line-height: 1.3; }
+    h1, h2 { line-height: 1.1; margin: 1em 0 0.5em 0; }
+    a { color: #B0E0E6; text-decoration: underline; }
+    a:hover { color: #FFFFFF; background: rgba(255,255,255,0.15); }
+    a:visited { color: #A0D0D8; }
+</style
+</style>
+</head>
+<body>
+<h1>Помощь - Hearts 2.0</h1>
+<h2 id="rules">1. Основные правила игры</h2>
+<p>Hearts — это карточная игра с штрафными очками. В этой разновидности играют 4 игрока, используя полную колоду из 52 карт.
+Цель игры — дойти до конца игры с наименьшим количеством очков.
+В начале каждого раунда каждый игрок получает 13 карт. Они должны выбрать 3 карты для передачи, а затем нажать на стрелку, указывающую направление передачи.
+В обмен каждый игрок получает 3 карты.</p>
+<p>Направление паса меняется в каждом раунде: игрок слева, справа, напротив, затем игроки оставляют свои карты. Эта система повторяется до конца игры.</p>
+<p>Игрок, у которого на руках 2 треф, начинает игру автоматически. Первой мастью является трефа. Каждый игрок должен сыграть трефу, если у него нет такой карты; в этом случае он может сыграть любую карту (см. правило № 1). Игрок, сыгравший самую старшую карту соответствующей масти, выигрывает взятку.</p>
+Самая старшая карта — туз, за ним следуют король, дама, валет, 10, 9, 8, 7, 6, 5, 4, 3, а 2 — самая младшая.<br>
+Победитель розыгрыша выбирает карту для розыгрыша, но не черву, пока червы не будут разбиты (см. правило № 2).<br>
+Каждый игрок должен сыграть указанную масть. Если у игрока больше нет карт этой масти, он может сыграть любую карту. Мы повторяем это до тех пор, пока не останется карт.
+<p>В этот момент подсчитываются штрафные очки. Игрок, выигравший взятку с дамой пик, получает 13 дополнительных очков. Каждая взятка с червой приносит игроку 1 очко.</p>
+Если игрок «выстрелил в луну» (см. правило № 3), очки всех остальных игроков увеличиваются на 26 очков.<br>
+Раунды продолжаются до тех пор, пока один из игроков не достигнет предела в 100 очков.<br><br>
+Победителями становятся участники с наименьшим количеством баллов.<br><br>
+<b>Правило 1:</b> В начале раунда вы не можете выложить даму пик или любую карту червей, ЕСЛИ только это не единственные карты, которые у вас остались. В этом случае вы должны выложить даму пик.<br><br>
+<b>Правило 2:</b> Сердца разбиваются, когда игрок выкладывает сердце.
+		<ul>
+			<li>Игрок, выигравший взятку, может выложить черву, если у него остались только червы.</li>
+			<li>Игрок может разбить сердца, если не может следовать текущей масти (за исключением первого раунда, см. Правило 1).</li>
+			<li>Примечание: Дама пик может разбивать сердца, если включена опция «Дама пик разбивает сердца».</li>
+		</ul>
+<b>Правило 3:</b> «Стреляй в луну»
+<ul><li>Игрок «стреляет в луну», забирая все штрафные очки (необходимо забрать все червы и даму пик).</li>
+	<li>Примечание: Если включена опция «омнибус», необходимо взять валет бубен. (См. «Омнибус» [Опции])</li></ul>
+<h2 id="settings">2. Настройки игры</h2>
+На вкладке [Настройки] можно включить или отключить следующие параметры:
+<h2 id="variants">2.1 Варианты игры</h2>
+<p>В конце раунда применяются следующие бонусы (если они включены в [Настройки]):</p>
+<h3>Идеальный 100</h3>
+<p>Если игрок набирает 100 очков, его счет уменьшается до 50.</p>
+<h3>Бонус «Бубновый валет»(*)</h3>
+<p>Игрок, выигравший валет бубен, теряет 10 очков.
+Валет бубен становится условием для «выстрела в Луну».</p>
+<h3>Без штрафных очков(*)</h3>
+<p>Если игрок не получает штрафных очков в течение раунда, он получает бонус в размере 5 очков, которые вычитаются из его результата.</p>
+<h3>Новолуние(*)</h3>
+<p>Если вы «попали в яблочко» и ваш результат превысил 25 очков, у вас будет возможность уменьшить его на 26 очков.</p><br>
+<b>Примечание:</b> Если бонус (*) или комбинация бонусов приводит к результату меньше нуля, результат устанавливается равным нулю.<br>
+	** Бонусы «Omnibus» и «No Tricks» не применяются, если игрок «попал в луну».<br>
+<h3>Пиковая дама разбивает сердца</h3>
+<p>Игрок разбивает «Сердца», сыграв даму пик.</p>
+<h3>Без ничьих</h3>
+<p>Если по окончании игры несколько игроков имеют одинаковый наименьший результат, игра продолжается до тех пор, пока не останется только один победитель.</p>
+<h2 id="miscellaneous">2.2 Разное</h2>
+<h3>Подтвердить [Выход]</h3>
+<p>Вы можете включить подтверждение выхода из игры, чтобы предотвратить случайные нажатия, или отключить его.</p>
+<h3>Подтвердить [Новая игра]</h3>
+<p>Вы можете включить подтверждение новой игры, чтобы предотвратить случайные нажатия, или отключить его.</p>
+<h3>Обнаружить конец раунда:</h3>
+<p>  Если эта функция включена, система определит, когда игрок выиграет все следующие взятки в текущем раунде, и все несыгранные карты перейдут к этому игроку. Раунд также заканчивается. (**)</p>
+<p>Система также определит трам, когда все штрафные карты будут взяты. (Должен быть сыгран валет бубен [игра Omnibus]).</p>   
+<ul> <li>** Система не активна в последних ходах раунда.</li></ul>
+<h3>Режим читов</h3>
+<p>Если режим читов включен, на вкладке игрового поля появится новая кнопка <reveal>. Эта кнопка позволит вам показывать или скрывать карты ваших противников. Также будет добавлена новая вкладка «!», содержащая список сыгранных карт, чтобы вы могли увидеть обзор уже сброшенных карт.</p>
+<h3>Стиль карточек</h3>
+<p>Вы можете выбрать один из 8 различных стилей карточных игр, включенных в программное обеспечение.</p>
+<ul><li>Standard</li>
+	<li>Nicu (white)</li>
+	<li>English</li>
+	<li>Russian</li>
+	<li>Kaiser jubilaum</li>
+	<li>Tigullio (international)</li>
+	<li>Mittelalter</li>
+	<li>Neo classical</li></ul>
+<h3>Язык</h3>
+<p>Игра поддерживает следующие 3 языка:</p>
+<ul><li>английский</li>
+	<li>французский</li>
+	<li>русский</li></ul>
+<h3>Анимации</h3>
+<p>Вы можете включить или отключить каждую из следующих анимаций. Вы также можете установить флажок «Отключить все».</p>
+<ul><li>Раздавать карты</li>
+	<li>Сыграть картой<br>
+		«Анимацию распределения карт можно отключить, если она кажется слишком длинной».</li>
+	<li>Собирать трюки</li>
+	<li>Передача трех карт<br>
+		«Это анимация обмена картами».</li>
+	<li>Анимированная стрелка.<br> 
+		«Если стрелка отключена, она по-прежнему будет видна, но ее анимация будет приостановлена».</li>
+	<li>Your turn indicator<br>
+		«Если треугольный индикатор отключен, он будет полностью отсутствовать».</li></ul>
+<h3>Фоновые изображения</h3>
+<p>Вы можете выбрать любое изображение в качестве фона из каталога фоновых изображений программного обеспечения. Поддерживаются распространенные форматы изображений: JPEG, GIF, PNG, BMP и SVG. Можно выбрать изображение из папки вне программного обеспечения, но эта функция может не работать с упакованной версией Hearts, поскольку эти форматы, такие как Snap, AppImage и Flatpak, защищены в изолированной («песочнице») среде — симулированной среде, которая не имеет прямого доступа к данным вашего компьютера.</p>
+<h2 id="scoreboard">2.3 Табло</h2>
+<p>Вы можете переместить табло в любое место в пределах игровой области. Просто щелкните по нему правой кнопкой мыши, удерживайте кнопку и перетащите.<br>
+<b>Примечание:</b> новое положение не является постоянным. Независимо от того, как вы изменяете размер окна, табло снова появится в левом нижнем углу.</p>
+<p>На табло значок человека рядом с именем обозначает игрока-человека, а значок компьютера обозначает бота.</p>
+<h2 id="shortcuts">3. Ярлыки игр</h2>
+<ul><li>Ctrl-Q выйти из игры без подтверждения.</li>
+	<li>Ctrl-N чтобы начать новую игру.</li>
+	<li>Ctrl-U отменить последний ход.</li>
+	<li>Ctrl-R раскрыть карты противников.</li>
+	<li>Ctrl-S для включения и выключения звуков.</li>
+	<li>Ctrl-C включить или отключить отображение табло.</li>
+	<li>Ctrl-Tab для переключения между вкладками.</li></ul>
+<h2 id="online">4. Играть онлайн</h2>
+<p>Эта функция должна быть включена в предстоящую версию 2.1 Hearts.</p>
+<h2 id="credits">5. Спасибо</h2>
+<p>Автор программного обеспечения: Bob <a href="mailto:castillo7@hotmail.com">castillo7@hotmail.com</a><br><br>
+Version 2.0 Qt6 Dev / Unstable<br>
+Исходный код: <a href="https://github.com/Rescator7/Hearts2">https://github.com/Rescator7/Hearts2</a></p>
+<h2 id="decks">5.1 Игральные карты</h2>
+Стиль игральных карт: <a href="https://nicubunu.ro/graphics:playingcards:white">Nicu (white)</a><br>
+Лицензия: <a href="https://creativecommons.org/public-domain/">Public Domain</a><br><br>
+Стиль игральных карт: <a href="https://commons.wikimedia.org/wiki/File:English_pattern_playing_cards_deck.svg">English</a><br>
+Лицензия: <a href="https://creativecommons.org/publicdomain/zero/1.0/deed.en"> CC0 1.0 Universal Deed</a><br><br>
+Другое: &quot;English&quot; <a href="https://commons.wikimedia.org/wiki/File:Card_back_05.svg">Back card</a><br>
+Лицензия: <a href="https://en.wikipedia.org/wiki/GNU_Lesser_General_Public_License">GNU Lesser General Public License</a><br><br>
+Стиль игральных карт: <a href="https://commons.wikimedia.org/wiki/File:Atlasnye_playing_cards_deck_2.svg">Russian</a><br>
+Лицензия: <a href="https://creativecommons.org/publicdomain/zero/1.0/deed.en"> CC0 1.0 Universal Deed</a><br><br>
+Другое: <a href="https://commons.wikimedia.org/wiki/File:Russian_style_card_back.jpg">Russian Back card</a><br>
+Лицензия: <a href="https://en.wikipedia.org/wiki/Public_domain">Public Domain</a><br><br>
+Стиль игральных карт: <a href="https://gitlab.gnome.org/GNOME/aisleriot/-/blob/master/cards/README.mittelalter">mittelalter</a><br>
+Лицензия: <a href="https://www.gnu.org/licenses/lgpl-3.0.html">GNU Lesser General Public License 3.0</a><br><br>
+Стиль игральных карт: <a href="https://gitlab.gnome.org/GNOME/aisleriot/-/blob/master/cards/README.neoclassical">neo classical</a><br>
+Лицензия: <a href="https://www.gnu.org/licenses/lgpl-3.0.html">GNU Lesser General Public License 3.0</a><br><br>
+Стиль игральных карт: <a href="https://gitlab.gnome.org/GNOME/aisleriot/-/blob/master/cards/README.tigullio">tigullio international</a><br>
+Лицензия: <a href="https://www.gnu.org/licenses/lgpl-3.0.html">GNU Lesser General Public License 3.0</a><br><br>
+Стиль игральных карт: <a href="https://www.pling.com/p/2052182/">kaiser-jubilaum</a><br>
+Лицензия: <a href="https://creativecommons.org/public-domain/cc0/">Public Domain</a><br><br>
+Стиль игральных карт: &quot;Standard&quot; <a href="https://www.pling.com/p/2052185/">Ramino</a><br>
+Лицензия: <a href="https://creativecommons.org/public-domain/cc0/">Public Domain</a><br>
+<h2 id="icons">5.2 Иконки</h2>
+Набор значков: <a href="https://phosphoricons.com/">Phosphor icons</a><br>
+Лицензия: <a href="https://raw.githubusercontent.com/phosphor-icons/homepage/master/LICENSE">Mit</a><br>
+<p><span style="background-color: #b0b0b0; padding: 4px 6px; border-radius: 4px; display: inline-block;">
+<img src="qrc:/icons/arrow-counter-clockwise.svg" alt="arrow-counter-clockwisea" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/calculator-slash.svg" alt="calculator-slash" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/calculator.svg" alt="calculator" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/chart-line.svg" alt="chat-line" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/chat-duotone.svg" alt="chat-duotone" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/chat-slash-duotone.svg" alt="chat-slash=duotone" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/chat-text.svg" alt="chat-text" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/desktop.svg" alt="desktop" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/escalator-down-duotone.svg" alt="escalator-down-duotone" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/eye-slash.svg" alt="eye-slsh" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/eye.svg" alt="eye" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/file-plus.svg" alt="file-plus" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/gear.svg" alt="gear" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/play-duotone.svg" alt="plus-duotone" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/plus-circle-duotone.svg" alt="plus-circle-duotone" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/question.svg" alt="question" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/sign-out-duotone.svg" alt="sign-out-duotone" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/sign-out.svg" alt="sign-out" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/speaker-high-duotone.svg" alt="speaker-high-duotone" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/speaker-slash-duotone.svg" alt="speaker-slash-duotone" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/exclamation-mark.svg" alt="exclamation-mark" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/table-duotone.svg" alt="table-duotone" style="width: 20px; height: 20px;"></img></p><br>
+</span>
+Иконка человека: <a href="https://openclipart.org/detail/275133/person-generic">Cheeseness</a><br>
+Иконка компьютера: <a href="https://openclipart.org/detail/89275/computer-icon">kuba</a><br>
+Лицензия: <a href="https://creativecommons.org/publicdomain/zero/1.0/">Creative Commons Zero 1.0 License</a><br><br>
+<img src="qrc:/icons/persongeneric.svg" alt="persongeneric" style="width: 20px; height: 20px;"></img>
+<img src="qrc:/icons/computer-icon.png" alt="computer-icon" style="width: 20px; height: 20px;"></img><br>
+Анимированная стрелка: <a href="https://pixabay.com/gifs/arrow-green-upload-11610/">u_d9e9zl5kpt</a><br>
+Лицензия: <a href="https://pixabay.com/service/license-summary/">Pixabay</a><br>
+<h2 id="backgrounds">5.3 Фоновые изображения</h2>
+<p>Universe: <a href="https://www.eso.org/public/images/eso1723a/">Photo by ESO/G. Beccarii</a><br>
+Лицензия: <a href="https://www.eso.org/public/copyright/">Creative Commons Attribution 4.0 International License</a><br><br>
+Everest: <a href="https://commons.wikimedia.org/wiki/File:8,848m_Everest_8,516m_Lhotse_Himalaya_Mountain_Flights_Nepal_-_panoramio_(2).jpg">Photo by Hiroki Ogawai</a><br>
+Лицензия: <a href="https://creativecommons.org/licenses/by/3.0/deed.en">Creative Commons Attribution 3.0 Unported</a><br><br>
+Mt.Fuji: <a href="https://commons.wikimedia.org/wiki/File:Mount._Fuji_early_in_the_morning_%E6%97%A9%E6%9C%9D%E3%81%AE%E5%AF%8C%E5%A3%AB%E5%B1%B1_-_panoramio.jpg">Photo by Jack Somai</a><br>
+Лицензия: <a href="https://creativecommons.org/licenses/by/3.0/deed.en">Creative Commons Attribution 3.0 Unported</a><br><br>
+Desert: <a href="https://commons.wikimedia.org/wiki/File:Wadi_rum_desert.jpg">Photo by Peter Chisholmi</a><br>
+Лицензия: <a href="https://creativecommons.org/publicdomain/zero/1.0/deed.en">CC0 1.0 Universal Public Domain Dedication</a><br><br>
+Ocean: <a href="https://commons.wikimedia.org/wiki/File:%22_Palm_%22_Beach._Port_Douglas._-_panoramio.jpg">Photo by grumpylumixuseri</a><br>
+Лицензия: <a href="https://creativecommons.org/licenses/by/3.0/deed.en">Creative Commons Attribution 3.0 Unported</a><br><br>
+Green: <a href="https://github.com/Rescator7/Hearts/issues/4">Image by Attila Tóthi</a><br>
+Лицензия: Изображение, созданное для этого программного обеспечения.<br><br>
+Wood Texture: <a href="https://openclipart.org/detail/299936/wood-texture">Image by Firkini</a><br>
+Лицензия: <a href="https://creativecommons.org/publicdomain/zero/1.0/">Creative Commons Zero 1.0 License</a><br><br>
+Wooden Floor 2: <a href="https://openclipart.org/detail/267070/wooden-floor-2">Image by Firkin</a><br>
+Лицензия: <a href="https://creativecommons.org/publicdomain/zero/1.0/">Creative Commons Zero 1.0 License</a><br><br>
+Overlapping planks 5: <a href="https://openclipart.org/detail/269799/overlapping-planks-5">Image by Firkini</a><br>
+Лицензия: <a href="https://creativecommons.org/publicdomain/zero/1.0/">Creative Commons Zero 1.0 License</a><br><br>
+Wooden planks: <a href="https://openclipart.org/detail/269803/wooden-planks">Image by Firkin</a><br>
+Лицензия: <a href="https://creativecommons.org/publicdomain/zero/1.0/">Creative Commons Zero 1.0 License</a><br><br>
+Leaves &amp; Marble: Изображение создано с помощью gimp 2.10.18<br>
+Лицензия: <a href="https://creativecommons.org/publicdomain/zero/1.0/">Creative Commons Zero 1.0 License</a></p>
+<h2 id="sounds">5.4 Звуки</h2>
+Звук: 34201__themfish__glass-house1.wav by <a href="https://freesound.org/people/themfish/sounds/34201/">themfish</a><br>
+Используется как: sound_breaking_hearts<br>
+Лицензия: <a href="https://creativecommons.org/licenses/by/4.0/">Attribution 4.0 International Deed</a><br><br>
+Звук: 240777__f4ngy__dealing-card.wav by <a href="https://freesound.org/people/f4ngy/sounds/240777/">f4ngy</a><br>
+Используется как: sound_dealing_card<br>
+Лицензия: <a href="https://creativecommons.org/licenses/by/4.0/">Attribution 4.0 International Deed</a><br><br>
+Звук: 253886__themusicalnomad__negative-beeps.wav by <a href="https://freesound.org/people/themusicalnomad/sounds/253886/">themusicalnomad</a><br>
+Используется как: sound_error<br>
+Лицензия: <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0 1.0 Universal Deed</a><br><br>
+Звук: 33283__fins__game-over.wav by <a href="https://freesound.org/people/Leszek_Szary/sounds/133283/">Leszek_Szary</a><br>
+Используется как: sound_game_over<br>
+Лицензия: <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0 1.0 Universal Deed</a><br><br>
+Звук: 171671__fins__success-1.wav by <a href="https://freesound.org/people/Leszek_Szary/sounds/171671/">Leszek_Szary</a><br>
+Используется как: sound_shoot_moon<br>
+Лицензия: <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0 1.0 Universal Deed</a><br><br>
+Звук: Soundwhich - Correct (LittleRainySeasons) [public].wav by <a href="https://freesound.org/people/LittleRainySeasons/sounds/335908/">LittleRainySeasons</a><br>
+Используется как: sound_your_turn<br>
+Лицензия: <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0 1.0 Universal Deed</a><br><br>
+Звук: 344013__reitanna__high-pitched-ah2.wav by <a href="https://freesound.org/people/Reitanna/sounds/344013/">Reitanna</a><br>
+Используется как: sound_queen_spade<br>
+Лицензия: <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0 1.0 Universal Deed</a><br><br>
+Звук: 6127__bmaczero__contact1.wav by <a href="https://freesound.org/people/BMacZero/sounds/96127/">BMacZero</a><br>
+Используется как: sound_contact<br>
+Лицензия: <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0 1.0 Universal Deed</a><br><br>
+Звук: 434472__dersuperanton__taking-card.wav by <a href="https://freesound.org/people/dersuperanton/sounds/434472/">dersuperanton</a><br>
+Используется как: sound_passing_cards<br>
+Лицензия: <a href="https://creativecommons.org/licenses/by/4.0/">Attribution 4.0 International Deed</a><br><br>
+Звук: 423767__someonecool14__card-shuffling.wav by <a href="https://freesound.org/people/SomeoneCool15/sounds/423767/">SomeoneCool15</a><br>
+Используется как: sound_shuffling_cards<br>
+Лицензия: <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0 1.0 Universal Deed</a><br><br>
+Звук: 400163__vitovsky1__fanfare-short.wav by <a href="https://freesound.org/people/vitovsky1/sounds/400163/">vitovsky1</a><br>
+Используется как: sound_perfect_100<br>
+Лицензия: <a href="https://creativecommons.org/licenses/by/3.0/">Attribution 3.0 Unported Deed</a><br><br>
+Звук: 322897__rhodesmas__connected-01.wav by <a href="https://freesound.org/people/rhodesmas/sounds/322897/">rhodesmas</a><br>
+Используется как: sound_connected<br>
+Лицензия: <a href="https://creativecommons.org/licenses/by/4.0/">Attribution 4.0 International Deed</a><br><br>
+Звук: 322895__rhodesmas__disconnected-01.wav by <a href="https://freesound.org/people/rhodesmas/sounds/322895/">rhodesmas</a><br>
+Используется как: sound_disconnected<br>
+Лицензия: <a href="https://creativecommons.org/licenses/by/4.0/">Attribution 4.0 International Deed</a><br><br>
+Звук: 493696__stib__bingbong.wav by <a href="https://freesound.org/people/stib/sounds/493696/">stib</a><br>
+Используется как: sound_announcement<br>
+Лицензия: <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0 1.0 Universal Deed</a><br><br>
+Звук: 403013__inspectorj__ui-confirmation-alert-b5.wav by <a href="https://freesound.org/people/InspectorJ/sounds/403013/">InspectorJ</a><br>
+Используется как: sound_undo<br>
+Лицензия: <a href="https://creativecommons.org/licenses/by/4.0/">Attribution 4.0 International Deed</a><br><br>
+Звук: 404553__inspectorj__clap-single-7_modified.wav by <a href="https://freesound.org/people/InspectorJ/sounds/404553/">InspectorJ</a><br>
+Используется как: sound_tram<br>
+Примечание: Версия, представленная в программном обеспечении, является ремиксом (модифицированной версией). Она повторяет исходный звук 3 раза.<br>
+Лицензия: <a href="https://creativecommons.org/licenses/by/4.0/">Attribution 4.0 International Deed</a><br>
+<h2 id="special">5.5 Особая благодарность</h2>
+<p>Огромное спасибо Grok из X. Хотя Hearts Major Version 2 основана на версии 1.9.6, которую я разработал полностью самостоятельно, эта новая версия является полной переработкой и была запрограммирована с помощью искусственного интеллекта Grok. Он позволил мне генерировать код, особенно для анимации, отлаживать, получать объяснения, переводить некоторый текст и давал много ценных советов. Без Grok эта версия никогда бы не увидела свет.</p><br>
+    <!-- Ajoute ici toutes tes sections -->
+</body>
+</html>

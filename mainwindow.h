@@ -22,6 +22,7 @@
 #include <QButtonGroup>
 #include <QGraphicsTextItem>
 #include <QPoint>
+#include <QTranslator>
 
 #include "sounds.h"
 #include "deck.h"
@@ -78,6 +79,7 @@ private:
                                       QParallelAnimationGroup *masterGroup,
                                       int startDelay,
                                       int perCardStagger);
+    QTranslator* currentTranslator = nullptr;
     void initCardsPlayedPointers();
     void tryQuit();
 
@@ -213,6 +215,7 @@ public:
     void setCheatMode(bool enabled);
     void loadCardsPlayed();
     void createTOC();
+    void setLanguage();
 
     // Setters (publics)
     /*

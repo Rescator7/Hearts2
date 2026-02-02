@@ -59,19 +59,21 @@ MainWindow::MainWindow(QWidget *parent)
     background = new Background(scene, this);
     scene->protectItem(background);
 
+    initCardsPlayedPointers();
+
     createButtonsGroups();
 
     create_arrows();
 
     createPlayerNames();
 
-    createTOC();
+ //   createTOC();
 
     applyAllSettings();
 
-    initCardsPlayedPointers();
-
-    loadCardsPlayed();
+//  when setting the language. Set language is forced to call loadCardsPlayed, because the translation remove the QPixmap images
+//  by the new translated Labels text.
+//    loadCardsPlayed();
 
     ui->channel->setStyleSheet(
       "color: yellow;"              // Text color
@@ -203,6 +205,16 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(qApp, &QCoreApplication::aboutToQuit, this, &MainWindow::aboutToQuit);
 
+    connect(ui->treeHelpTOC, &QTreeWidget::currentItemChanged,
+        this, [this](QTreeWidgetItem *current, QTreeWidgetItem *previous) {
+            if (!current) return;
+
+            QString anchor = current->data(0, Qt::UserRole).toString();
+            if (!anchor.isEmpty()) {
+                ui->textHelpContent->setSource(QUrl("#" + anchor));
+            }
+   });
+
    // Global quick Quit with shortcut Ctrl+Q
     QShortcut *quitShortcut = new QShortcut(QKeySequence("Ctrl+Q"), this);
     quitShortcut->setContext(Qt::ApplicationShortcut);
@@ -249,16 +261,16 @@ void MainWindow::aboutToQuit()
 
 void MainWindow::loadHelpFile()
 {
-  QFile file; // (":/help.html");
+  QFile file; // (":/translations/help.html");
   if (ui->opt_english->isChecked()) {
-    file.setFileName(":/help.html");
+    file.setFileName(":/translations/help.html");
   } else
     if (ui->opt_french->isChecked()) {
       qDebug() << "Set french help.";
-      file.setFileName(":/help_fr.html");
+      file.setFileName(":/translations/help_fr.html");
     } else
       if (ui->opt_russian->isChecked()) {
-        file.setFileName(":/help_ru.html");
+        file.setFileName(":/translations/help_ru.html");
       }
 
   if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -277,26 +289,25 @@ void MainWindow::loadHelpFile()
 void MainWindow::createTOC()
 {  
   struct tocEntry {
-    QString title;
     QString anchor;
     bool isSubsection;
   };
 
   static const tocEntry TOC[] =  {
-                                 {tr("1. Basic rules of the game"), "rules", false },
-                                 {tr("2. Game settings"), "settings", false },
-                                 {tr("2.1 Game variants"), "variants", true },
-                                 {tr("2.2 Miscellaneous"), "miscellaneous", true },
-                                 {tr("2.3 Scoreboard"), "scoreboard", true },
-                                 {tr("3. Game shortcuts"), "shortcuts", false },
-                                 {tr("4. Playing online"), "online", false },
-                                 {tr("5. Credits"), "credits", false },
-                                 {tr("5.1 Playing card decks"), "decks", true },
-                                 {tr("5.2 Icons"), "icons", true },
-                                 {tr("5.3 Backgrounds Images"), "backgrounds", true },
-                                 {tr("5.4 Sounds"), "sounds", true },
-                                 {tr("5.5 Special thanks"), "special", true}
-                                 };
+                           {"rules", false },
+                           {"settings", false },
+                           {"variants", true },
+                           {"miscellaneous", true },
+                           {"scoreboard", true },
+                           {"shortcuts", false },
+                           {"online", false },
+                           {"credits", false },
+                           {"decks", true },
+                           {"icons", true },
+                           {"backgrounds", true },
+                           {"sounds", true },
+                           {"special", true}
+                         };
 
   ui->treeHelpTOC->setHeaderHidden(true);  // pas de header
   ui->treeHelpTOC->setColumnCount(1);
@@ -307,6 +318,7 @@ void MainWindow::createTOC()
 
   QTreeWidgetItem *lastParent = nullptr;
 
+  int cpt = 0;
   for (const auto &entry : TOC) {
     QTreeWidgetItem *item;
 
@@ -317,27 +329,34 @@ void MainWindow::createTOC()
         lastParent = item;
     }
 
-    item->setText(0, entry.title);
+    QString title;
+    switch (static_cast<TocIndex>(cpt)) {
+       case TOC_Rules :         title = tr("1. Basic rules of the game"); break;
+       case TOC_Settings :      title = tr("2. Game settings"); break;
+       case TOC_Variants :      title = tr("2.1 Game variants"); break;
+       case TOC_Miscellaneous : title = tr("2.2 Miscellaneous"); break;
+       case TOC_Scoreboard :    title = tr("2.3 Scoreboard"); break;
+       case TOC_Shortcuts :     title = tr("3. Game shortcuts"); break;
+       case TOC_Online :        title = tr("4. Playing online"); break;
+       case TOC_Credits :       title = tr("5. Credits"); break;
+       case TOC_Decks :         title = tr("5.1 Playing card decks"); break;
+       case TOC_Icons :         title = tr("5.2 Icons"); break;
+       case TOC_Backgrounds :   title = tr("5.3 Backgrounds Images"); break;
+       case TOC_Sounds :        title = tr("5.4 Sounds"); break;
+       case TOC_Special :       title = tr("5.5 Special thanks"); break;
+    }
+
+    item->setText(0, title);
     item->setData(0, Qt::UserRole, entry.anchor);
     if (entry.isSubsection) {
         QFont font = item->font(0);
         font.setPointSize(font.pointSize() - 1);
         item->setFont(0, font);
     }
+    cpt++;
   }
 
   ui->treeHelpTOC->expandAll();
-
-  // keyboard
-  connect(ui->treeHelpTOC, &QTreeWidget::currentItemChanged,
-        this, [this](QTreeWidgetItem *current, QTreeWidgetItem *previous) {
-            if (!current) return;
-
-            QString anchor = current->data(0, Qt::UserRole).toString();
-            if (!anchor.isEmpty()) {
-                ui->textHelpContent->setSource(QUrl("#" + anchor));
-            }
-  });
 }
 
 bool MainWindow::loadBackgroundPreview(const QString &image_path)
@@ -434,15 +453,26 @@ void MainWindow::initCardsPlayedPointers()
 
 void MainWindow::loadCardsPlayed()
 {
-  static const QStringList ranks = { "2", "3", "4", "5", "6", "7", "8", "9", "10", tr("Jack"), tr("Queen"), tr("King"), tr("Ace") };
+  static const QStringList ranks = { "2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King", "Ace" };
   static const QStringList suits = { " ♣", " ♠", " ♦", " ♥" };
 
   QPixmap pix;
+  QString sRank;
 
   for (int cardId = 0; cardId < DECK_SIZE; cardId++) {
+    int suit = cardId / 13;
+    int rank = cardId % 13;
+    switch (rank) {
+       case 9  : sRank = tr("Jack"); break;
+       case 10 : sRank = tr("Queen"); break;
+       case 11 : sRank = tr("King"); break;
+       case 12 : sRank = tr("Ace"); break;
+       default : sRank = ranks[rank];
+    }
+
     pix = deck->get_card_pixmap(cardId);
     cardLabels[cardId]->setPixmap(pix);
-    cardLabels[cardId]->setToolTip(QString(ranks[cardId % 13]) + QString(suits[cardId / 13]));
+    cardLabels[cardId]->setToolTip(sRank + QString(suits[suit]));
     cardLabels[cardId]->setDisabled(engine->isCardPlayed(cardId));
   }
 }
@@ -527,7 +557,7 @@ void MainWindow::applyAllSettings()
     case LANG_FRENCH: ui->opt_french->setChecked(true); break;
     case LANG_RUSSIAN: ui->opt_russian->setChecked(true); break;  
   }
-  loadHelpFile();
+  setLanguage();
 
   QSize savedSize(config->width(), config->height());
   QPoint savedPos(config->posX(), config->posY());
@@ -1608,8 +1638,8 @@ void MainWindow::createButtonsGroups()
    languageGroup->setExclusive(true);
 
     connect(languageGroup, QOverload<int>::of(&QButtonGroup::idClicked), this, [this](int id) {
-      loadHelpFile();
       config->set_language(id);
+      setLanguage();
     });
 
 // Animations buttons
@@ -2774,6 +2804,43 @@ void MainWindow::setAnimationButtons(bool enabled)
   ui->opt_anim_pass_cards->setEnabled(enabled);
   ui->opt_anim_arrow->setEnabled(enabled);
   ui->opt_anim_triangle->setEnabled(enabled);
+}
+
+void MainWindow::setLanguage()
+{
+  // Retirer l’ancien translator s’il existe
+  if (currentTranslator) {
+   qApp->removeTranslator(currentTranslator);
+   delete currentTranslator;
+   currentTranslator = nullptr;
+  }
+
+  currentTranslator = new QTranslator(this);
+
+  QString translation(":/translations/Hearts_en_CA.qm");
+
+  if (ui->opt_french->isChecked()) {
+    translation = ":/translations/Hearts_fr_CA.qm";
+  } else
+      if (ui->opt_russian->isChecked()) {
+        translation = ":/translations/Hearts_ru_RU.qm";
+      }
+
+  // Chargement depuis les ressources embarquées
+  if (currentTranslator->load(translation)) {
+    qApp->installTranslator(currentTranslator);
+  } else {
+    qDebug() << "Échec chargement traduction :" << translation;
+  }
+
+  ui->retranslateUi(this);
+  statistics->Translate();
+
+  ui->treeHelpTOC->clear();
+  qDebug() << "Create new TOC";
+  createTOC();
+  loadHelpFile();
+  loadCardsPlayed();
 }
 
 void MainWindow::on_opt_animations_clicked()
