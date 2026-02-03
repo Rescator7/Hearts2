@@ -16,7 +16,7 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string notr="true">MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="sizePolicy">
@@ -3926,12 +3926,12 @@ QGroupBox QRadioButton::disabled  {
            <rect>
             <x>10</x>
             <y>30</y>
-            <width>201</width>
+            <width>211</width>
             <height>24</height>
            </rect>
           </property>
           <property name="text">
-           <string>Standard</string>
+           <string notr="true">Standard</string>
           </property>
          </widget>
          <widget class="QRadioButton" name="button_Deck_Nicu_White">
@@ -3939,12 +3939,12 @@ QGroupBox QRadioButton::disabled  {
            <rect>
             <x>10</x>
             <y>60</y>
-            <width>201</width>
+            <width>211</width>
             <height>24</height>
            </rect>
           </property>
           <property name="text">
-           <string>Nicu (white)</string>
+           <string notr="true">Nicu (white)</string>
           </property>
          </widget>
          <widget class="QRadioButton" name="button_Deck_English">
@@ -3952,12 +3952,12 @@ QGroupBox QRadioButton::disabled  {
            <rect>
             <x>10</x>
             <y>90</y>
-            <width>201</width>
+            <width>211</width>
             <height>24</height>
            </rect>
           </property>
           <property name="text">
-           <string>English</string>
+           <string notr="true">English</string>
           </property>
          </widget>
          <widget class="QRadioButton" name="button_Deck_Russian">
@@ -3965,12 +3965,12 @@ QGroupBox QRadioButton::disabled  {
            <rect>
             <x>10</x>
             <y>120</y>
-            <width>201</width>
+            <width>211</width>
             <height>24</height>
            </rect>
           </property>
           <property name="text">
-           <string>Russian</string>
+           <string notr="true">Russian</string>
           </property>
          </widget>
          <widget class="QRadioButton" name="button_Deck_Kaiser_jubilaum">
@@ -3978,12 +3978,12 @@ QGroupBox QRadioButton::disabled  {
            <rect>
             <x>10</x>
             <y>150</y>
-            <width>201</width>
+            <width>211</width>
             <height>24</height>
            </rect>
           </property>
           <property name="text">
-           <string>Kaiser jubilaum</string>
+           <string notr="true">Kaiser jubilaum</string>
           </property>
          </widget>
          <widget class="QRadioButton" name="button_Deck_Tigullio_inter">
@@ -3991,12 +3991,12 @@ QGroupBox QRadioButton::disabled  {
            <rect>
             <x>10</x>
             <y>180</y>
-            <width>201</width>
+            <width>211</width>
             <height>24</height>
            </rect>
           </property>
           <property name="text">
-           <string>Tigullio (international)</string>
+           <string notr="true">Tigullio (international)</string>
           </property>
          </widget>
          <widget class="QRadioButton" name="button_Deck_Mittelalter">
@@ -4004,7 +4004,7 @@ QGroupBox QRadioButton::disabled  {
            <rect>
             <x>10</x>
             <y>210</y>
-            <width>201</width>
+            <width>211</width>
             <height>24</height>
            </rect>
           </property>
@@ -4017,7 +4017,7 @@ QGroupBox QRadioButton::disabled  {
            <rect>
             <x>10</x>
             <y>240</y>
-            <width>201</width>
+            <width>211</width>
             <height>24</height>
            </rect>
           </property>
@@ -4084,7 +4084,7 @@ QGroupBox QCheckBox::disabled  {
            <rect>
             <x>10</x>
             <y>30</y>
-            <width>231</width>
+            <width>211</width>
             <height>24</height>
            </rect>
           </property>
@@ -4097,7 +4097,7 @@ QGroupBox QCheckBox::disabled  {
            <rect>
             <x>10</x>
             <y>60</y>
-            <width>231</width>
+            <width>211</width>
             <height>24</height>
            </rect>
           </property>
@@ -4110,7 +4110,7 @@ QGroupBox QCheckBox::disabled  {
            <rect>
             <x>10</x>
             <y>90</y>
-            <width>231</width>
+            <width>211</width>
             <height>24</height>
            </rect>
           </property>
@@ -4123,7 +4123,7 @@ QGroupBox QCheckBox::disabled  {
            <rect>
             <x>10</x>
             <y>120</y>
-            <width>231</width>
+            <width>211</width>
             <height>24</height>
            </rect>
           </property>
@@ -4136,7 +4136,7 @@ QGroupBox QCheckBox::disabled  {
            <rect>
             <x>10</x>
             <y>150</y>
-            <width>231</width>
+            <width>211</width>
             <height>24</height>
            </rect>
           </property>
@@ -4149,7 +4149,7 @@ QGroupBox QCheckBox::disabled  {
            <rect>
             <x>10</x>
             <y>180</y>
-            <width>231</width>
+            <width>211</width>
             <height>24</height>
            </rect>
           </property>
@@ -4341,7 +4341,7 @@ QGroupBox QLabel {
            <rect>
             <x>10</x>
             <y>40</y>
-            <width>181</width>
+            <width>211</width>
             <height>24</height>
            </rect>
           </property>
@@ -4364,7 +4364,7 @@ QGroupBox QLabel {
            <rect>
             <x>10</x>
             <y>100</y>
-            <width>181</width>
+            <width>211</width>
             <height>24</height>
            </rect>
           </property>
@@ -4380,7 +4380,7 @@ QGroupBox QLabel {
            <rect>
             <x>10</x>
             <y>130</y>
-            <width>181</width>
+            <width>211</width>
             <height>24</height>
            </rect>
           </property>
@@ -4396,7 +4396,7 @@ QGroupBox QLabel {
            <rect>
             <x>10</x>
             <y>70</y>
-            <width>181</width>
+            <width>211</width>
             <height>24</height>
            </rect>
           </property>

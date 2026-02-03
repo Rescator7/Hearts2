@@ -108,9 +108,9 @@ public:
                QWidget *widget = nullptr) override;
 
     void setupBackgroundList(QListView *listView, QLabel *previewLabel);
-    void setBackgroundPixmap(const QString path, bool update_credits = true);
+    void setBackgroundPixmap(const QString path);
     void setBackground(int index);
-    void setCredits(const QString &path);
+    void setCredits();
     QString &Credits() { return credit; };
     QString &FullPath() { return fullpath; };
     QString &CreditTextColor() { return creditColor; };

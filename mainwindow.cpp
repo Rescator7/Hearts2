@@ -112,6 +112,8 @@ MainWindow::MainWindow(QWidget *parent)
 
       createScoreDisplay();
 
+      setLanguage();  // creditsLabel must be created first.
+
       int handScores[4] = {0, 0, 0, 0};
       int totalScores[4] = {0, 0, 0, 0};
       QString names[4] = {"South", "West", "North", "East"};
@@ -557,7 +559,6 @@ void MainWindow::applyAllSettings()
     case LANG_FRENCH: ui->opt_french->setChecked(true); break;
     case LANG_RUSSIAN: ui->opt_russian->setChecked(true); break;  
   }
-  setLanguage();
 
   QSize savedSize(config->width(), config->height());
   QPoint savedPos(config->posX(), config->posY());
@@ -824,6 +825,7 @@ void MainWindow::onBackgroundPreviewClicked()
 
     // Update the actual scene background
     background->setBackgroundPixmap(fileName);
+    updateCreditsPosition();
 
     // Update preview label
     loadBackgroundPreview(fileName);
@@ -1638,6 +1640,9 @@ void MainWindow::createButtonsGroups()
    languageGroup->setExclusive(true);
 
     connect(languageGroup, QOverload<int>::of(&QButtonGroup::idClicked), this, [this](int id) {
+      if (id == config->get_language()) {
+        return;
+      }
       config->set_language(id);
       setLanguage();
     });
@@ -2841,6 +2846,9 @@ void MainWindow::setLanguage()
   createTOC();
   loadHelpFile();
   loadCardsPlayed();
+  background->setCredits();
+  updateCredits(background->Credits(), background->CreditTextColor());
+  updateCreditsPosition();
 }
 
 void MainWindow::on_opt_animations_clicked()

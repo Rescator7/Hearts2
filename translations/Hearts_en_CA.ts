@@ -4,14 +4,12 @@
 <context>
     <name>Background</name>
     <message>
-        <location filename="../background.cpp" line="85"/>
-        <location filename="../background.cpp" line="134"/>
+        <location filename="../background.cpp" line="99"/>
         <source>Background created using gimp 2.10.18</source>
         <translation>Background created using gimp 2.10.18</translation>
     </message>
     <message>
-        <location filename="../background.cpp" line="87"/>
-        <location filename="../background.cpp" line="136"/>
+        <location filename="../background.cpp" line="101"/>
         <source>Background image by: </source>
         <translation>Background image by: </translation>
     </message>
@@ -828,118 +826,118 @@ Do you want to continue ?</translation>
         <location filename="../engine.cpp" line="633"/>
         <location filename="../engine.cpp" line="993"/>
         <source>You</source>
-        <translation type="unfinished">You</translation>
+        <translation>You</translation>
     </message>
     <message>
         <location filename="../engine.h" line="100"/>
         <source>West</source>
-        <translation type="unfinished">West</translation>
+        <translation>West</translation>
     </message>
     <message>
         <location filename="../engine.h" line="100"/>
         <source>North</source>
-        <translation type="unfinished">North</translation>
+        <translation>North</translation>
     </message>
     <message>
         <location filename="../engine.h" line="100"/>
         <source>East</source>
-        <translation type="unfinished">East</translation>
+        <translation>East</translation>
     </message>
     <message>
         <location filename="../engine.cpp" line="30"/>
         <source>Previous saved game has been loaded!</source>
-        <translation type="unfinished"></translation>
+        <translation>Previous saved game has been loaded!</translation>
     </message>
     <message>
         <location filename="../engine.cpp" line="141"/>
         <source>Starting a new game.</source>
-        <translation type="unfinished"></translation>
+        <translation>Starting a new game.</translation>
     </message>
     <message>
         <location filename="../engine.cpp" line="159"/>
         <source>The cancellation was successful!</source>
-        <translation type="unfinished"></translation>
+        <translation>The cancellation was successful!</translation>
     </message>
     <message>
         <location filename="../engine.cpp" line="164"/>
         <source>There is no undo available!</source>
-        <translation type="unfinished">There is no undo available!</translation>
+        <translation>There is no undo available!</translation>
     </message>
     <message>
         <location filename="../engine.cpp" line="490"/>
         <source>We now pass the cards to the person on the right.</source>
-        <translation type="unfinished"></translation>
+        <translation>We now pass the cards to the person on the right.</translation>
     </message>
     <message>
         <location filename="../engine.cpp" line="493"/>
         <source>We now pass the cards to the player opposite.</source>
-        <translation type="unfinished"></translation>
+        <translation>We now pass the cards to the player opposite.</translation>
     </message>
     <message>
         <location filename="../engine.cpp" line="496"/>
         <source>No card exchange this round.</source>
-        <translation type="unfinished"></translation>
+        <translation>No card exchange this round.</translation>
     </message>
     <message>
         <location filename="../engine.cpp" line="499"/>
         <source>We now pass the cards to the person on the left.</source>
-        <translation type="unfinished"></translation>
+        <translation>We now pass the cards to the person on the left.</translation>
     </message>
     <message>
         <location filename="../engine.cpp" line="552"/>
         <location filename="../engine.cpp" line="561"/>
         <source>Hearts has been broken!</source>
-        <translation type="unfinished"></translation>
+        <translation>Hearts has been broken!</translation>
     </message>
     <message>
         <location filename="../engine.cpp" line="605"/>
         <source>What would you like to do?</source>
-        <translation type="unfinished"></translation>
+        <translation>What would you like to do?</translation>
     </message>
     <message>
         <location filename="../engine.cpp" line="607"/>
         <source>➕ 26 to opponents</source>
-        <translation type="unfinished"></translation>
+        <translation>➕ 26 to opponents</translation>
     </message>
     <message>
         <location filename="../engine.cpp" line="608"/>
         <source>➖ 26 to myself</source>
-        <translation type="unfinished"></translation>
+        <translation>➖ 26 to myself</translation>
     </message>
     <message>
         <location filename="../engine.cpp" line="629"/>
         <source> substracted </source>
-        <translation type="unfinished"></translation>
+        <translation> substracted </translation>
     </message>
     <message>
         <location filename="../engine.cpp" line="629"/>
         <source> pts to </source>
-        <translation type="unfinished"></translation>
+        <translation> pts to </translation>
     </message>
     <message>
         <location filename="../engine.cpp" line="630"/>
         <source>your</source>
-        <translation type="unfinished"></translation>
+        <translation>your</translation>
     </message>
     <message>
         <location filename="../engine.cpp" line="630"/>
         <source>his/her</source>
-        <translation type="unfinished"></translation>
+        <translation>his/her</translation>
     </message>
     <message>
         <location filename="../engine.cpp" line="630"/>
         <source> score!</source>
-        <translation type="unfinished"></translation>
+        <translation> score!</translation>
     </message>
     <message>
         <location filename="../engine.cpp" line="633"/>
         <source> added 26 pts to everyone&apos;s scores!</source>
-        <translation type="unfinished"></translation>
+        <translation> added 26 pts to everyone&apos;s scores!</translation>
     </message>
     <message>
         <location filename="../engine.cpp" line="654"/>
         <source>You shoot the moon!</source>
-        <translation type="unfinished">You shoot the moon!</translation>
+        <translation>You shoot the moon!</translation>
     </message>
     <message>
         <location filename="../engine.cpp" line="656"/>
@@ -948,17 +946,17 @@ Do you want to continue ?</translation>
         <location filename="../engine.cpp" line="711"/>
         <location filename="../engine.cpp" line="916"/>
         <source>Player &apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Player &apos;</translation>
     </message>
     <message>
         <location filename="../engine.cpp" line="656"/>
         <source>&apos; shoot the moon!</source>
-        <translation type="unfinished">&apos; shoot the moon!</translation>
+        <translation>&apos; shoot the moon!</translation>
     </message>
     <message>
         <location filename="../engine.cpp" line="678"/>
         <source>You receive the bonus: no tricks bonus </source>
-        <translation type="unfinished"></translation>
+        <translation>You receive the bonus: no tricks bonus </translation>
     </message>
     <message>
         <location filename="../engine.cpp" line="678"/>
@@ -966,71 +964,72 @@ Do you want to continue ?</translation>
         <location filename="../engine.cpp" line="694"/>
         <location filename="../engine.cpp" line="697"/>
         <source> point(s)</source>
-        <translation type="unfinished"> point(s)</translation>
+        <translation> point(s)</translation>
     </message>
     <message>
         <location filename="../engine.cpp" line="681"/>
         <source>&apos; receive the bonus: no tricks bonus </source>
-        <translation type="unfinished"></translation>
+        <translation>&apos; receive the bonus: no tricks bonus </translation>
     </message>
     <message>
         <location filename="../engine.cpp" line="694"/>
         <source>You receive the bonus: omnibus </source>
-        <translation type="unfinished"></translation>
+        <translation>You receive the bonus: omnibus </translation>
     </message>
     <message>
         <location filename="../engine.cpp" line="697"/>
         <source>&apos; receive the bonus: omnibus </source>
-        <translation type="unfinished"></translation>
+        <translation>&apos; receive the bonus: omnibus </translation>
     </message>
     <message>
         <location filename="../engine.cpp" line="709"/>
         <source>You got the perfect 100!
 [Info]: Your score has been set to 50.</source>
-        <translation type="unfinished"></translation>
+        <translation>You got the perfect 100!
+[Info]: Your score has been set to 50.</translation>
     </message>
     <message>
         <location filename="../engine.cpp" line="711"/>
         <source>&apos; got the perfect 100!
 [Info]: Player &apos;</source>
-        <translation type="unfinished">&apos; got the perfect 100!
+        <translation>&apos; got the perfect 100!
 [Info]: Player &apos;</translation>
     </message>
     <message>
         <location filename="../engine.cpp" line="712"/>
         <source>&apos; score has been set to 50.</source>
-        <translation type="unfinished">&apos; score has been set to 50.</translation>
+        <translation>&apos; score has been set to 50.</translation>
     </message>
     <message>
         <location filename="../engine.cpp" line="726"/>
         <source>New scores: &apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>New scores: &apos;</translation>
     </message>
     <message>
         <location filename="../engine.cpp" line="914"/>
         <source>You takes the rest!</source>
-        <translation type="unfinished"></translation>
+        <translation>You takes the rest!</translation>
     </message>
     <message>
         <location filename="../engine.cpp" line="916"/>
         <source>&apos; takes the rest!</source>
-        <translation type="unfinished">&apos; takes the rest!</translation>
+        <translation>&apos; takes the rest!</translation>
     </message>
     <message>
         <location filename="../engine.cpp" line="971"/>
         <source>Drew !</source>
-        <translation type="unfinished">Drew !</translation>
+        <translation>Drew !</translation>
     </message>
     <message>
         <location filename="../engine.cpp" line="971"/>
         <source>Won !</source>
-        <translation type="unfinished">Won !</translation>
+        <translation>Won !</translation>
     </message>
     <message>
         <location filename="../engine.cpp" line="993"/>
         <source>GAME OVER!
 [Info]: Player &apos;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../engine.cpp" line="994"/>
@@ -1038,7 +1037,7 @@ Do you want to continue ?</translation>
         <location filename="../engine.cpp" line="998"/>
         <location filename="../engine.cpp" line="1000"/>
         <source> point(s) </source>
-        <translation type="unfinished"> point(s) </translation>
+        <translation> point(s) </translation>
     </message>
     <message>
         <location filename="../engine.cpp" line="995"/>
@@ -1046,48 +1045,48 @@ Do you want to continue ?</translation>
         <location filename="../engine.cpp" line="999"/>
         <source>
 [Info]: Player &apos;</source>
-        <translation type="unfinished">
+        <translation>
 [Info]: Player &apos;</translation>
     </message>
     <message>
         <location filename="../engine.cpp" line="1489"/>
         <source>You must play the 2 of Clubs on the first trick!</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../engine.cpp" line="1490"/>
         <source>Hearts are not broken yet!</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../engine.cpp" line="1491"/>
         <source>The Queen of Spades is not allowed on the first trick!</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../engine.cpp" line="1492"/>
         <source>You must follow the suit led!</source>
-        <translation type="unfinished"></translation>
+        <translation>You must follow the suit led!</translation>
     </message>
     <message>
         <location filename="../engine.cpp" line="1493"/>
         <source>Invalid card or not in your hand.</source>
-        <translation type="unfinished"></translation>
+        <translation>Invalid card or not in your hand.</translation>
     </message>
     <message>
         <location filename="../engine.cpp" line="1494"/>
         <source>The game engine is busy, please try again when it&apos;s your turn to play.</source>
-        <translation type="unfinished"></translation>
+        <translation>The game engine is busy, please try again when it&apos;s your turn to play.</translation>
     </message>
     <message>
         <location filename="../engine.cpp" line="1495"/>
         <source>The saved game file is corrupted! Deleted!</source>
-        <translation type="unfinished">The saved game file is corrupted! Deleted!</translation>
+        <translation>The saved game file is corrupted! Deleted!</translation>
     </message>
     <message>
         <location filename="../engine.cpp" line="1496"/>
         <source>Unknown error.</source>
-        <translation type="unfinished"></translation>
+        <translation>Unknown error.</translation>
     </message>
 </context>
 <context>
@@ -1144,267 +1143,267 @@ Do you want to continue ?</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="19"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1610"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1616"/>
         <source>MainWindow</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="497"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1653"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1659"/>
         <source>Board</source>
-        <translation type="unfinished"></translation>
+        <translation>Board</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="975"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1612"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1618"/>
         <source>Quit</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="1449"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1616"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1622"/>
         <source>New game</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="1465"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1620"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1626"/>
         <source>Ctrl+N</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="1942"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1627"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1633"/>
         <source>Ctrl+U</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="1955"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1630"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1636"/>
         <source>Sounds</source>
-        <translation type="unfinished"></translation>
+        <translation>Sounds</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="1995"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1634"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1640"/>
         <source>Ctrl+S</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="2014"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1637"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1643"/>
         <source>Scores</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="2054"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1641"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1647"/>
         <source>Ctrl+C</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="2079"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1644"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1650"/>
         <source>Reveal</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="2119"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1648"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1654"/>
         <source>Ctrl+R</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="2152"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1674"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1680"/>
         <source>Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Channel</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="2209"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1656"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1662"/>
         <source>Game ID</source>
-        <translation type="unfinished"></translation>
+        <translation>Game ID</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="2214"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1658"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1664"/>
         <source>North</source>
-        <translation type="unfinished">North</translation>
+        <translation>North</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="2219"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1660"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1666"/>
         <source>South</source>
-        <translation type="unfinished">South</translation>
+        <translation>South</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="2224"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1662"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1668"/>
         <source>West</source>
-        <translation type="unfinished">West</translation>
+        <translation>West</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="2229"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1664"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1670"/>
         <source>East</source>
-        <translation type="unfinished">East</translation>
+        <translation>East</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="2254"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1665"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1671"/>
         <source>Username: </source>
-        <translation type="unfinished"></translation>
+        <translation>Username: </translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="2283"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1666"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1672"/>
         <source>@</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="2299"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1667"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1673"/>
         <source>rescator7.com</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="2324"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1668"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1674"/>
         <source>5000</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="2364"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1670"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1676"/>
         <source>Status: </source>
-        <translation type="unfinished"></translation>
+        <translation>Status: </translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="2371"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1671"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1677"/>
         <source>N/A</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="2406"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1678"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1684"/>
         <source>Statistics</source>
-        <translation type="unfinished">Game Statistics</translation>
+        <translation>Game Statistics</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="2448"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1734"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1740"/>
         <source>List of cards played </source>
-        <translation type="unfinished"></translation>
+        <translation>List of cards played </translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="2456"/>
         <location filename="../mainwindow.ui" line="2629"/>
         <location filename="../mainwindow.ui" line="2802"/>
         <location filename="../mainwindow.ui" line="2975"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1680"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1693"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1706"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1719"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1686"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1699"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1712"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1725"/>
         <source>2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="2469"/>
         <location filename="../mainwindow.ui" line="2642"/>
         <location filename="../mainwindow.ui" line="2815"/>
         <location filename="../mainwindow.ui" line="2988"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1681"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1694"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1707"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1720"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1687"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1700"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1713"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1726"/>
         <source>3</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="2482"/>
         <location filename="../mainwindow.ui" line="2655"/>
         <location filename="../mainwindow.ui" line="2828"/>
         <location filename="../mainwindow.ui" line="3001"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1682"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1695"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1708"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1721"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1688"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1701"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1714"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1727"/>
         <source>4</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="2495"/>
         <location filename="../mainwindow.ui" line="2668"/>
         <location filename="../mainwindow.ui" line="2841"/>
         <location filename="../mainwindow.ui" line="3014"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1683"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1696"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1709"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1722"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1689"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1702"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1715"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1728"/>
         <source>5</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="2508"/>
         <location filename="../mainwindow.ui" line="2681"/>
         <location filename="../mainwindow.ui" line="2854"/>
         <location filename="../mainwindow.ui" line="3027"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1684"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1697"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1710"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1723"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1690"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1703"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1716"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1729"/>
         <source>6</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="2521"/>
         <location filename="../mainwindow.ui" line="2694"/>
         <location filename="../mainwindow.ui" line="2867"/>
         <location filename="../mainwindow.ui" line="3040"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1685"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1698"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1711"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1724"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1691"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1704"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1717"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1730"/>
         <source>7</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="2534"/>
         <location filename="../mainwindow.ui" line="2707"/>
         <location filename="../mainwindow.ui" line="2880"/>
         <location filename="../mainwindow.ui" line="3053"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1686"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1699"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1712"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1725"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1692"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1705"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1718"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1731"/>
         <source>8</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="2547"/>
         <location filename="../mainwindow.ui" line="2720"/>
         <location filename="../mainwindow.ui" line="2893"/>
         <location filename="../mainwindow.ui" line="3066"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1687"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1700"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1713"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1726"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1693"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1706"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1719"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1732"/>
         <source>9</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="2560"/>
         <location filename="../mainwindow.ui" line="2733"/>
         <location filename="../mainwindow.ui" line="2906"/>
         <location filename="../mainwindow.ui" line="3079"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1688"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1701"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1714"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1727"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1694"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1707"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1720"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1733"/>
         <source>10</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="2573"/>
@@ -1412,10 +1411,10 @@ Do you want to continue ?</translation>
         <location filename="../mainwindow.ui" line="2919"/>
         <location filename="../mainwindow.ui" line="3092"/>
         <location filename="../mainwindow.cpp" line="466"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1689"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1702"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1715"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1728"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1695"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1708"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1721"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1734"/>
         <source>Jack</source>
         <translation>Jack</translation>
     </message>
@@ -1425,10 +1424,10 @@ Do you want to continue ?</translation>
         <location filename="../mainwindow.ui" line="2932"/>
         <location filename="../mainwindow.ui" line="3105"/>
         <location filename="../mainwindow.cpp" line="467"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1690"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1703"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1716"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1729"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1696"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1709"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1722"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1735"/>
         <source>Queen</source>
         <translation>Queen</translation>
     </message>
@@ -1438,10 +1437,10 @@ Do you want to continue ?</translation>
         <location filename="../mainwindow.ui" line="2945"/>
         <location filename="../mainwindow.ui" line="3118"/>
         <location filename="../mainwindow.cpp" line="468"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1691"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1704"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1717"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1730"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1697"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1710"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1723"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1736"/>
         <source>King</source>
         <translation>King</translation>
     </message>
@@ -1451,22 +1450,22 @@ Do you want to continue ?</translation>
         <location filename="../mainwindow.ui" line="2958"/>
         <location filename="../mainwindow.ui" line="3131"/>
         <location filename="../mainwindow.cpp" line="469"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1692"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1705"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1718"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1731"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1698"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1711"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1724"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1737"/>
         <source>Ace</source>
         <translation>Ace</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="3166"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1752"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1758"/>
         <source>Help</source>
-        <translation type="unfinished"></translation>
+        <translation>Help</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="3197"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1742"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1748"/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;meta charset=&quot;utf-8&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
@@ -1475,155 +1474,133 @@ li.unchecked::marker { content: &quot;\2610&quot;; }
 li.checked::marker { content: &quot;\2612&quot;; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Noto Sans&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu Sans&apos;;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="3226"/>
         <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1804"/>
         <source>Settings</source>
-        <translation type="unfinished">Settings</translation>
+        <translation>Settings</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="3273"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1754"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1760"/>
         <source>Game variants</source>
-        <translation type="unfinished"></translation>
+        <translation>Game variants</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="3285"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1755"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1761"/>
         <source>Queen spade break hearts</source>
-        <translation type="unfinished"></translation>
+        <translation>Queens pade break hearts</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="3298"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1756"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1762"/>
         <source>Perfect 100</source>
-        <translation type="unfinished">Perfect 100</translation>
+        <translation>Perfect 100</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="3311"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1757"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1763"/>
         <source>Omnibus</source>
-        <translation type="unfinished">Omnibus</translation>
+        <translation>Omnibus</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="3324"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1758"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1764"/>
         <source>No tricks bonus</source>
-        <translation type="unfinished"></translation>
+        <translation>No tricks bonus</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="3337"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1759"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1765"/>
         <source>New moon</source>
-        <translation type="unfinished"></translation>
+        <translation>New moon</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="3350"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1760"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1766"/>
         <source>No draw</source>
-        <translation type="unfinished"></translation>
+        <translation>No draw</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="3844"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1761"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1767"/>
         <source>Click to change background</source>
-        <translation type="unfinished"></translation>
+        <translation>Click to change background</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="3922"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1763"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1769"/>
         <source>Deck style</source>
-        <translation type="unfinished"></translation>
+        <translation>Deck style</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="3934"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1764"/>
-        <source>Standard</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mainwindow.ui" line="3960"/>
         <location filename="../mainwindow.ui" line="4268"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1766"/>
         <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1782"/>
         <source>English</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="3973"/>
         <location filename="../mainwindow.ui" line="4294"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1767"/>
         <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1784"/>
         <source>Russian</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mainwindow.ui" line="3986"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1768"/>
-        <source>Kaiser jubilaum</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mainwindow.ui" line="3999"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1769"/>
-        <source>Tigullio (international)</source>
-        <translation type="unfinished"></translation>
+        <translation>Русский</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="4012"/>
         <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1770"/>
         <source>Mittelalter</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="4025"/>
         <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1771"/>
         <source>Neo classical</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="4080"/>
         <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1772"/>
         <source>Animations</source>
-        <translation type="unfinished"></translation>
+        <translation>Animations</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="4092"/>
         <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1773"/>
         <source>Deal cards</source>
-        <translation type="unfinished"></translation>
+        <translation>Deal cards</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="4105"/>
         <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1774"/>
         <source>Play a card</source>
-        <translation type="unfinished">Play a card</translation>
+        <translation>Play a card</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="4118"/>
         <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1775"/>
         <source>Collect tricks</source>
-        <translation type="unfinished"></translation>
+        <translation>Collect tricks</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="4131"/>
         <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1776"/>
         <source>Passing three cards</source>
-        <translation type="unfinished"></translation>
+        <translation>Passing three cards</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="4144"/>
         <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1777"/>
         <source>Animated arrow</source>
-        <translation type="unfinished"></translation>
+        <translation>Animated arrow</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="4157"/>
         <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1778"/>
         <source>Your turn indicator</source>
-        <translation type="unfinished"></translation>
+        <translation>Your turn indicator</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="4256"/>
@@ -1635,61 +1612,61 @@ li.checked::marker { content: &quot;\2612&quot;; }
         <location filename="../mainwindow.ui" line="4281"/>
         <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1783"/>
         <source>French</source>
-        <translation type="unfinished"></translation>
+        <translation>Français</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="4337"/>
         <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1785"/>
         <source>Miscellaneous</source>
-        <translation type="unfinished"></translation>
+        <translation>Miscellaneous</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="4349"/>
         <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1787"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enable or disable the option to request confirmation from the user when using the exit button.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enable or disable the option to request confirmation from the user when using the exit button.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="4352"/>
         <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1789"/>
         <source>Confirm [Exit]</source>
-        <translation type="unfinished"></translation>
+        <translation>Confirm [Exit]</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="4372"/>
         <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1791"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enable or disable the game engine&apos;s ability to detect the winner of all remaining cards.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enable or disable the game engine&apos;s ability to detect the winner of all remaining cards.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="4375"/>
         <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1793"/>
         <source>Detect TRAM</source>
-        <translation type="unfinished"></translation>
+        <translation>Detect TRAM</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="4388"/>
         <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1795"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enable or disable &amp;quot;cheat mode&amp;quot;; when enabled, the &amp;quot;Reveal&amp;quot; button and the information tab listing the cards already played will be available.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enable or disable &amp;quot;cheat mode&amp;quot;; when enabled, the &amp;quot;Reveal&amp;quot; button and the information tab listing the cards already played will be available.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="4391"/>
         <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1797"/>
         <source>Cheat mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Cheat mode</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="4404"/>
         <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1799"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enable or disable the option to request confirmation from the user when using the new game button.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enable or disable the option to request confirmation from the user when using the new game button.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="4407"/>
         <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1801"/>
         <source>Confirm [New game]</source>
-        <translation type="unfinished"></translation>
+        <translation>Confirm [New game]</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="4203"/>
@@ -1887,7 +1864,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
     </message>
     <message>
         <location filename="../mainwindow.ui" line="2344"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1669"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1675"/>
         <source>Connect</source>
         <translation>Connect</translation>
     </message>
@@ -1921,7 +1898,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
     </message>
     <message>
         <location filename="../mainwindow.ui" line="1926"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1623"/>
+        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1629"/>
         <source>Undo</source>
         <translation>Undo</translation>
     </message>
@@ -1942,10 +1919,8 @@ li.checked::marker { content: &quot;\2612&quot;; }
         <translation type="vanished">Mt. Fuji</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="3947"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1765"/>
         <source>Nicu (white)</source>
-        <translation>Nicu (white)</translation>
+        <translation type="vanished">Nicu (white)</translation>
     </message>
     <message>
         <source>Everest</source>
@@ -2031,17 +2006,17 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <message>
         <location filename="../mainwindow.cpp" line="229"/>
         <source>Exit the game?</source>
-        <translation type="unfinished"></translation>
+        <translation>Exit the game?</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="230"/>
         <source>Do you really want to leave the game?</source>
-        <translation type="unfinished"></translation>
+        <translation>Do you really want to leave the game?</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="283"/>
         <source>Error : help file not found.</source>
-        <translation type="unfinished"></translation>
+        <translation>Error : help file not found.</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="334"/>
@@ -2114,37 +2089,40 @@ li.checked::marker { content: &quot;\2612&quot;; }
 
 It may be unsupported, missing files or corrupted.
 Please select a different deck in Settings.</source>
-        <translation type="unfinished"></translation>
+        <translation>The selected deck could not be loaded.
+
+It may be unsupported, missing files or corrupted.
+Please select a different deck in Settings.</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="813"/>
         <source>Choose Background Image</source>
-        <translation type="unfinished"></translation>
+        <translation>Choose Background Image</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="815"/>
         <source>Images (*.png *.jpg *.jpeg *.bmp *.gif *.svg)</source>
-        <translation type="unfinished"></translation>
+        <translation>Images (*.png *.jpg *.jpeg *.bmp *.gif *.svg)</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="886"/>
         <source>You must select 3 cards to pass!</source>
-        <translation type="unfinished"></translation>
+        <translation>You must select 3 cards to pass!</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="1004"/>
         <source>Start a new game?</source>
-        <translation type="unfinished"></translation>
+        <translation>Start a new game?</translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="1005"/>
         <source>Are you ready to start a new game?</source>
-        <translation type="unfinished"></translation>
+        <translation>Are you ready to start a new game?</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1731"/>
+        <location filename="../mainwindow.cpp" line="1734"/>
         <source>[Info]: </source>
-        <translation type="unfinished"></translation>
+        <translation>[Info]: </translation>
     </message>
     <message>
         <source>The statistics file is corrupted!</source>
@@ -2325,7 +2303,7 @@ Fourth : </translation>
         <translation type="vanished">You needs to select 3 cards to pass!</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1728"/>
+        <location filename="../mainwindow.cpp" line="1731"/>
         <source>[Error]: </source>
         <translation>[Error]: </translation>
     </message>
@@ -2418,121 +2396,121 @@ Fourth : </translation>
     <name>Statistics</name>
     <message>
         <location filename="../statistics.ui" line="443"/>
-        <location filename="../build/Hearts_autogen/include/ui_statistics.h" line="480"/>
+        <location filename="../build/Hearts_autogen/include/ui_statistics.h" line="484"/>
         <source>Statistics</source>
         <translation>Game Statistics</translation>
     </message>
     <message>
         <location filename="../statistics.ui" line="457"/>
-        <location filename="../build/Hearts_autogen/include/ui_statistics.h" line="482"/>
+        <location filename="../build/Hearts_autogen/include/ui_statistics.h" line="486"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Reset the statistics&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Reset the statistics&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../statistics.ui" line="460"/>
-        <location filename="../build/Hearts_autogen/include/ui_statistics.h" line="484"/>
+        <location filename="../build/Hearts_autogen/include/ui_statistics.h" line="488"/>
         <source>Reset</source>
         <translation>Reset</translation>
     </message>
     <message>
         <location filename="../statistics.ui" line="1123"/>
-        <location filename="../build/Hearts_autogen/include/ui_statistics.h" line="486"/>
+        <location filename="../build/Hearts_autogen/include/ui_statistics.h" line="490"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
         <location filename="../statistics.ui" line="1134"/>
-        <location filename="../build/Hearts_autogen/include/ui_statistics.h" line="488"/>
+        <location filename="../build/Hearts_autogen/include/ui_statistics.h" line="492"/>
         <source>First</source>
         <translation>First</translation>
     </message>
     <message>
         <location filename="../statistics.ui" line="1139"/>
-        <location filename="../build/Hearts_autogen/include/ui_statistics.h" line="490"/>
+        <location filename="../build/Hearts_autogen/include/ui_statistics.h" line="494"/>
         <source>Second</source>
         <translation>Second</translation>
     </message>
     <message>
         <location filename="../statistics.ui" line="1144"/>
-        <location filename="../build/Hearts_autogen/include/ui_statistics.h" line="492"/>
+        <location filename="../build/Hearts_autogen/include/ui_statistics.h" line="496"/>
         <source>Third</source>
         <translation>Third</translation>
     </message>
     <message>
         <location filename="../statistics.ui" line="1149"/>
-        <location filename="../build/Hearts_autogen/include/ui_statistics.h" line="494"/>
+        <location filename="../build/Hearts_autogen/include/ui_statistics.h" line="498"/>
         <source>Fourth</source>
         <translation>Fourth</translation>
     </message>
     <message>
         <location filename="../statistics.ui" line="1154"/>
-        <location filename="../build/Hearts_autogen/include/ui_statistics.h" line="496"/>
+        <location filename="../build/Hearts_autogen/include/ui_statistics.h" line="500"/>
         <source>Avg. Score</source>
         <translation>Avg. Score</translation>
     </message>
     <message>
         <location filename="../statistics.ui" line="1159"/>
-        <location filename="../build/Hearts_autogen/include/ui_statistics.h" line="498"/>
+        <location filename="../build/Hearts_autogen/include/ui_statistics.h" line="502"/>
         <source>Best Score</source>
         <translation>Best Score</translation>
     </message>
     <message>
         <location filename="../statistics.ui" line="1164"/>
-        <location filename="../build/Hearts_autogen/include/ui_statistics.h" line="500"/>
+        <location filename="../build/Hearts_autogen/include/ui_statistics.h" line="504"/>
         <source>Worst Score</source>
         <translation>Worst Score</translation>
     </message>
     <message>
         <location filename="../statistics.ui" line="1169"/>
-        <location filename="../build/Hearts_autogen/include/ui_statistics.h" line="502"/>
+        <location filename="../build/Hearts_autogen/include/ui_statistics.h" line="506"/>
         <source>Shoot Moon</source>
         <translation>Shoot Moon</translation>
     </message>
     <message>
         <location filename="../statistics.ui" line="1174"/>
-        <location filename="../build/Hearts_autogen/include/ui_statistics.h" line="504"/>
+        <location filename="../build/Hearts_autogen/include/ui_statistics.h" line="508"/>
         <source>Queen ♠</source>
         <translation>Queen ♠</translation>
     </message>
     <message>
         <location filename="../statistics.ui" line="1179"/>
-        <location filename="../build/Hearts_autogen/include/ui_statistics.h" line="506"/>
+        <location filename="../build/Hearts_autogen/include/ui_statistics.h" line="510"/>
         <source>Omnibus</source>
         <translation>Omnibus</translation>
     </message>
     <message>
         <location filename="../statistics.ui" line="1184"/>
-        <location filename="../build/Hearts_autogen/include/ui_statistics.h" line="508"/>
+        <location filename="../build/Hearts_autogen/include/ui_statistics.h" line="512"/>
         <source>No Tricks</source>
         <translation>No Tricks</translation>
     </message>
     <message>
         <location filename="../statistics.ui" line="1189"/>
-        <location filename="../build/Hearts_autogen/include/ui_statistics.h" line="510"/>
+        <location filename="../build/Hearts_autogen/include/ui_statistics.h" line="514"/>
         <source>Perfect 100</source>
         <translation>Perfect 100</translation>
     </message>
     <message>
-        <location filename="../statistics.ui" line="1211"/>
-        <location filename="../build/Hearts_autogen/include/ui_statistics.h" line="511"/>
+        <location filename="../statistics.ui" line="1217"/>
+        <location filename="../build/Hearts_autogen/include/ui_statistics.h" line="515"/>
         <source>Undos:</source>
         <translation>Undos:</translation>
     </message>
     <message>
-        <location filename="../statistics.ui" line="1258"/>
-        <location filename="../build/Hearts_autogen/include/ui_statistics.h" line="512"/>
+        <location filename="../statistics.ui" line="1270"/>
+        <location filename="../build/Hearts_autogen/include/ui_statistics.h" line="516"/>
         <source>Games Started: </source>
         <translation>Games Started: </translation>
     </message>
     <message>
-        <location filename="../statistics.ui" line="1291"/>
-        <location filename="../build/Hearts_autogen/include/ui_statistics.h" line="513"/>
+        <location filename="../statistics.ui" line="1309"/>
+        <location filename="../build/Hearts_autogen/include/ui_statistics.h" line="517"/>
         <source>Games Finished: </source>
         <translation>Games Finished: </translation>
     </message>
     <message>
-        <location filename="../statistics.ui" line="1327"/>
-        <location filename="../build/Hearts_autogen/include/ui_statistics.h" line="514"/>
+        <location filename="../statistics.ui" line="1351"/>
+        <location filename="../build/Hearts_autogen/include/ui_statistics.h" line="518"/>
         <source>Hands Played:</source>
         <translation>Hands Played:</translation>
     </message>

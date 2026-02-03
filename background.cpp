@@ -59,37 +59,7 @@ void Background::onBackgroundSelected(const QModelIndex &index)
     }
 }
 
-void Background::setCredits(const QString &filename)
-{
-  QString prefix, suffix;
-
-  int index = 0;
-
-  for (int b = 1; b <= BACKGROUND_LAST_INDEX; b++) {
-    if (filename.contains(BACKGROUND_FILES[b])) {
-      suffix = FILES_CREDIT[b];
-
-      index = b;
-      break;
-    }
-  }
-
-  creditColor = CREDITS_COLOR[index]; // found or not found (0) is still good.
-
-  if (!index) {
-    credit = "";
-    return;
-  }
-
-  if (suffix.isEmpty())
-    prefix = tr("Background created using gimp 2.10.18");
-  else
-    prefix = tr("Background image by: ");
-
-  credit = prefix + suffix;
-}
-
-void Background::setBackgroundPixmap(const QString path, bool update_credits)
+void Background::setBackgroundPixmap(const QString path)
 {
     QPixmap newPixmap(path);
     if (newPixmap.isNull()) return;
@@ -98,12 +68,38 @@ void Background::setBackgroundPixmap(const QString path, bool update_credits)
     m_pixmap = newPixmap;
     update();  // Repaint the graphics item
 
-    if (update_credits) {
-      setCredits(path);
-    }
+    setCredits();
 
     calcAverageColor();
     emit backgroundChanged(path);  // Notify MainWindow
+}
+
+void Background::setCredits()
+{
+  int index = 0;
+  QString suffix;
+
+  for (int b = 1; b <= BACKGROUND_LAST_INDEX; b++) {
+    if (fullpath.contains(BACKGROUND_FILES[b])) {
+      suffix = FILES_CREDIT[b];
+
+      index = b;
+      break;
+     }
+  }
+
+  if (!index) {
+    credit = "";
+    return;
+  }
+
+  creditColor = CREDITS_COLOR[index];
+
+  if ((index == 11) || (index == 12)) {
+    credit = tr("Background created using gimp 2.10.18");
+  } else {
+      credit = tr("Background image by: ") + suffix;
+  }
 }
 
 // This functions is used to load legacy index INT format in configuration file.
@@ -130,14 +126,7 @@ void Background::setBackground(int index)
       return;
   }
 
-  if ((index == BACKGROUND_LEAVES) || (index == BACKGROUND_MARBLE))
-    credit = tr("Background created using gimp 2.10.18");
-  else {
-    credit = tr("Background image by: ");
-    credit += FILES_CREDIT[index];
-  }
-
-  setBackgroundPixmap(fullpath, false);
+  setBackgroundPixmap(fullpath);
 }
 
 void Background::calcAverageColor()
