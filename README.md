@@ -53,4 +53,5 @@ Note(&ast;): Online play should be available from Hearts 2.1 onwards.
 
 ## 4. Licenses: 
  - MIT for the software (source code)
+
 ![screenshoot](https://github.com/Rescator7/Hearts2/blob/master/screenshot/Hearts2.png)
