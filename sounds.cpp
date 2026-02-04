@@ -48,7 +48,7 @@ Sounds::~Sounds() {
 
 void Sounds::play(int soundId)
 {
-    if (!enabled || soundId < 0 || soundId >= LAST_SOUND) return;
+    if (!enabled || soundId < 0 || soundId > LAST_SOUND) return;
 
     QMediaPlayer *player = soundPlayers[soundId];
     if (!player) return;

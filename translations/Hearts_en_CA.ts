@@ -4,12 +4,12 @@
 <context>
     <name>Background</name>
     <message>
-        <location filename="../background.cpp" line="99"/>
+        <location filename="../background.cpp" line="98"/>
         <source>Background created using gimp 2.10.18</source>
         <translation>Background created using gimp 2.10.18</translation>
     </message>
     <message>
-        <location filename="../background.cpp" line="101"/>
+        <location filename="../background.cpp" line="100"/>
         <source>Background image by: </source>
         <translation>Background image by: </translation>
     </message>
@@ -822,9 +822,10 @@ Do you want to continue ?</translation>
     <message>
         <location filename="../engine.h" line="100"/>
         <location filename="../engine.cpp" line="72"/>
-        <location filename="../engine.cpp" line="629"/>
-        <location filename="../engine.cpp" line="633"/>
-        <location filename="../engine.cpp" line="993"/>
+        <location filename="../engine.cpp" line="634"/>
+        <location filename="../engine.cpp" line="638"/>
+        <location filename="../engine.cpp" line="999"/>
+        <location filename="../engine.cpp" line="1018"/>
         <source>You</source>
         <translation>You</translation>
     </message>
@@ -864,227 +865,234 @@ Do you want to continue ?</translation>
         <translation>There is no undo available!</translation>
     </message>
     <message>
-        <location filename="../engine.cpp" line="490"/>
+        <location filename="../engine.cpp" line="495"/>
         <source>We now pass the cards to the person on the right.</source>
         <translation>We now pass the cards to the person on the right.</translation>
     </message>
     <message>
-        <location filename="../engine.cpp" line="493"/>
+        <location filename="../engine.cpp" line="498"/>
         <source>We now pass the cards to the player opposite.</source>
         <translation>We now pass the cards to the player opposite.</translation>
     </message>
     <message>
-        <location filename="../engine.cpp" line="496"/>
+        <location filename="../engine.cpp" line="501"/>
         <source>No card exchange this round.</source>
         <translation>No card exchange this round.</translation>
     </message>
     <message>
-        <location filename="../engine.cpp" line="499"/>
+        <location filename="../engine.cpp" line="504"/>
         <source>We now pass the cards to the person on the left.</source>
         <translation>We now pass the cards to the person on the left.</translation>
     </message>
     <message>
-        <location filename="../engine.cpp" line="552"/>
-        <location filename="../engine.cpp" line="561"/>
+        <location filename="../engine.cpp" line="557"/>
+        <location filename="../engine.cpp" line="566"/>
         <source>Hearts has been broken!</source>
         <translation>Hearts has been broken!</translation>
     </message>
     <message>
-        <location filename="../engine.cpp" line="605"/>
+        <location filename="../engine.cpp" line="610"/>
         <source>What would you like to do?</source>
         <translation>What would you like to do?</translation>
     </message>
     <message>
-        <location filename="../engine.cpp" line="607"/>
+        <location filename="../engine.cpp" line="612"/>
         <source>➕ 26 to opponents</source>
         <translation>➕ 26 to opponents</translation>
     </message>
     <message>
-        <location filename="../engine.cpp" line="608"/>
+        <location filename="../engine.cpp" line="613"/>
         <source>➖ 26 to myself</source>
         <translation>➖ 26 to myself</translation>
     </message>
     <message>
-        <location filename="../engine.cpp" line="629"/>
+        <location filename="../engine.cpp" line="634"/>
         <source> substracted </source>
         <translation> substracted </translation>
     </message>
     <message>
-        <location filename="../engine.cpp" line="629"/>
+        <location filename="../engine.cpp" line="634"/>
         <source> pts to </source>
         <translation> pts to </translation>
     </message>
     <message>
-        <location filename="../engine.cpp" line="630"/>
+        <location filename="../engine.cpp" line="635"/>
         <source>your</source>
         <translation>your</translation>
     </message>
     <message>
-        <location filename="../engine.cpp" line="630"/>
+        <location filename="../engine.cpp" line="635"/>
         <source>his/her</source>
         <translation>his/her</translation>
     </message>
     <message>
-        <location filename="../engine.cpp" line="630"/>
+        <location filename="../engine.cpp" line="635"/>
         <source> score!</source>
         <translation> score!</translation>
     </message>
     <message>
-        <location filename="../engine.cpp" line="633"/>
+        <location filename="../engine.cpp" line="638"/>
         <source> added 26 pts to everyone&apos;s scores!</source>
         <translation> added 26 pts to everyone&apos;s scores!</translation>
     </message>
     <message>
-        <location filename="../engine.cpp" line="654"/>
+        <location filename="../engine.cpp" line="659"/>
         <source>You shoot the moon!</source>
         <translation>You shoot the moon!</translation>
     </message>
     <message>
-        <location filename="../engine.cpp" line="656"/>
-        <location filename="../engine.cpp" line="681"/>
-        <location filename="../engine.cpp" line="697"/>
-        <location filename="../engine.cpp" line="711"/>
-        <location filename="../engine.cpp" line="916"/>
+        <location filename="../engine.cpp" line="661"/>
+        <location filename="../engine.cpp" line="687"/>
+        <location filename="../engine.cpp" line="703"/>
+        <location filename="../engine.cpp" line="717"/>
+        <location filename="../engine.cpp" line="922"/>
+        <location filename="../engine.cpp" line="1017"/>
         <source>Player &apos;</source>
         <translation>Player &apos;</translation>
     </message>
     <message>
-        <location filename="../engine.cpp" line="656"/>
+        <location filename="../engine.cpp" line="661"/>
         <source>&apos; shoot the moon!</source>
         <translation>&apos; shoot the moon!</translation>
     </message>
     <message>
-        <location filename="../engine.cpp" line="678"/>
+        <location filename="../engine.cpp" line="684"/>
         <source>You receive the bonus: no tricks bonus </source>
         <translation>You receive the bonus: no tricks bonus </translation>
     </message>
     <message>
-        <location filename="../engine.cpp" line="678"/>
-        <location filename="../engine.cpp" line="681"/>
-        <location filename="../engine.cpp" line="694"/>
-        <location filename="../engine.cpp" line="697"/>
+        <location filename="../engine.cpp" line="684"/>
+        <location filename="../engine.cpp" line="687"/>
+        <location filename="../engine.cpp" line="700"/>
+        <location filename="../engine.cpp" line="703"/>
+        <location filename="../engine.cpp" line="1019"/>
         <source> point(s)</source>
         <translation> point(s)</translation>
     </message>
     <message>
-        <location filename="../engine.cpp" line="681"/>
+        <location filename="../engine.cpp" line="687"/>
         <source>&apos; receive the bonus: no tricks bonus </source>
         <translation>&apos; receive the bonus: no tricks bonus </translation>
     </message>
     <message>
-        <location filename="../engine.cpp" line="694"/>
+        <location filename="../engine.cpp" line="700"/>
         <source>You receive the bonus: omnibus </source>
         <translation>You receive the bonus: omnibus </translation>
     </message>
     <message>
-        <location filename="../engine.cpp" line="697"/>
+        <location filename="../engine.cpp" line="703"/>
         <source>&apos; receive the bonus: omnibus </source>
         <translation>&apos; receive the bonus: omnibus </translation>
     </message>
     <message>
-        <location filename="../engine.cpp" line="709"/>
+        <location filename="../engine.cpp" line="715"/>
         <source>You got the perfect 100!
 [Info]: Your score has been set to 50.</source>
         <translation>You got the perfect 100!
 [Info]: Your score has been set to 50.</translation>
     </message>
     <message>
-        <location filename="../engine.cpp" line="711"/>
+        <location filename="../engine.cpp" line="717"/>
         <source>&apos; got the perfect 100!
 [Info]: Player &apos;</source>
         <translation>&apos; got the perfect 100!
 [Info]: Player &apos;</translation>
     </message>
     <message>
-        <location filename="../engine.cpp" line="712"/>
+        <location filename="../engine.cpp" line="718"/>
         <source>&apos; score has been set to 50.</source>
         <translation>&apos; score has been set to 50.</translation>
     </message>
     <message>
-        <location filename="../engine.cpp" line="726"/>
+        <location filename="../engine.cpp" line="732"/>
         <source>New scores: &apos;</source>
         <translation>New scores: &apos;</translation>
     </message>
     <message>
-        <location filename="../engine.cpp" line="914"/>
+        <location filename="../engine.cpp" line="920"/>
         <source>You takes the rest!</source>
         <translation>You takes the rest!</translation>
     </message>
     <message>
-        <location filename="../engine.cpp" line="916"/>
+        <location filename="../engine.cpp" line="922"/>
         <source>&apos; takes the rest!</source>
         <translation>&apos; takes the rest!</translation>
     </message>
     <message>
-        <location filename="../engine.cpp" line="971"/>
+        <location filename="../engine.cpp" line="977"/>
         <source>Drew !</source>
         <translation>Drew !</translation>
     </message>
     <message>
-        <location filename="../engine.cpp" line="971"/>
+        <location filename="../engine.cpp" line="977"/>
         <source>Won !</source>
         <translation>Won !</translation>
     </message>
     <message>
-        <location filename="../engine.cpp" line="993"/>
+        <location filename="../engine.cpp" line="999"/>
         <source>GAME OVER!
 [Info]: Player &apos;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../engine.cpp" line="994"/>
-        <location filename="../engine.cpp" line="996"/>
-        <location filename="../engine.cpp" line="998"/>
         <location filename="../engine.cpp" line="1000"/>
+        <location filename="../engine.cpp" line="1002"/>
+        <location filename="../engine.cpp" line="1004"/>
+        <location filename="../engine.cpp" line="1006"/>
         <source> point(s) </source>
         <translation> point(s) </translation>
     </message>
     <message>
-        <location filename="../engine.cpp" line="995"/>
-        <location filename="../engine.cpp" line="997"/>
-        <location filename="../engine.cpp" line="999"/>
+        <location filename="../engine.cpp" line="1001"/>
+        <location filename="../engine.cpp" line="1003"/>
+        <location filename="../engine.cpp" line="1005"/>
         <source>
 [Info]: Player &apos;</source>
         <translation>
 [Info]: Player &apos;</translation>
     </message>
     <message>
-        <location filename="../engine.cpp" line="1489"/>
+        <location filename="../engine.cpp" line="1029"/>
+        <source>Game result</source>
+        <translation type="unfinished">Game result</translation>
+    </message>
+    <message>
+        <location filename="../engine.cpp" line="1546"/>
         <source>You must play the 2 of Clubs on the first trick!</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../engine.cpp" line="1490"/>
+        <location filename="../engine.cpp" line="1547"/>
         <source>Hearts are not broken yet!</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../engine.cpp" line="1491"/>
+        <location filename="../engine.cpp" line="1548"/>
         <source>The Queen of Spades is not allowed on the first trick!</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../engine.cpp" line="1492"/>
+        <location filename="../engine.cpp" line="1549"/>
         <source>You must follow the suit led!</source>
         <translation>You must follow the suit led!</translation>
     </message>
     <message>
-        <location filename="../engine.cpp" line="1493"/>
+        <location filename="../engine.cpp" line="1550"/>
         <source>Invalid card or not in your hand.</source>
         <translation>Invalid card or not in your hand.</translation>
     </message>
     <message>
-        <location filename="../engine.cpp" line="1494"/>
+        <location filename="../engine.cpp" line="1551"/>
         <source>The game engine is busy, please try again when it&apos;s your turn to play.</source>
         <translation>The game engine is busy, please try again when it&apos;s your turn to play.</translation>
     </message>
     <message>
-        <location filename="../engine.cpp" line="1495"/>
+        <location filename="../engine.cpp" line="1552"/>
         <source>The saved game file is corrupted! Deleted!</source>
         <translation>The saved game file is corrupted! Deleted!</translation>
     </message>
     <message>
-        <location filename="../engine.cpp" line="1496"/>
+        <location filename="../engine.cpp" line="1553"/>
         <source>Unknown error.</source>
         <translation>Unknown error.</translation>
     </message>
@@ -1140,12 +1148,6 @@ Do you want to continue ?</translation>
     <message>
         <source>Game Speed</source>
         <translation type="vanished">Game Speed</translation>
-    </message>
-    <message>
-        <location filename="../mainwindow.ui" line="19"/>
-        <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1616"/>
-        <source>MainWindow</source>
-        <translation></translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="497"/>
@@ -1410,7 +1412,7 @@ Do you want to continue ?</translation>
         <location filename="../mainwindow.ui" line="2746"/>
         <location filename="../mainwindow.ui" line="2919"/>
         <location filename="../mainwindow.ui" line="3092"/>
-        <location filename="../mainwindow.cpp" line="466"/>
+        <location filename="../mainwindow.cpp" line="602"/>
         <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1695"/>
         <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1708"/>
         <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1721"/>
@@ -1423,7 +1425,7 @@ Do you want to continue ?</translation>
         <location filename="../mainwindow.ui" line="2759"/>
         <location filename="../mainwindow.ui" line="2932"/>
         <location filename="../mainwindow.ui" line="3105"/>
-        <location filename="../mainwindow.cpp" line="467"/>
+        <location filename="../mainwindow.cpp" line="603"/>
         <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1696"/>
         <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1709"/>
         <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1722"/>
@@ -1436,7 +1438,7 @@ Do you want to continue ?</translation>
         <location filename="../mainwindow.ui" line="2772"/>
         <location filename="../mainwindow.ui" line="2945"/>
         <location filename="../mainwindow.ui" line="3118"/>
-        <location filename="../mainwindow.cpp" line="468"/>
+        <location filename="../mainwindow.cpp" line="604"/>
         <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1697"/>
         <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1710"/>
         <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1723"/>
@@ -1449,7 +1451,7 @@ Do you want to continue ?</translation>
         <location filename="../mainwindow.ui" line="2785"/>
         <location filename="../mainwindow.ui" line="2958"/>
         <location filename="../mainwindow.ui" line="3131"/>
-        <location filename="../mainwindow.cpp" line="469"/>
+        <location filename="../mainwindow.cpp" line="605"/>
         <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1698"/>
         <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1711"/>
         <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1724"/>
@@ -1999,92 +2001,92 @@ li.checked::marker { content: &quot;\2612&quot;; }
         <translation type="vanished">Won !</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="40"/>
+        <location filename="../mainwindow.cpp" line="41"/>
         <source>Welcome to </source>
         <translation>Welcome to </translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="229"/>
+        <location filename="../mainwindow.cpp" line="226"/>
         <source>Exit the game?</source>
         <translation>Exit the game?</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="230"/>
+        <location filename="../mainwindow.cpp" line="227"/>
         <source>Do you really want to leave the game?</source>
         <translation>Do you really want to leave the game?</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="283"/>
+        <location filename="../mainwindow.cpp" line="570"/>
         <source>Error : help file not found.</source>
         <translation>Error : help file not found.</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="334"/>
+        <location filename="../mainwindow.cpp" line="1854"/>
         <source>1. Basic rules of the game</source>
         <translation>1. Basic rules of the game</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="335"/>
+        <location filename="../mainwindow.cpp" line="1855"/>
         <source>2. Game settings</source>
         <translation>2. Game settings</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="336"/>
+        <location filename="../mainwindow.cpp" line="1856"/>
         <source>2.1 Game variants</source>
         <translation>2.1 Game variants</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="337"/>
+        <location filename="../mainwindow.cpp" line="1857"/>
         <source>2.2 Miscellaneous</source>
         <translation>2.2 Miscellaneous</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="338"/>
+        <location filename="../mainwindow.cpp" line="1858"/>
         <source>2.3 Scoreboard</source>
         <translation>2.3 Scoreboard</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="339"/>
+        <location filename="../mainwindow.cpp" line="1859"/>
         <source>3. Game shortcuts</source>
         <translation>3. Game shortcuts</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="340"/>
+        <location filename="../mainwindow.cpp" line="1860"/>
         <source>4. Playing online</source>
         <translation>4. Playing online</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="341"/>
+        <location filename="../mainwindow.cpp" line="1861"/>
         <source>5. Credits</source>
         <translation>5. Credits</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="342"/>
+        <location filename="../mainwindow.cpp" line="1862"/>
         <source>5.1 Playing card decks</source>
         <translation>5.1 Playing card decks</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="343"/>
+        <location filename="../mainwindow.cpp" line="1863"/>
         <source>5.2 Icons</source>
         <translation>5.2 Icons</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="344"/>
+        <location filename="../mainwindow.cpp" line="1864"/>
         <source>5.3 Backgrounds Images</source>
         <translation>5.3 Backgrounds Images</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="345"/>
+        <location filename="../mainwindow.cpp" line="1865"/>
         <source>5.4 Sounds</source>
         <translation>5.4 Sounds</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="346"/>
+        <location filename="../mainwindow.cpp" line="1866"/>
         <source>5.5 Special thanks</source>
         <translation>5.5 Special thanks</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="384"/>
+        <location filename="../mainwindow.cpp" line="2779"/>
         <source>The selected deck could not be loaded.
 
 It may be unsupported, missing files or corrupted.
@@ -2095,32 +2097,32 @@ It may be unsupported, missing files or corrupted.
 Please select a different deck in Settings.</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="813"/>
+        <location filename="../mainwindow.cpp" line="852"/>
         <source>Choose Background Image</source>
         <translation>Choose Background Image</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="815"/>
+        <location filename="../mainwindow.cpp" line="854"/>
         <source>Images (*.png *.jpg *.jpeg *.bmp *.gif *.svg)</source>
         <translation>Images (*.png *.jpg *.jpeg *.bmp *.gif *.svg)</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="886"/>
+        <location filename="../mainwindow.cpp" line="925"/>
         <source>You must select 3 cards to pass!</source>
         <translation>You must select 3 cards to pass!</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1004"/>
+        <location filename="../mainwindow.cpp" line="1043"/>
         <source>Start a new game?</source>
         <translation>Start a new game?</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1005"/>
+        <location filename="../mainwindow.cpp" line="1044"/>
         <source>Are you ready to start a new game?</source>
         <translation>Are you ready to start a new game?</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1734"/>
+        <location filename="../mainwindow.cpp" line="2797"/>
         <source>[Info]: </source>
         <translation>[Info]: </translation>
     </message>
@@ -2303,7 +2305,7 @@ Fourth : </translation>
         <translation type="vanished">You needs to select 3 cards to pass!</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1731"/>
+        <location filename="../mainwindow.cpp" line="2794"/>
         <source>[Error]: </source>
         <translation>[Error]: </translation>
     </message>

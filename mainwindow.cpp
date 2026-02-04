@@ -1462,7 +1462,7 @@ void MainWindow::updateScores(const QString playersName[4],
 
     // En-tête + tableau compact
     QString html = QString(
-        "<table width='%1' cellspacing='3' cellpadding='2' style='color:white; font-size:11px; margin-bottom: -14px; marging: 0; padding: 0;'>"
+        "<table width='%1' cellspacing='3' cellpadding='2' style='color:white; font-size:11px; margin-bottom: -12px; marging: 0; padding: 0;'>"
         "<tr style='font-weight:bold; color:#ddd;'>"
         "<td>Name</td><td align='right'>Score</td><td align='right'>Total</td>"
         "</tr>"

@@ -433,9 +433,9 @@ void Engine::Loop()
                          busy = false;
                          locked = false;
                          emit sig_busy(busy);
-                         sendGameResult();
                          emit sig_play_sound(SOUND_GAME_OVER);
                          emit sig_update_stat(0, STATS_GAME_FINISHED);
+                         sendGameResult();
                          for (int p = 0; p < 4; p++) {
                            // while new game will call init_variables, and this list will be cleared.
                            // This clear() prevent using the reveal button to show cards that weren't "played" before a TRAM.
@@ -1006,6 +1006,57 @@ void Engine::sendGameResult()
          QString::number(total_score[PLAYER_EAST]) + tr(" point(s) ") + (total_score[PLAYER_EAST] == lowest ? result : "");
 
   emit sig_message(mesg, MESSAGE_INFO);
+
+  QString formatedMesg = "<h2 style='color:#f38ba8; text-align:center;'>GAME OVER!</h2><br>";
+
+  for (int i = 0; i < 4; i++) {
+    bool isWinner = (total_score[i] == lowest);
+    if (isWinner) {
+        formatedMesg += "<span style='color:#a6e3a1; font-weight:bold;'> ";
+    }
+    formatedMesg += tr("Player '");
+    formatedMesg += (i == 0) ? tr("You") : QString(playersName[i]);
+    formatedMesg += QString("': ") + QString::number(total_score[i]) + tr(" point(s)");
+    if (isWinner) {
+        formatedMesg += " " + result + " 🏆</span>";
+    }
+    if (i < 3) {
+        formatedMesg += "<br>";
+    }
+  }
+
+  QMessageBox msgBox(mainWindow);  // ou mainWindow si dans une autre classe
+  msgBox.setWindowTitle(tr("Game result"));
+  msgBox.setTextFormat(Qt::RichText);
+  msgBox.setText(formatedMesg);
+  msgBox.setIcon(QMessageBox::NoIcon);
+  msgBox.setStyleSheet(QStringLiteral(
+    "QMessageBox {"
+    "   background-color: #1e1e2e;"
+    "   color: #cdd6f4;"
+    "   font-family: 'Segoe UI', Arial;"
+    "   font-size: 14px;"
+    "}"
+    "QLabel {"
+    "   color: #cdd6f4;"
+    "   min-width: 380px;"
+    "   text-align: center;"
+    "}"
+    "QPushButton {"
+    "   background-color: #89b4fa;"  // bleu clair pour OK
+    "   color: #1e1e2e;"
+    "   border: 1px solid #89b4fa;"
+    "   padding: 8px 24px;"
+    "   border-radius: 6px;"
+    "   font-size: 13px;"
+    "   font-weight: bold;"
+    "}"
+    "QPushButton:hover {"
+    "   background-color: #74c7ec;"
+    "}" ));
+
+  msgBox.setStandardButtons(QMessageBox::Ok);
+  msgBox.exec();
 }
 
 int Engine::lowestCardInSuitForPlayer(PLAYER player, SUIT suit) const
