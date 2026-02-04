@@ -1,5 +1,6 @@
 #include "deck.h"
 #include "define.h"
+#include "resourcepaths.h"
 
 #include <QDebug>
 #include <QDir>
@@ -31,18 +32,6 @@ void Deck::delete_current_deck() {
   qDeleteAll(deck);
   deck.clear();
   pixImages.clear();
-}
-
-bool Deck::check_file(QString &filename) {
-    QFile aFile;
-
-    aFile.setFileName(filename);
-    if (!aFile.exists()) {
-      qDebug() << filename << ": not found!";
-      return false;
-    }
-
-    return true;
 }
 
 void Deck::createPixmap(int cardId, bool suitFirst, int format)
@@ -232,53 +221,58 @@ void Deck::reset_selections()
 bool Deck::set_deck(int style) {
   int format;
   bool suitFirst = true;
+  bool built_in = false;
 
-  QString path, location, folder_name, fullpath;
+  QString path, location, fullpath;
 
   const char cards_name[13][10] = {"2", "3", "4", "5", "6", "7", "8", "9", "10", "jack", "queen", "king", "1"};
-  const char image_format[3][4] = {"PNG", "SVG", "SVG"};
-  const char card_suit_name [4][10] = {"/club_", "/spade_", "/diamond_", "/heart_"};
+  const char image_format[3][5] = {".PNG", ".SVG", ".SVG"};
+  const char card_suit_name [4][10] = {"club_", "spade_", "diamond_", "heart_"};
 
   if (style == current_deck_style)
     return true;
 
-  if (current_deck_style != UNSET_DECK)
+  if (current_deck_style != UNSET_DECK) {
     delete_current_deck();
+  }
 
   current_deck_style = style;
 
   QGraphicsSvgItem *item;
 
+  path = QString("SVG-cards/");
+
   switch (style) {
-    case KAISER_JUBILAUM:             folder_name = "kaiser-jubilaum";
-                                      format = SVG_1_FILE_FORMAT;
+    case KAISER_JUBILAUM:             format = SVG_1_FILE_FORMAT;
+                                      fullpath = path + QString("kaiser-jubilaum/kaiser-jubilaum.svg");
                                       suitFirst = true;
                                       break;
-    case MITTELALTER_DECK:            folder_name = "mittelalter";
-                                      format = SVG_53_FILES_FORMAT;
+    case MITTELALTER_DECK:            format = SVG_53_FILES_FORMAT;
+                                      path += "mittelalter/";
                                       break;
-    case ENGLISH_DECK:                folder_name = "English";
-                                      format = SVG_53_FILES_FORMAT;
+    case ENGLISH_DECK:                format = SVG_53_FILES_FORMAT;
+                                      path += "English/";
                                       break;
-    case RUSSIAN_DECK:                folder_name = "Russian";
-                                      format = SVG_53_FILES_FORMAT;
+    case RUSSIAN_DECK:                format = SVG_53_FILES_FORMAT;
+                                      path += "Russian/";
                                       break;
-    case NICU_WHITE_DECK:             folder_name = "white";
-                                      format = SVG_53_FILES_FORMAT;
+    case NICU_WHITE_DECK:             format = SVG_53_FILES_FORMAT;
+                                      path += "white/";
                                       break;
-    case NEOCLASSICAL_DECK:           folder_name = "neoclassical";
-                                      format = SVG_53_FILES_FORMAT;
+    case NEOCLASSICAL_DECK:           format = SVG_53_FILES_FORMAT;
+                                      path += "neoclassical/";
                                       break;
-    case TIGULLIO_INTERNATIONAL_DECK: folder_name = "tigullio-international";
-                                      format = SVG_53_FILES_FORMAT;
+    case TIGULLIO_INTERNATIONAL_DECK: format = SVG_53_FILES_FORMAT;
+                                      path += "tigullio-international/";
                                      // format = SVG_1_FILE_FORMAT;
                                       break;
     case TIGULLIO_MODERN_DECK:        return false; // unsupported
 
     default:
-    case STANDARD_DECK:               folder_name = "Default";
-                                      format = SVG_1_FILE_FORMAT;
+    case STANDARD_DECK:               format = SVG_1_FILE_FORMAT;
+                                      location = QString(":/SVG-cards/Default/Default.svg");
                                       suitFirst = true;
+                                      built_in = true;
                                       break;
   }
 
@@ -287,22 +281,13 @@ bool Deck::set_deck(int style) {
   }
   renderer = new QSvgRenderer(this);
 
-  // built-in deck
-  if (style == STANDARD_DECK) {
-    fullpath = QString(":/SVG-cards/Default");
-  } else {
-      path = "/usr/local/Hearts/";
-      if (!check_file(path))
-        path = QDir::homePath() + FOLDER;
-
-        fullpath = path + QString(image_format[format]) + QString("-cards/") + folder_name;
-      }
-
   if (format == SVG_1_FILE_FORMAT) {
-    location = fullpath + QString("/" + folder_name + QString(".svg"));
-     if (!check_file(location)) {
-      delete_current_deck();
-      return false;
+    if (!built_in) {
+      location = getResourceFile(fullpath);
+       if (location.isEmpty()) {
+         delete_current_deck();
+         return false;
+      }
     }
 
     renderer->load(location);
@@ -311,7 +296,7 @@ bool Deck::set_deck(int style) {
       qCritical() << "Failed to load deck SVG! [" << location << "]";
       return false;
     } else {
- //     qDebug() << "Deck SVG loaded successfully";
+        qDebug() << "SVG_1_FILE_FORMAT loaded successfully : " << location;
       }
   }
 
@@ -321,8 +306,9 @@ bool Deck::set_deck(int style) {
   for (int i = 0; i < DECK_SIZE; i++) {
     switch (format) {
        case PNG_FILE_FORMAT:
-       case SVG_53_FILES_FORMAT: location = fullpath + QString(card_suit_name[suit]) + QString(cards_name[cpt]) + QString(".") + QString(image_format[format]).toLower();
-                                 if (!check_file(location)) {
+       case SVG_53_FILES_FORMAT: fullpath = path + QString(card_suit_name[suit]) + QString(cards_name[cpt]) + QString(image_format[format]).toLower();
+                                 location = getResourceFile(fullpath);
+                                 if (location.isEmpty()) {
                                    delete_current_deck();
                                    return false;
                                  }
@@ -353,9 +339,10 @@ bool Deck::set_deck(int style) {
     if (format == SVG_1_FILE_FORMAT) {
       item = createSvgCardElement(BACK_CARD, suitFirst);
     } else {
-        location = fullpath + QString("/back.") + QString(image_format[format]).toLower();
+        fullpath = path + QString("back") + QString(image_format[format]).toLower();
+        location = getResourceFile(fullpath);
 
-        if (!check_file(location)) {
+        if (location.isEmpty()) {
           delete_current_deck();
           return false;
         }

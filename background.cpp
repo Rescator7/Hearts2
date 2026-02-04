@@ -1,5 +1,5 @@
-#include "define.h"
 #include "background.h"
+#include "resourcepaths.h"
 
 #include <QGraphicsScene>
 #include <QGraphicsView>
@@ -7,7 +7,6 @@
 #include <QDir>
 #include <QIcon>
 #include <QPainter>
-#include <QDebug>
 
 Background::Background(QGraphicsScene *scene, QObject *parent)
     : QGraphicsObject()
@@ -115,15 +114,9 @@ void Background::setBackground(int index)
 
   QFile aFile;
 
-  fullpath = QString(INSTALL_PATH) + QString("/backgrounds/") + filename;
-  aFile.setFileName(fullpath);
-
-  if (!aFile.exists()) {
-    fullpath = QDir::homePath() + QString("/DEV/Hearts2/backgrounds/" + filename);
-    aFile.setFileName(fullpath);
-
-    if (!aFile.exists())
-      return;
+  fullpath = getResourceFile(QString("backgrounds/") + filename);
+  if (fullpath.isEmpty()) {
+    return;
   }
 
   setBackgroundPixmap(fullpath);

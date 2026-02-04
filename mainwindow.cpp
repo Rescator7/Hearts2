@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 #include "define.h"
+#include "resourcepaths.h"
 
 #include <QList>
 #include <QDir>
@@ -47,8 +48,8 @@ MainWindow::MainWindow(QWidget *parent)
     sounds = new Sounds(this);
 
     scene = new CardScene(this);
-   // scene->setItemIndexMethod(QGraphicsScene::NoIndex);  // Moins de repaint inutiles
-//ui->graphicsView->setRenderHint(QPainter::Antialiasing, false);
+    // scene->setItemIndexMethod(QGraphicsScene::NoIndex);  // Moins de repaint inutiles
+    //ui->graphicsView->setRenderHint(QPainter::Antialiasing, false);
 
     deck = new Deck(this);
 
@@ -67,13 +68,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     createPlayerNames();
 
- //   createTOC();
-
     applyAllSettings();
-
-//  when setting the language. Set language is forced to call loadCardsPlayed, because the translation remove the QPixmap images
-//  by the new translated Labels text.
-//    loadCardsPlayed();
 
     ui->channel->setStyleSheet(
       "color: yellow;"              // Text color
@@ -311,7 +306,7 @@ void MainWindow::createTOC()
                            {"special", true}
                          };
 
-  ui->treeHelpTOC->setHeaderHidden(true);  // pas de header
+  ui->treeHelpTOC->setHeaderHidden(true);
   ui->treeHelpTOC->setColumnCount(1);
   ui->treeHelpTOC->setStyleSheet("QTreeWidget { background: #2e5c3e; color: #e0ffe0; font-size: 12px; }"
                                  "QTreeWidget::item { padding: 8px; }"
@@ -553,7 +548,6 @@ void MainWindow::applyAllSettings()
 
   ui->opt_anim_triangle->setChecked(config->is_anim_turn_indicator());
 
-// TODO: apply all languages changes
   switch (config->get_language()) {
     case LANG_ENGLISH: ui->opt_english->setChecked(true); break;
     case LANG_FRENCH: ui->opt_french->setChecked(true); break;
@@ -565,7 +559,7 @@ void MainWindow::applyAllSettings()
 
   // If there is no background path. We load the legacy background save by index.
   if (config->Path().isEmpty()) {
-    // TODO: add credit.
+    qDebug() << "applyAllSettings loading a legacy background!";
     background->setBackground(config->get_background_index());
   } else {
     background->setBackgroundPixmap(config->Path());
@@ -796,8 +790,8 @@ void MainWindow::tryQuit()
 // ************************************[ 2- Private Slots ] ***************************************
 void MainWindow::onDeckChanged(int deckId)
 {
-  qDebug() << "New deck: " << deckId;
-  qDebug() << "Scene size:" << scene->items().size();
+  qDebug() << "onDeckChanged: " << deckId;
+  qDebug() << "onDeckChanged: Scene size: " << scene->items().size();
   QGraphicsItem *item;
 
   for (int i = 0; i < selectedCards.size(); i++) {
@@ -807,12 +801,13 @@ void MainWindow::onDeckChanged(int deckId)
   loadCardsPlayed();
 }
 
-//TODO: fix the default path
 void MainWindow::onBackgroundPreviewClicked()
 {
+    QString path = getResourceFile(QString("backgrounds"));
+
     QString fileName = QFileDialog::getOpenFileName(this,
         tr("Choose Background Image"),
-        QDir::homePath() + FOLDER + QString("/backgrounds"),
+        path,
         tr("Images (*.png *.jpg *.jpeg *.bmp *.gif *.svg)"));
 
     if (fileName.isEmpty()) return;
@@ -871,7 +866,6 @@ void MainWindow::onCardClicked(QGraphicsItem *item)
           engine->Play(cardId);
           sounds->play(SOUND_DEALING_CARD);
           yourTurnIndicator->hide();
-qDebug() << "We clicked to play a card";
           removeInvalidCardsEffect();
           playCard(cardId, PLAYER_SOUTH);
         }
@@ -2070,10 +2064,10 @@ void MainWindow::animatePassCards(const QList<int> passedCards[4], int direction
         group->addAnimation(posAnim);
         group->addAnimation(rotAnim);
         group->start(QAbstractAnimation::DeleteWhenStopped);
-
       }
     }
 
+    // Enough time to let all animations finish + 1-2 seconds to see the cards that were passed.
     QTimer::singleShot(3000, this, [this, direction, passedCards]() {
       deck->reset_selections();
       engine->Step();
@@ -2343,7 +2337,6 @@ void MainWindow::animateDeal(int dealDuration, int delayBetweenCards)
         group->addAnimation(posAnim);
         group->addAnimation(rotAnim);
 
-        // Option #1
         // Final Z-value when animation finishes
         connect(group, &QParallelAnimationGroup::finished, this, [item, player, handIndex]() {
             int finalZ = handIndex;
@@ -2371,19 +2364,6 @@ void MainWindow::animateDeal(int dealDuration, int delayBetweenCards)
 
     // re-enable resizing
     QTimer::singleShot(totalDelay + 400, this, [this]() {
-    /*
-      // Option #2
-      int player = 0;
-    for (int i=0; i<52; i++) {
-      QGraphicsItem *item = deck->get_card_item(i);
-
-      if ((player == PLAYER_SOUTH) || (player == PLAYER_WEST))
-        item->setZValue(114 - i);
-      else
-       item->setZValue(101 + i);
-      if (++player > 3) player = 0;
-    }
-    */
       engine->Step();
       setAnimationUnlock();
     });
@@ -2435,11 +2415,11 @@ void MainWindow::animateYourTurnIndicator()
     group->addAnimation(scaleAnim);
     group->addAnimation(posAnim);
 
-    group->start(QAbstractAnimation::DeleteWhenStopped);
-
-    QTimer::singleShot(700, this, [this]() {
-      setAnimationUnlock();
+    connect(group, &QParallelAnimationGroup::finished, this, [this, group]() {
+        setAnimationUnlock();
     });
+
+    group->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
 void MainWindow::highlightAIPassedCards(int player, const QList<int>& passedCardIds)

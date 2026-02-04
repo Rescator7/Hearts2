@@ -291,7 +291,7 @@ void Engine::Loop()
   int cardId;
 
   switch (game_status) {
-     case NEW_ROUND:       qDebug() << "NEW ROUND";
+     case NEW_ROUND:       qDebug() << "Engine: NEW ROUND";
                            locked = true;
                            init_variables();
                            emit sig_refresh_cards_played();
@@ -306,10 +306,10 @@ void Engine::Loop()
                            }
                            LockedLoop();
                            break;
-    case DEAL_CARDS:       qDebug() << "DEAL_CARDS";
+    case DEAL_CARDS:       qDebug() << "Engine: DEAL_CARDS";
                            emit sig_deal_cards();
                            break;
-    case SELECT_CARDS:     qDebug() << "SELECT_CARDS direction " << direction;
+    case SELECT_CARDS:     qDebug() << "Engine: SELECT_CARDS direction " << direction;
                            sort_players_hand();          // sort after animated deal
                            emit sig_refresh_deck();
 
@@ -323,13 +323,13 @@ void Engine::Loop()
                            emit sig_busy(busy);
                            locked = false;
                            break;
-    case TRADE_CARDS:      qDebug() << "TRADE CARDS";
+    case TRADE_CARDS:      qDebug() << "Engine: TRADE CARDS";
                            locked = true;
                            cpus_select_cards();
                            completePassCards();
                            emit sig_passed();
                            break;
-    case PLAY_TWO_CLUBS :  qDebug() << "PLAY_TWO_CLUBS";
+    case PLAY_TWO_CLUBS :  qDebug() << "Engine: PLAY_TWO_CLUBS";
                            sort_players_hand();          // need to sort again after trading cards
                            emit sig_refresh_deck();
                            game_status = PLAY_A_CARD_1;
@@ -353,20 +353,19 @@ void Engine::Loop()
                              emit sig_your_turn();
                            }
                            break;
-     case PLAY_A_CARD_1 : previous_winner = turn;
-                          currentTrick.clear();
+     case PLAY_A_CARD_1 :
      case PLAY_A_CARD_2 :
      case PLAY_A_CARD_3 :
-     case PLAY_A_CARD_4 : qDebug() << "Play a card: " << game_status;
+     case PLAY_A_CARD_4 : qDebug() << "Engine: PLAY_A_CARD_: " << game_status;
                           locked = true;
-                          qDebug() << "current_suit: " << currentSuit;
+                          qDebug() << "Engine: currentSuit: " << currentSuit;
                           filterValidMoves(turn);
                           if ((turn != PLAYER_SOUTH) && (turn != PLAYER_NOBODY)) {
                           //   cardId = validHandsById[turn].at(0);
                              cardId = AI_get_cpu_move();
-                             qDebug() << "Player: " << turn << "ValidHand: " << validHandsById[turn] << "cardId: " << cardId << "Full hand: " << playerHandsById[turn];
+                             qDebug() << "Engine: Player: " << turn << "ValidHand: " << validHandsById[turn] << "cardId: " << cardId << "Full hand: " << playerHandsById[turn];
                              Play(cardId, turn);
-                             qDebug() << "Remove from: " << turn << "CardId: " << cardId;
+                             qDebug() << "ENgine: Player: " << turn << "CardId removed from hand: " << cardId;
                            } else
                               if (turn == PLAYER_SOUTH) {
                                 qDebug() << "Your turn, cards left: " << cards_left;
@@ -375,10 +374,11 @@ void Engine::Loop()
                                 emit sig_busy(busy);
                                 emit sig_your_turn();
                               }
-                              qDebug() << "Refresh";
-                           qDebug() << "Card LEFT: " << cards_left;
+                           qDebug() << "Engine: Card Left: " << cards_left;
                            break;
-     case END_TURN:        currentSuit = SUIT_ALL;
+     case END_TURN:        qDebug() << "Engine: END_TURN";
+                           currentSuit = SUIT_ALL;
+                           previous_winner = turn;
                            turn = best_hand_owner;
                            tram = is_it_TRAM(turn);
                            if (tram) {
@@ -398,9 +398,11 @@ void Engine::Loop()
                              emit sig_update_stat(playersIndex[best_hand_owner], STATS_QUEEN_SPADE);
                            }
                            emit sig_collect_tricks(turn, tram);
-                           qDebug() << "END_TURN";
+                           currentTrick.clear();
+
                            break;
-     case LOOP_TURN:   qDebug() << "Status: " << game_status << "turn : " << turn << "cards_left: " << cards_left << "cpt_played: " << cpt_played;
+     case LOOP_TURN:   qDebug() << "Engine: LOOP_TURN";
+                       qDebug() << "Status: " << game_status << "turn : " << turn << "cards_left: " << cards_left << "cpt_played: " << cpt_played;
                        qDebug() << "South: " << playerHandsById[PLAYER_SOUTH] << "sise:" << playerHandsById[PLAYER_SOUTH].size();
                        qDebug() << "Westh: " << playerHandsById[PLAYER_WEST] << "sise:" << playerHandsById[PLAYER_WEST].size();
                        qDebug() << "North: " << playerHandsById[PLAYER_NORTH] << "sise:" << playerHandsById[PLAYER_NORTH].size();
@@ -417,7 +419,7 @@ void Engine::Loop()
                          LockedLoop();
                          break;
      case END_ROUND:     update_total_scores();
-                         qDebug() << "END_ROUND " << game_score;
+                         qDebug() << "Engine: END_ROUND " << game_score;
                          if (!is_game_over()) {
                            game_status = NEW_ROUND;
                            advance_direction();
@@ -426,7 +428,8 @@ void Engine::Loop()
                          }
                          LockedLoop();
                          break;
-     case GAME_OVER:     qDebug() << "GAME_OVER";
+     case GAME_OVER:     qDebug() << "Engine: GAME_OVER";
+                         undoStack.available = false;
                          busy = false;
                          locked = false;
                          emit sig_busy(busy);
@@ -474,6 +477,8 @@ void Engine::advance_turn()
     case PLAYER_COUNT :
     case PLAYER_NOBODY : qCritical() << "advance_turn invalid turn !";
   }
+
+  qDebug() << "Engine:: advance_turn = " << turn;
 
   busy = true;
   emit sig_busy(busy);
@@ -655,6 +660,7 @@ void Engine::update_total_scores()
       } else {
         mesg = tr("Player '") + playersName[p] + tr("' shoot the moon!");
       }
+      emit sig_play_sound(SOUND_SHOOT_MOON);
       emit sig_message(mesg, MESSAGE_INFO);
 
       shoot_moon(p);
@@ -1197,7 +1203,6 @@ bool Engine::load_game()
     int value;
     QString line = file.readLine();
     cpt++;
-    qDebug() << "Step: " << cpt;
 
     switch (cpt) {
        // Line #1: Data = 4 x players index (0 = You)
@@ -1206,7 +1211,7 @@ bool Engine::load_game()
                  if ((value < 0) || (value >= MAX_PLAYERS_NAME)) {
                    return false;
                  }
-                 qDebug() << "case 1: " << value;
+                 qDebug() << "Engine: load_game -> case 1: " << value;
                  playersIndex[p] = value;
                  playersName[p] = names[value];
                }
@@ -1220,7 +1225,7 @@ bool Engine::load_game()
        // Line #2: Data = Turn, Trick Pile size, Best Hand owner, Jack of diamond owner, Direction, current suit
        case 2: for (int d = 0; d < 6; d++) {
                  value = line.section(' ', d, d).toInt();
-                   qDebug() << "case 2: " << value << " d: " << d;
+                   qDebug() << "Engine: load_game -> case 2: " << value << " d: " << d;
                    switch (d) {
                       case 0 : if ((value < 0) || (value > 3)) return false;
                                turn = (PLAYER)value; break;
@@ -1242,7 +1247,7 @@ bool Engine::load_game()
         case 3: for (int i = 0; i < 4; i++) {
                    value = line.section(' ', i, i).toInt();
 
-                   qDebug() << "case 3: " << value;
+                   qDebug() << "Engine: load_game -> case 3: " << value;
                    switch (i) {
                       case 0 : if ((value < 0) || (value > 1))
                                  return false;
@@ -1281,7 +1286,7 @@ bool Engine::load_game()
         // Line #4: Data = Players hand scores
         case 4: for (int p = 0; p < 4; p++) {
                   value = line.section(' ', p, p).toInt();
-                  qDebug() << "case 4: " << value;
+                  qDebug() << "Engine: load_game -> case 4: " << value;
 
                    if ((value < 0) || (value > 26))
                      return false;
@@ -1292,7 +1297,7 @@ bool Engine::load_game()
         // Line #5: Data = Players total scores
         case 5: for (int p = 0; p < 4; p++) {
                   value = line.section(' ', p, p).toInt();
-                  qDebug() << "case 5: " << value;
+                  qDebug() << "Engine: load_game -> case 5: " << value;
 
                   if (value < 0) {
                      return false;
@@ -1309,7 +1314,7 @@ bool Engine::load_game()
         // Line #6: Data = Trick Pile
         case 6: for (int i = 0; i < 4; i++) {
                   value = line.section(' ', i, i).toInt();
-                  qDebug() << "case 6: " << value;
+                  qDebug() << "Engine: load_game -> case 6: " << value;
 
                   if (value == INVALID_CARD)
                     break;
@@ -1335,7 +1340,7 @@ bool Engine::load_game()
         case 9:
         case 10: for (int i = 0; i < 13; i++) {
                   value = line.section(' ', i, i).toInt();
-                  qDebug() << "case 7: " << value;
+                  qDebug() << "Engine: load_game -> case " << cpt << ": " << value;
 
                   if (value == INVALID_CARD)
                     break;
@@ -1371,16 +1376,17 @@ bool Engine::load_game()
     cards_left += playerHandsById[p].size();
   }
 
-qDebug() << "Cards Left: " << cards_left;
-qDebug() << "SOUTH" << playerHandsById[PLAYER_SOUTH];
-qDebug() << "WEST" << playerHandsById[PLAYER_WEST];
-qDebug() << "NORTH" << playerHandsById[PLAYER_NORTH];
-qDebug() << "EAST" << playerHandsById[PLAYER_EAST];
-qDebug() << "Pile" << trickPileSize;
+qDebug() << "Engine: load_game -> Cards Left: " << cards_left;
+qDebug() << "Engine: load_game -> SOUTH" << playerHandsById[PLAYER_SOUTH];
+qDebug() << "Engine: load_game -> WEST" << playerHandsById[PLAYER_WEST];
+qDebug() << "Engine: load_game -> NORTH" << playerHandsById[PLAYER_NORTH];
+qDebug() << "Engine: load_game -> EAST" << playerHandsById[PLAYER_EAST];
+qDebug() << "Engine: load_game -> trickPile" << trickPileSize;
 
   if ((game_status == SELECT_CARDS) && (cards_left != DECK_SIZE))
     return false;
-qDebug() << "Step select";
+
+qDebug() << "Engine: load_game -> Step select";
 
   if (isPlaying() && (cards_left < 1))
     return false;
@@ -1399,17 +1405,17 @@ qDebug() << "Step select";
 
   emit sig_refresh_cards_played();
   emit sig_setTrickPile(currentTrick);
-qDebug() << "Pile: " << currentTrick;
+
+qDebug() << "Engine: load_game -> trickPile: " << currentTrick;
+
   emit sig_refresh_deck();
 
   emit sig_new_players();
   emit sig_update_scores_board(playersName, hand_score, total_score);
 
-qDebug() << "STATUS: " << game_status;
+qDebug() << "Engine: load_game -> game_status = " << game_status;
 
   LockedLoop();
-
-qDebug() << "Step H";
 
   return true;
 }
@@ -1599,11 +1605,20 @@ int Engine::AI_eval_lead_spade(DECK_INDEX cardId)
        return 40;
    }
 
- // if the ace is in the trick throw away our king
+  // if the ace is in the trick throw away our king
   if ((cardId == SPADES_KING) && spades_ace_table && !is_moon_an_option())
     return 75;
-  else
-    return -25;
+
+  if ((cardId == SPADES_ACE) || (cardId == SPADES_KING)) {
+    if (game_status == PLAY_A_CARD_4) {
+      return 75 + cardId;
+    }
+    if (!cardPlayed[SPADES_QUEEN] && (Owner(SPADES_QUEEN) != turn) && !is_moon_an_option()) {
+      return - 140;
+    }
+  }
+
+  return -cardId;
 }
 
 int Engine::AI_eval_lead_diamond(DECK_INDEX cardId)
@@ -1735,9 +1750,12 @@ int Engine::AI_get_cpu_move()
 
      switch (currentSuit) {
        case SUIT_ALL:   eval[i] = AI_eval_lead_freesuit(cardId);
+       qDebug() << "Free card: " << cardId << " eval: " << eval[i];
                         break;
 
        case SPADES:     eval[i] = AI_eval_lead_spade(cardId);
+       qDebug() << "Spade card: " << cardId << " eval: " << eval[i];
+
                         break;
 
        case DIAMONDS:   eval[i] = AI_eval_lead_diamond(cardId);

@@ -1,5 +1,5 @@
 #include "sounds.h"
-#include "define.h"
+#include "resourcepaths.h"
 #include <QDir>
 #include <QFile>
 #include <QUrl>
@@ -43,12 +43,10 @@ void Sounds::play(int soundId)
         oldest->deleteLater();
     }
 
-    QString basePath = "/usr/local/Hearts2/sounds/";
-    if (!QFile::exists(basePath + sounds_files[0])) {
-        basePath = QDir::homePath() + FOLDER + "sounds/";
+    QString filename = getResourceFile(QString("sounds/") + sounds_files[soundId]);
+    if (filename.isEmpty()) {
+      return;
     }
-
-    QString filename = basePath + QString(sounds_files[soundId]);
 
     qDebug() << "Filename: " << filename;
 
@@ -91,7 +89,7 @@ void Sounds::setEnabled(bool activate)
   enabled = activate;
 
   if (!enabled) {
- //   qDebug() << "Sounds stopped: " << activePlayers.size();
+    qDebug() << "Sounds: Sounds stopped: " << activePlayers.size();
     stopAllSounds();
   }
 }

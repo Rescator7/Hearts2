@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.16)
 
 project(Hearts VERSION 2.0 LANGUAGES CXX)
 
+include(GNUInstallDirs)
+
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -9,7 +11,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt6 6.4 REQUIRED COMPONENTS
+find_package(Qt6 6.4.2 REQUIRED COMPONENTS
     Widgets
     LinguistTools
     Multimedia
@@ -31,7 +33,7 @@ set(PROJECT_SOURCES
     cpus.h
     draggablescoregroup.h   draggablescoregroup.cpp
     statistics.cpp          statistics.h          statistics.ui
-    client.cpp              client.h
+    client.cpp              client.h              resourcepaths.h
     resources.qrc
 )
 
@@ -79,13 +81,15 @@ install(TARGETS Hearts
 
 # Ressources → /usr/local/share/hearts/
 install(DIRECTORY
-    "${CMAKE_CURRENT_SOURCE_DIR}/background/"
-    "${CMAKE_CURRENT_SOURCE_DIR}/icons/"
-    "${CMAKE_CURRENT_SOURCE_DIR}/sounds/"
-    "${CMAKE_CURRENT_SOURCE_DIR}/SVG-cards/"
+    "${CMAKE_CURRENT_SOURCE_DIR}/backgrounds"
+    "${CMAKE_CURRENT_SOURCE_DIR}/icons"
+    "${CMAKE_CURRENT_SOURCE_DIR}/sounds"
+    "${CMAKE_CURRENT_SOURCE_DIR}/SVG-cards"
     DESTINATION ${CMAKE_INSTALL_DATADIR}/hearts
     FILES_MATCHING
-    PATTERN "*"   # tous les fichiers (png, jpg, svg, wav, mp3, ogg, etc.)
+    PATTERN "*"
+    PATTERN "*~" EXCLUDE             # optionnel : ignore backups
+    PATTERN ".git*" EXCLUDE
 )
 
 # Fichier .desktop
@@ -101,17 +105,9 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/hearts.desktop"
 
 # Icônes (multi-tailles si tu les as)
 install(FILES
-    "${CMAKE_CURRENT_SOURCE_DIR}/icons/hearts-256.png"   # renomme si besoin
+    "${CMAKE_CURRENT_SOURCE_DIR}/icons/hearts.svg"
     DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/256x256/apps
-    RENAME hearts.png
+    RENAME hearts.svg
 )
-
-# Optionnel : ajoute 48x48, 64x64, 128x128 si tu as ces tailles
-# install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/icons/hearts-48.png"
-#     DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/48x48/apps
-#     RENAME hearts.png
-# )
-
-include(GNUInstallDirs)
 
 qt_finalize_executable(Hearts)

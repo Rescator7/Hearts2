@@ -115,7 +115,6 @@ signals:
 public:
     explicit Deck(QObject *parent = nullptr);
     ~Deck();
-    bool check_file(QString &filename);
     bool set_deck(int style);
     void delete_current_deck();
     void apply_settings(QGraphicsItem *item, int cardId);
