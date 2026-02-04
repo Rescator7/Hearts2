@@ -4,17 +4,10 @@
 #include <QFile>
 #include <QUrl>
 #include <QDateTime>
+#include <QTimer>
 #include <QDebug>
 
 Sounds::Sounds(QObject *parent) : QObject(parent) {
-}
-
-Sounds::~Sounds() {
-    // Parent (this) will delete all children automatically
-}
-
-void Sounds::play(int soundId)
-{
     const char sounds_files[LAST_SOUND + 1][127] = {
         "34201__themfish__glass-house1.wav",
         "240777__f4ngy__dealing-card.wav",
@@ -34,54 +27,54 @@ void Sounds::play(int soundId)
         "404553__inspectorj__clap-single-7_modified.wav"
     };
 
-    if (soundId < 0 || (soundId > LAST_SOUND) || !enabled) return;
+    // 1 player per sound to allow overlapping sounds.
+    for (int i = 0; i < LAST_SOUND + 1; ++i) {
+        QString path = getResourceFile(QString("sounds/") + sounds_files[i]);
+        if (path.isEmpty()) continue;
 
-    if (activePlayers.size() >= 5) {
-        // Stop the oldest one
-        QMediaPlayer *oldest = activePlayers.takeFirst();
-        oldest->stop();
-        oldest->deleteLater();
+        QMediaPlayer *player = new QMediaPlayer(this);
+        QAudioOutput *output = new QAudioOutput(this);
+        output->setVolume(0.5f);
+        player->setAudioOutput(output);
+        player->setSource(QUrl::fromLocalFile(path));
+
+        soundPlayers.append(player);
     }
+}
 
-    QString filename = getResourceFile(QString("sounds/") + sounds_files[soundId]);
-    if (filename.isEmpty()) {
-      return;
-    }
+Sounds::~Sounds() {
+    // Parent (this) will delete all children automatically
+}
 
-    qDebug() << "Filename: " << filename;
+void Sounds::play(int soundId)
+{
+    if (!enabled || soundId < 0 || soundId >= LAST_SOUND) return;
 
-    // Create completely new player/output every time
-    QAudioOutput *output = new QAudioOutput(this);
-    output->setVolume(0.5f);
+    QMediaPlayer *player = soundPlayers[soundId];
+    if (!player) return;
 
-    QMediaPlayer *player = new QMediaPlayer(this);
+  // Étape 1 : Sauvegarde la source actuelle AVANT de la vider
+    QUrl savedSource = player->source();
 
-    player->setAudioOutput(output);
-    player->setSource(QUrl::fromLocalFile(filename));
-
-    // Auto-cleanup when finished
-    connect(player, &QMediaPlayer::mediaStatusChanged, player, [player, output, this](QMediaPlayer::MediaStatus status) {
-        if (status == QMediaPlayer::EndOfMedia ||
-            status == QMediaPlayer::InvalidMedia ||
-            status == QMediaPlayer::NoMedia) {
-            player->stop();
-            activePlayers.removeAll(player);
-            player->deleteLater();
-            output->deleteLater();
-        }
-    });
-
+    // Étape 2 : Arrêt + reset complet
+    player->stop();
     player->setPosition(0);
-    activePlayers.append(player);
-    player->play();
+
+    // Étape 3 : Vide puis recharge la source (force la réinitialisation interne)
+    player->setSource(QUrl());           // vide
+    player->setSource(savedSource);      // remet l'original
+
+// Petit délai pour laisser le backend "respirer" (souvent 10–50 ms suffit)
+    QTimer::singleShot(50, player, [player]() {
+        player->play();
+    });
 }
 
 void Sounds::stopAllSounds()
 {
-  for (QMediaPlayer *p : activePlayers) {
-     p->stop();
-   }
-  activePlayers.clear();
+    for (QMediaPlayer *p : soundPlayers) {
+        if (p) p->stop();
+    }
 }
 
 void Sounds::setEnabled(bool activate)
@@ -89,7 +82,7 @@ void Sounds::setEnabled(bool activate)
   enabled = activate;
 
   if (!enabled) {
-    qDebug() << "Sounds: Sounds stopped: " << activePlayers.size();
+    qDebug() << "Sounds: Sounds stopped: " << soundPlayers.size();
     stopAllSounds();
   }
 }

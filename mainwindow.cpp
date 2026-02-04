@@ -32,7 +32,7 @@ MainWindow::MainWindow(QWidget *parent)
 // setMinimumHeight(MIN_APPL_HEIGHT);
 
     ui->graphicsView->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
- //   ui->graphicsView->setCacheMode(QGraphicsView::CacheNone);
+    ui->graphicsView->setCacheMode(QGraphicsView::CacheBackground);
 
     ui->splitterHelp->setSizes(QList<int>() << 250 << 750);
 
@@ -241,352 +241,32 @@ MainWindow::~MainWindow()
     qDebug() << "~MainWindow() terminé";
 }
 
-void MainWindow::aboutToQuit()
-{
-  statistics->save_stats_file();
-  engine->save_game();
-
-  config->set_width(size().width());
-  config->set_height(size().height());
-  config->set_posX(pos().x());
-  config->set_posY(pos().y());
-
-  // Give Pulse audio time to clean stuff to avoid crashes on exit()
-  sounds->stopAllSounds();
-  QTimer::singleShot(200, qApp, &QApplication::quit);
-}
-
-void MainWindow::loadHelpFile()
-{
-  QFile file; // (":/translations/help.html");
-  if (ui->opt_english->isChecked()) {
-    file.setFileName(":/translations/help.html");
-  } else
-    if (ui->opt_french->isChecked()) {
-      qDebug() << "Set french help.";
-      file.setFileName(":/translations/help_fr.html");
-    } else
-      if (ui->opt_russian->isChecked()) {
-        file.setFileName(":/translations/help_ru.html");
-      }
-
-  if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-    QTextStream in(&file);
-    QString html = in.readAll();
-    ui->textHelpContent->setHtml(html);
-    file.close();
-  } else {
-      qWarning() << "Impossible de charger help.html";
-      ui->textHelpContent->setPlainText(tr("Error : help file not found."));
-    }
-  ui->textHelpContent->setOpenExternalLinks(true);
-  ui->textHelpContent->setOpenLinks(true);
-}
-
-void MainWindow::createTOC()
-{  
-  struct tocEntry {
-    QString anchor;
-    bool isSubsection;
-  };
-
-  static const tocEntry TOC[] =  {
-                           {"rules", false },
-                           {"settings", false },
-                           {"variants", true },
-                           {"miscellaneous", true },
-                           {"scoreboard", true },
-                           {"shortcuts", false },
-                           {"online", false },
-                           {"credits", false },
-                           {"decks", true },
-                           {"icons", true },
-                           {"backgrounds", true },
-                           {"sounds", true },
-                           {"special", true}
-                         };
-
-  ui->treeHelpTOC->setHeaderHidden(true);
-  ui->treeHelpTOC->setColumnCount(1);
-  ui->treeHelpTOC->setStyleSheet("QTreeWidget { background: #2e5c3e; color: #e0ffe0; font-size: 12px; }"
-                                 "QTreeWidget::item { padding: 8px; }"
-                                 "QTreeWidget::item:selected { background: #5a9f5a; color: white; }"
-  );
-
-  QTreeWidgetItem *lastParent = nullptr;
-
-  int cpt = 0;
-  for (const auto &entry : TOC) {
-    QTreeWidgetItem *item;
-
-    if (entry.isSubsection && lastParent != nullptr) {
-        item = new QTreeWidgetItem(lastParent);
-    } else {
-        item = new QTreeWidgetItem(ui->treeHelpTOC);
-        lastParent = item;
-    }
-
-    QString title;
-    switch (static_cast<TocIndex>(cpt)) {
-       case TOC_Rules :         title = tr("1. Basic rules of the game"); break;
-       case TOC_Settings :      title = tr("2. Game settings"); break;
-       case TOC_Variants :      title = tr("2.1 Game variants"); break;
-       case TOC_Miscellaneous : title = tr("2.2 Miscellaneous"); break;
-       case TOC_Scoreboard :    title = tr("2.3 Scoreboard"); break;
-       case TOC_Shortcuts :     title = tr("3. Game shortcuts"); break;
-       case TOC_Online :        title = tr("4. Playing online"); break;
-       case TOC_Credits :       title = tr("5. Credits"); break;
-       case TOC_Decks :         title = tr("5.1 Playing card decks"); break;
-       case TOC_Icons :         title = tr("5.2 Icons"); break;
-       case TOC_Backgrounds :   title = tr("5.3 Backgrounds Images"); break;
-       case TOC_Sounds :        title = tr("5.4 Sounds"); break;
-       case TOC_Special :       title = tr("5.5 Special thanks"); break;
-    }
-
-    item->setText(0, title);
-    item->setData(0, Qt::UserRole, entry.anchor);
-    if (entry.isSubsection) {
-        QFont font = item->font(0);
-        font.setPointSize(font.pointSize() - 1);
-        item->setFont(0, font);
-    }
-    cpt++;
-  }
-
-  ui->treeHelpTOC->expandAll();
-}
-
-bool MainWindow::loadBackgroundPreview(const QString &image_path)
-{
-  QPixmap preview(image_path);
-
-  if (preview.isNull())
-    return false;
-
-  ui->labelBackgroundPreview->setPixmap(preview.scaled(ui->labelBackgroundPreview->size(),
-                                        Qt::KeepAspectRatioByExpanding,
-                                        Qt::SmoothTransformation ));
-
-  return true;
-}
-
-void MainWindow::disableDeck(int deckId) {
-  QAbstractButton *button = deckGroup->button(deckId);
-  if (button) {
-    button->setChecked(false);
-    button->setEnabled(false);
-  }
-
-  QMessageBox::warning(this, "Deck Load Failed",
-            tr("The selected deck could not be loaded.\n\n"
-            "It may be unsupported, missing files or corrupted.\n"
-            "Please select a different deck in Settings."));
-
-  if (!forced_new_deck) {
-    ui->tabWidget->setTabEnabled(TAB_BOARD, false);
-    ui->tabWidget->setCurrentIndex(TAB_SETTINGS);
-    forced_new_deck = true;
-  }
-}
-
-void MainWindow::initCardsPlayedPointers()
-{
-  cardLabels[CLUBS_TWO] =   ui->label_clubs_2;
-  cardLabels[CLUBS_THREE] = ui->label_clubs_3;
-  cardLabels[CLUBS_FOUR] =  ui->label_clubs_4;
-  cardLabels[CLUBS_FIVE] =  ui->label_clubs_5;
-  cardLabels[CLUBS_SIX] =   ui->label_clubs_6;
-  cardLabels[CLUBS_SEVEN] = ui->label_clubs_7;
-  cardLabels[CLUBS_EIGHT] = ui->label_clubs_8;
-  cardLabels[CLUBS_NINE] =  ui->label_clubs_9;
-  cardLabels[CLUBS_TEN] =   ui->label_clubs_10;
-  cardLabels[CLUBS_JACK] =  ui->label_clubs_jack;
-  cardLabels[CLUBS_QUEEN] = ui->label_clubs_queen;
-  cardLabels[CLUBS_KING] =  ui->label_clubs_king;
-  cardLabels[CLUBS_ACE] =   ui->label_clubs_ace;
-
-  cardLabels[SPADES_TWO] =   ui->label_spades_2;
-  cardLabels[SPADES_THREE] = ui->label_spades_3;
-  cardLabels[SPADES_FOUR] =  ui->label_spades_4;
-  cardLabels[SPADES_FIVE] =  ui->label_spades_5;
-  cardLabels[SPADES_SIX] =   ui->label_spades_6;
-  cardLabels[SPADES_SEVEN] = ui->label_spades_7;
-  cardLabels[SPADES_EIGHT] = ui->label_spades_8;
-  cardLabels[SPADES_NINE] =  ui->label_spades_9;
-  cardLabels[SPADES_TEN] =   ui->label_spades_10;
-  cardLabels[SPADES_JACK] =  ui->label_spades_jack;
-  cardLabels[SPADES_QUEEN] = ui->label_spades_queen;
-  cardLabels[SPADES_KING] =  ui->label_spades_king;
-  cardLabels[SPADES_ACE] =   ui->label_spades_ace;
-
-  cardLabels[DIAMONDS_TWO] =   ui->label_diamonds_2;
-  cardLabels[DIAMONDS_THREE] = ui->label_diamonds_3;
-  cardLabels[DIAMONDS_FOUR] =  ui->label_diamonds_4;
-  cardLabels[DIAMONDS_FIVE] =  ui->label_diamonds_5;
-  cardLabels[DIAMONDS_SIX] =   ui->label_diamonds_6;
-  cardLabels[DIAMONDS_SEVEN] = ui->label_diamonds_7;
-  cardLabels[DIAMONDS_EIGHT] = ui->label_diamonds_8;
-  cardLabels[DIAMONDS_NINE] =  ui->label_diamonds_9;
-  cardLabels[DIAMONDS_TEN] =   ui->label_diamonds_10;
-  cardLabels[DIAMONDS_JACK] =  ui->label_diamonds_jack;
-  cardLabels[DIAMONDS_QUEEN] = ui->label_diamonds_queen;
-  cardLabels[DIAMONDS_KING] =  ui->label_diamonds_king;
-  cardLabels[DIAMONDS_ACE] =   ui->label_diamonds_ace;
-
-  cardLabels[HEARTS_TWO] =   ui->label_hearts_2;
-  cardLabels[HEARTS_THREE] = ui->label_hearts_3;
-  cardLabels[HEARTS_FOUR] =  ui->label_hearts_4;
-  cardLabels[HEARTS_FIVE] =  ui->label_hearts_5;
-  cardLabels[HEARTS_SIX] =   ui->label_hearts_6;
-  cardLabels[HEARTS_SEVEN] = ui->label_hearts_7;
-  cardLabels[HEARTS_EIGHT] = ui->label_hearts_8;
-  cardLabels[HEARTS_NINE] =  ui->label_hearts_9;
-  cardLabels[HEARTS_TEN] =   ui->label_hearts_10;
-  cardLabels[HEARTS_JACK] =  ui->label_hearts_jack;
-  cardLabels[HEARTS_QUEEN] = ui->label_hearts_queen;
-  cardLabels[HEARTS_KING] =  ui->label_hearts_king;
-  cardLabels[HEARTS_ACE] =   ui->label_hearts_ace;
-}
-
-void MainWindow::loadCardsPlayed()
-{
-  static const QStringList ranks = { "2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King", "Ace" };
-  static const QStringList suits = { " ♣", " ♠", " ♦", " ♥" };
-
-  QPixmap pix;
-  QString sRank;
-
-  for (int cardId = 0; cardId < DECK_SIZE; cardId++) {
-    int suit = cardId / 13;
-    int rank = cardId % 13;
-    switch (rank) {
-       case 9  : sRank = tr("Jack"); break;
-       case 10 : sRank = tr("Queen"); break;
-       case 11 : sRank = tr("King"); break;
-       case 12 : sRank = tr("Ace"); break;
-       default : sRank = ranks[rank];
-    }
-
-    pix = deck->get_card_pixmap(cardId);
-    cardLabels[cardId]->setPixmap(pix);
-    cardLabels[cardId]->setToolTip(sRank + QString(suits[suit]));
-    cardLabels[cardId]->setDisabled(engine->isCardPlayed(cardId));
-  }
-}
-
-void MainWindow::applyAllSettings()
-{
-  int deck_style = config->get_deck_style();
-  bool deck_loaded = deck->set_deck(deck_style);
-  bool enabled;
-
-  if (!deck_loaded)
-    disableDeck(deck_style);
-  else {
-    deckGroup->button(deck_style)->setChecked(true);
-    import_allCards_to_scene();
-  }
-
-  enabled = config->is_sounds();
-  ui->pushButton_sound->setChecked(enabled);
-  sounds->setEnabled(enabled);
-
-  enabled = config->is_queen_spade_break_heart();
-  ui->opt_queen_spade->setChecked(enabled);
-  engine->set_variant(VARIANT_QUEEN_SPADE, enabled);
-
-  enabled = config->is_perfect_100();
-  ui->opt_perfect_100->setChecked(enabled);
-  engine->set_variant(VARIANT_PERFECT_100, enabled);
-
-  enabled = config->is_omnibus();
-  ui->opt_omnibus->setChecked(enabled);
-  engine->set_variant(VARIANT_OMNIBUS, enabled);
-
-  enabled = config->is_no_trick_bonus();
-  ui->opt_no_tricks->setChecked(enabled);
-  engine->set_variant(VARIANT_NO_TRICKS, enabled);
-
-  enabled = config->is_new_moon();
-  ui->opt_new_moon->setChecked(enabled);
-  engine->set_variant(VARIANT_NEW_MOON, enabled);
-
-  enabled = config->is_no_draw();
-  ui->opt_no_draw->setChecked(enabled);
-  engine->set_variant(VARIANT_NO_DRAW, enabled);
-
-  enabled = config->is_animated_play();
-  ui->opt_animations->setChecked(enabled);
-  setAnimationButtons(enabled);
-
-  enabled = config->is_confirm_exit();
-  ui->checkBox_confirm_exit->setChecked(enabled);
-
-  enabled = config->is_detect_tram();
-  ui->checkBox_tram->setChecked(enabled);
-
-  enabled = config->is_cheat_reveal();
-  ui->pushButton_reveal->setChecked(enabled);
-
-  enabled = config->is_confirm_new_game();
-  ui->checkBox_new_game->setChecked(enabled);
-
-  // This settings must be applied after is_cheat_reveal(), so setCheatMode will unset
-  // reveal pushButton if the overall cheat mode has been set to false.
-  enabled = config->is_cheat_mode();
-  ui->checkBox_cheat->setChecked(enabled);
-  setCheatMode(enabled);
-
-  ui->opt_anim_deal_cards->setChecked(config->is_anim_deal_cards());
-  ui->opt_anim_play_card->setChecked(config->is_anim_play_card());
-  ui->opt_anim_collect_tricks->setChecked(config->is_anim_collect_tricks());
-  ui->opt_anim_pass_cards->setChecked(config->is_anim_pass_cards());
-
-  enabled = config->is_animated_arrow();
-  ui->opt_anim_arrow->setChecked(enabled);
-  on_opt_anim_arrow_clicked(enabled);
-
-  ui->opt_anim_triangle->setChecked(config->is_anim_turn_indicator());
-
-  switch (config->get_language()) {
-    case LANG_ENGLISH: ui->opt_english->setChecked(true); break;
-    case LANG_FRENCH: ui->opt_french->setChecked(true); break;
-    case LANG_RUSSIAN: ui->opt_russian->setChecked(true); break;  
-  }
-
-  QSize savedSize(config->width(), config->height());
-  QPoint savedPos(config->posX(), config->posY());
-
-  // If there is no background path. We load the legacy background save by index.
-  if (config->Path().isEmpty()) {
-    qDebug() << "applyAllSettings loading a legacy background!";
-    background->setBackground(config->get_background_index());
-  } else {
-    background->setBackgroundPixmap(config->Path());
-  }
-
-  resize(savedSize);
-
-// With all the Linux window managers THAT doesn't works.
-// move(savedPos);
-
-  loadBackgroundPreview(background->FullPath());
-}
-
-
 // ************************************************************************************************
 // Section 1- [ EVENTS OVERRIDE ]
 //            resizeEvent(QResizeEvent *event)
 //            eventFilter(QObject *obj, QEvent *event)
 //            showEvent(QShowEvent *event)
 //            closeEvent(QCloseEvent *event) override
+//            tryQuit()
+//            aboutToQuit()
 //
-// Section 2- [ Private Slots ]
+// Section 2- [ Initialisation / Set / Loads ]
+//            initCardsPlayedPointers()
+//            loadHelpFile()
+//            loadBackgroundPreview(const QString &image_path)
+//            loadCardsPlayed()
+//            applyAllSettings()
+//            setAnimationLock()
+//            setAnimationUnlock()
+//            setCheatMode(bool enabled)
+//            setAnimationButtons(bool enabled)
+//            setLanguage()
+//
+// Section 3- [ Private Slots ]
 //            onDeckChanged(int deckId)
 //            onBackgroundPreviewClicked()
 //            onCardClicked(QGraphicsItem *item)
 //            onArrowClicked
-//
 //            onYourTurn();
 //            onPlaySound(SOUNDS soundId);
 //            onUpdateStat(int player, STATS stat);
@@ -608,15 +288,20 @@ void MainWindow::applyAllSettings()
 //            onAnimationToggled(int id, bool checked);
 //            onRefreshCardsPlayed()
 //            onCardPlayed()
+//            on_opt_animations_clicked()
+//            on_pushButton_undo_clicked()
+//            on_opt_anim_arrow_clicked(bool checked)
+//            on_pushButton_score_clicked()
 //
-// Section 3- [ Create Functions ]
+// Section 4- [ Create Functions ]
 //            createCreditsLabel()
 //            create_arrows()
 //            createButtonsGroups()
 //            createPlayerNames()
 //            createScoreDisplay()
+//            createTOC()
 //
-// Section 4- [ Update Functions ]
+// Section 5- [ Update Functions ]
 //            updateTurnArrow()
 //            updateYourTurnIndicator()
 //            updateTrickPile()
@@ -629,7 +314,7 @@ void MainWindow::applyAllSettings()
 //            updateScores(const int handScores[4], const int totalScores[4], const QString playersName[4], const PlayerIcon icons[4])
 //            repositionAllCardsAndElements()
 //
-// Section 5- [ Animate Functions ]
+// Section 6- [ Animate Functions ]
 //            animatePlayCard(int cardId, int player)
 //            animatePassCards(const QList<int> passedCards[4], int direction)
 //            animateCardsToCenter(const QList<int> &cardsId, QParallelAnimationGroup *masterGroup, int startDelay, int perCardStagger)
@@ -640,7 +325,7 @@ void MainWindow::applyAllSettings()
 //            animateYourTurnIndicator()
 //            highlightAIPassedCards(int player, const QList<int>& passedCardIds)
 //
-// Section 6- [ Mathematic Functions ]
+// Section 7- [ Mathematic Functions ]
 //            cardX(int cardId, int player, int handIndex)
 //            cardY(int cardId, int player, int handIndex)
 //            getTakenPileCenter(int player, const QSize& viewSize) const
@@ -649,8 +334,9 @@ void MainWindow::applyAllSettings()
 //            cardZ(int player, int cardId)
 //            calculatePlayerNamePos(int player)
 //
+// Section 8- [ UNSORTED FUNCTIONS ]
+//
 // ************************************************************************************************
-
 
 
 // ************************************[ 1- EVENTS OVERRIDE ] *************************************
@@ -783,11 +469,368 @@ void MainWindow::tryQuit()
     });
 }
 
+void MainWindow::aboutToQuit()
+{
+  statistics->save_stats_file();
+  engine->save_game();
+
+  config->set_width(size().width());
+  config->set_height(size().height());
+  config->set_posX(pos().x());
+  config->set_posY(pos().y());
+
+  // Give Pulse audio time to clean stuff to avoid crashes on exit()
+  sounds->stopAllSounds();
+  QTimer::singleShot(200, qApp, &QApplication::quit);
+}
+
+// ************************************************************************************************
+
+// *****************************[ 2- Initialisation / Set / Loads ] *******************************
+void MainWindow::initCardsPlayedPointers()
+{
+  cardLabels[CLUBS_TWO] =   ui->label_clubs_2;
+  cardLabels[CLUBS_THREE] = ui->label_clubs_3;
+  cardLabels[CLUBS_FOUR] =  ui->label_clubs_4;
+  cardLabels[CLUBS_FIVE] =  ui->label_clubs_5;
+  cardLabels[CLUBS_SIX] =   ui->label_clubs_6;
+  cardLabels[CLUBS_SEVEN] = ui->label_clubs_7;
+  cardLabels[CLUBS_EIGHT] = ui->label_clubs_8;
+  cardLabels[CLUBS_NINE] =  ui->label_clubs_9;
+  cardLabels[CLUBS_TEN] =   ui->label_clubs_10;
+  cardLabels[CLUBS_JACK] =  ui->label_clubs_jack;
+  cardLabels[CLUBS_QUEEN] = ui->label_clubs_queen;
+  cardLabels[CLUBS_KING] =  ui->label_clubs_king;
+  cardLabels[CLUBS_ACE] =   ui->label_clubs_ace;
+
+  cardLabels[SPADES_TWO] =   ui->label_spades_2;
+  cardLabels[SPADES_THREE] = ui->label_spades_3;
+  cardLabels[SPADES_FOUR] =  ui->label_spades_4;
+  cardLabels[SPADES_FIVE] =  ui->label_spades_5;
+  cardLabels[SPADES_SIX] =   ui->label_spades_6;
+  cardLabels[SPADES_SEVEN] = ui->label_spades_7;
+  cardLabels[SPADES_EIGHT] = ui->label_spades_8;
+  cardLabels[SPADES_NINE] =  ui->label_spades_9;
+  cardLabels[SPADES_TEN] =   ui->label_spades_10;
+  cardLabels[SPADES_JACK] =  ui->label_spades_jack;
+  cardLabels[SPADES_QUEEN] = ui->label_spades_queen;
+  cardLabels[SPADES_KING] =  ui->label_spades_king;
+  cardLabels[SPADES_ACE] =   ui->label_spades_ace;
+
+  cardLabels[DIAMONDS_TWO] =   ui->label_diamonds_2;
+  cardLabels[DIAMONDS_THREE] = ui->label_diamonds_3;
+  cardLabels[DIAMONDS_FOUR] =  ui->label_diamonds_4;
+  cardLabels[DIAMONDS_FIVE] =  ui->label_diamonds_5;
+  cardLabels[DIAMONDS_SIX] =   ui->label_diamonds_6;
+  cardLabels[DIAMONDS_SEVEN] = ui->label_diamonds_7;
+  cardLabels[DIAMONDS_EIGHT] = ui->label_diamonds_8;
+  cardLabels[DIAMONDS_NINE] =  ui->label_diamonds_9;
+  cardLabels[DIAMONDS_TEN] =   ui->label_diamonds_10;
+  cardLabels[DIAMONDS_JACK] =  ui->label_diamonds_jack;
+  cardLabels[DIAMONDS_QUEEN] = ui->label_diamonds_queen;
+  cardLabels[DIAMONDS_KING] =  ui->label_diamonds_king;
+  cardLabels[DIAMONDS_ACE] =   ui->label_diamonds_ace;
+
+  cardLabels[HEARTS_TWO] =   ui->label_hearts_2;
+  cardLabels[HEARTS_THREE] = ui->label_hearts_3;
+  cardLabels[HEARTS_FOUR] =  ui->label_hearts_4;
+  cardLabels[HEARTS_FIVE] =  ui->label_hearts_5;
+  cardLabels[HEARTS_SIX] =   ui->label_hearts_6;
+  cardLabels[HEARTS_SEVEN] = ui->label_hearts_7;
+  cardLabels[HEARTS_EIGHT] = ui->label_hearts_8;
+  cardLabels[HEARTS_NINE] =  ui->label_hearts_9;
+  cardLabels[HEARTS_TEN] =   ui->label_hearts_10;
+  cardLabels[HEARTS_JACK] =  ui->label_hearts_jack;
+  cardLabels[HEARTS_QUEEN] = ui->label_hearts_queen;
+  cardLabels[HEARTS_KING] =  ui->label_hearts_king;
+  cardLabels[HEARTS_ACE] =   ui->label_hearts_ace;
+}
+
+void MainWindow::loadHelpFile()
+{
+  QFile file; // (":/translations/help.html");
+  if (ui->opt_english->isChecked()) {
+    file.setFileName(":/translations/help.html");
+  } else
+    if (ui->opt_french->isChecked()) {
+      qDebug() << "Set french help.";
+      file.setFileName(":/translations/help_fr.html");
+    } else
+      if (ui->opt_russian->isChecked()) {
+        file.setFileName(":/translations/help_ru.html");
+      }
+
+  if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    QTextStream in(&file);
+    QString html = in.readAll();
+    ui->textHelpContent->setHtml(html);
+    file.close();
+  } else {
+      qWarning() << "Impossible de charger help.html";
+      ui->textHelpContent->setPlainText(tr("Error : help file not found."));
+    }
+  ui->textHelpContent->setOpenExternalLinks(true);
+  ui->textHelpContent->setOpenLinks(true);
+}
+
+bool MainWindow::loadBackgroundPreview(const QString &image_path)
+{
+  QPixmap preview(image_path);
+
+  if (preview.isNull())
+    return false;
+
+  ui->labelBackgroundPreview->setPixmap(preview.scaled(ui->labelBackgroundPreview->size(),
+                                        Qt::KeepAspectRatioByExpanding,
+                                        Qt::SmoothTransformation ));
+
+  return true;
+}
+
+void MainWindow::loadCardsPlayed()
+{
+  static const QStringList ranks = { "2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King", "Ace" };
+  static const QStringList suits = { " ♣", " ♠", " ♦", " ♥" };
+
+  QPixmap pix;
+  QString sRank;
+
+  for (int cardId = 0; cardId < DECK_SIZE; cardId++) {
+    int suit = cardId / 13;
+    int rank = cardId % 13;
+    switch (rank) {
+       case 9  : sRank = tr("Jack"); break;
+       case 10 : sRank = tr("Queen"); break;
+       case 11 : sRank = tr("King"); break;
+       case 12 : sRank = tr("Ace"); break;
+       default : sRank = ranks[rank];
+    }
+
+    pix = deck->get_card_pixmap(cardId);
+    cardLabels[cardId]->setPixmap(pix);
+    cardLabels[cardId]->setToolTip(sRank + QString(suits[suit]));
+    cardLabels[cardId]->setDisabled(engine->isCardPlayed(cardId));
+  }
+}
+
+void MainWindow::applyAllSettings()
+{
+  int deck_style = config->get_deck_style();
+  bool deck_loaded = deck->set_deck(deck_style);
+  bool enabled;
+
+  if (!deck_loaded)
+    disableDeck(deck_style);
+  else {
+    deckGroup->button(deck_style)->setChecked(true);
+    import_allCards_to_scene();
+  }
+
+  enabled = config->is_sounds();
+  ui->pushButton_sound->setChecked(enabled);
+  sounds->setEnabled(enabled);
+
+  enabled = config->is_queen_spade_break_heart();
+  ui->opt_queen_spade->setChecked(enabled);
+  engine->set_variant(VARIANT_QUEEN_SPADE, enabled);
+
+  enabled = config->is_perfect_100();
+  ui->opt_perfect_100->setChecked(enabled);
+  engine->set_variant(VARIANT_PERFECT_100, enabled);
+
+  enabled = config->is_omnibus();
+  ui->opt_omnibus->setChecked(enabled);
+  engine->set_variant(VARIANT_OMNIBUS, enabled);
+
+  enabled = config->is_no_trick_bonus();
+  ui->opt_no_tricks->setChecked(enabled);
+  engine->set_variant(VARIANT_NO_TRICKS, enabled);
+
+  enabled = config->is_new_moon();
+  ui->opt_new_moon->setChecked(enabled);
+  engine->set_variant(VARIANT_NEW_MOON, enabled);
+
+  enabled = config->is_no_draw();
+  ui->opt_no_draw->setChecked(enabled);
+  engine->set_variant(VARIANT_NO_DRAW, enabled);
+
+  enabled = config->is_animated_play();
+  ui->opt_animations->setChecked(enabled);
+  setAnimationButtons(enabled);
+
+  enabled = config->is_confirm_exit();
+  ui->checkBox_confirm_exit->setChecked(enabled);
+
+  enabled = config->is_detect_tram();
+  ui->checkBox_tram->setChecked(enabled);
+
+  enabled = config->is_cheat_reveal();
+  ui->pushButton_reveal->setChecked(enabled);
+
+  enabled = config->is_confirm_new_game();
+  ui->checkBox_new_game->setChecked(enabled);
+
+  // This settings must be applied after is_cheat_reveal(), so setCheatMode will unset
+  // reveal pushButton if the overall cheat mode has been set to false.
+  enabled = config->is_cheat_mode();
+  ui->checkBox_cheat->setChecked(enabled);
+  setCheatMode(enabled);
+
+  ui->opt_anim_deal_cards->setChecked(config->is_anim_deal_cards());
+  ui->opt_anim_play_card->setChecked(config->is_anim_play_card());
+  ui->opt_anim_collect_tricks->setChecked(config->is_anim_collect_tricks());
+  ui->opt_anim_pass_cards->setChecked(config->is_anim_pass_cards());
+
+  enabled = config->is_animated_arrow();
+  ui->opt_anim_arrow->setChecked(enabled);
+  on_opt_anim_arrow_clicked(enabled);
+
+  ui->opt_anim_triangle->setChecked(config->is_anim_turn_indicator());
+
+  switch (config->get_language()) {
+    case LANG_ENGLISH: ui->opt_english->setChecked(true); break;
+    case LANG_FRENCH: ui->opt_french->setChecked(true); break;
+    case LANG_RUSSIAN: ui->opt_russian->setChecked(true); break;
+  }
+
+  QSize savedSize(config->width(), config->height());
+  QPoint savedPos(config->posX(), config->posY());
+
+  // If there is no background path. We load the legacy background save by index.
+  if (config->Path().isEmpty()) {
+    qDebug() << "applyAllSettings loading a legacy background!";
+    background->setBackground(config->get_background_index());
+  } else {
+    background->setBackgroundPixmap(config->Path());
+  }
+
+  resize(savedSize);
+
+// With all the Linux window managers THAT doesn't works.
+// move(savedPos);
+
+  loadBackgroundPreview(background->FullPath());
+}
+
+void MainWindow::setAnimationLock()
+{
+    m_animationLockCount++;
+
+    if (m_animationLockCount == 1) {  // First lock (was 0 → 1)
+        // Remember current size before fixing
+        m_fixedSizeDuringLock = size();
+
+        // Lock window size
+        setFixedSize(m_fixedSizeDuringLock);
+
+        // Disable deck switch tab
+        ui->tabWidget->setTabEnabled(TAB_SETTINGS, false);
+
+        // Disable cards reveal
+        ui->pushButton_reveal->setDisabled(true);
+
+        // Disable new game
+        ui->pushButton_new->setDisabled(true);
+
+        // Disable undo
+        ui->pushButton_undo->setDisabled(true);
+
+        // Visual feedback
+        //  ui->graphicsView->setCursor(Qt::WaitCursor);
+        QApplication::setOverrideCursor(Qt::WaitCursor);
+    }
+}
+
+void MainWindow::setAnimationUnlock()
+{
+    if (m_animationLockCount <= 0) {
+        m_animationLockCount = 0;
+        return;
+    }
+
+    m_animationLockCount--;
+
+    if (m_animationLockCount == 0) {
+        // Fully unlocked
+        ui->tabWidget->setTabEnabled(TAB_SETTINGS, true);
+
+        // TODO don't enable reveal and undo, if we're playing ONLINE
+        ui->pushButton_reveal->setDisabled(false);
+        ui->pushButton_undo->setDisabled(false);
+        ui->pushButton_new->setDisabled(false);
+
+        // ui->graphicsView->unsetCursor();
+        QApplication::restoreOverrideCursor();
+
+        // Restore full resizability
+        setMinimumSize(QSize(MIN_APPL_WIDTH, MIN_APPL_HEIGHT));
+        setMaximumSize(QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
+    }
+}
+
+void MainWindow::setCheatMode(bool enabled)
+{
+  if (!enabled) {
+    ui->pushButton_reveal->setChecked(false);
+    config->set_config_file(CONFIG_CHEAT_REVEAL, false);
+  }
+  ui->tabWidget->setTabVisible(TAB_CARDS_PLAYED, enabled);
+  ui->pushButton_reveal->setVisible(enabled);
+}
+
+void MainWindow::setAnimationButtons(bool enabled)
+{
+  ui->opt_anim_deal_cards->setEnabled(enabled);
+  ui->opt_anim_play_card->setEnabled(enabled);
+  ui->opt_anim_collect_tricks->setEnabled(enabled);
+  ui->opt_anim_pass_cards->setEnabled(enabled);
+  ui->opt_anim_arrow->setEnabled(enabled);
+  ui->opt_anim_triangle->setEnabled(enabled);
+}
+
+void MainWindow::setLanguage()
+{
+  // Retirer l’ancien translator s’il existe
+  if (currentTranslator) {
+   qApp->removeTranslator(currentTranslator);
+   delete currentTranslator;
+   currentTranslator = nullptr;
+  }
+
+  currentTranslator = new QTranslator(this);
+
+  QString translation(":/translations/Hearts_en_CA.qm");
+
+  if (ui->opt_french->isChecked()) {
+    translation = ":/translations/Hearts_fr_CA.qm";
+  } else
+      if (ui->opt_russian->isChecked()) {
+        translation = ":/translations/Hearts_ru_RU.qm";
+      }
+
+  // Chargement depuis les ressources embarquées
+  if (currentTranslator->load(translation)) {
+    qApp->installTranslator(currentTranslator);
+  } else {
+    qDebug() << "Échec chargement traduction :" << translation;
+  }
+
+  ui->retranslateUi(this);
+  statistics->Translate();
+
+  ui->treeHelpTOC->clear();
+  qDebug() << "Create new TOC";
+  createTOC();
+  loadHelpFile();
+  loadCardsPlayed();
+  background->setCredits();
+  updateCredits(background->Credits(), background->CreditTextColor());
+  updateCreditsPosition();
+}
 // ************************************************************************************************
 
 
-
-// ************************************[ 2- Private Slots ] ***************************************
+// ************************************[ 3- Private Slots ] ***************************************
 void MainWindow::onDeckChanged(int deckId)
 {
   qDebug() << "onDeckChanged: " << deckId;
@@ -1131,11 +1174,56 @@ void MainWindow::onCardPlayed(int cardId)
 {
   cardLabels[cardId]->setDisabled(true);
 }
+
+void MainWindow::on_opt_animations_clicked()
+{
+  bool enabled = ui->opt_animations->isChecked();
+
+  config->set_config_file(CONFIG_ANIMATED_PLAY, enabled);
+  setAnimationButtons(enabled);
+  on_opt_anim_arrow_clicked(enabled);
+}
+
+void MainWindow::on_pushButton_undo_clicked()
+{
+  if (engine->Undo()) {
+    sounds->play(SOUND_UNDO);
+    statistics->increase_stats(PLAYER_SOUTH, STATS_UNDO);
+  }
+}
+
+void MainWindow::on_opt_anim_arrow_clicked(bool checked)
+{
+  if (!arrowMovie || !arrowMovie->isValid()) {
+   return;
+  }
+
+  int totalFrames = arrowMovie->frameCount();
+  if (totalFrames <= 0) {
+    return;
+  }
+
+  if (!checked || !ui->opt_animations->isChecked()) {
+    arrowMovie->jumpToFrame(totalFrames - 1);
+    arrowMovie->setPaused(true);
+    updateTurnArrow();
+  } else {
+      arrowMovie->jumpToFrame(0);
+      arrowMovie->start();
+    }
+}
+
+void MainWindow::on_pushButton_score_clicked()
+{
+  bool checked = ui->pushButton_score->isChecked();
+  m_scoreGroup->setVisible(checked);
+}
+
 // ************************************************************************************************
 
 
 
-// ************************************[ 3- Update Functions **************************************
+// ************************************[ 4- Update Functions **************************************
 void MainWindow::updateTurnArrow()
 {
     if (!arrowProxy) return;
@@ -1431,8 +1519,8 @@ void MainWindow::updateScorePosition()
     qreal y = viewSize.height() - m_scoreGroup->boundingRect().height() - 45;
 
     // Sécurité (même si resize très petit)
-    x = qBound(10.0, x, viewSize.width() - m_scoreGroup->boundingRect().width() - 10);
-    y = qBound(20.0, y, viewSize.height() - m_scoreGroup->boundingRect().height() - 10);
+    x = safeBound(10.0, x, viewSize.width() - m_scoreGroup->boundingRect().width() - 10);
+    y = safeBound(20.0, y, viewSize.height() - m_scoreGroup->boundingRect().height() - 10);
 
     m_scoreGroup->setPos(x, y);
 
@@ -1463,8 +1551,8 @@ void MainWindow::updateScorePosition()
         y = viewSize.height() - m_scoreGroup->boundingRect().height() - 80;
     }
 
-    x = qBound(10.0, x, viewSize.width() - m_scoreGroup->boundingRect().width() - 10);
-    y = qBound(120.0, y, viewSize.height() - m_scoreGroup->boundingRect().height() - 10);
+    x = safeBound(10.0, x, viewSize.width() - m_scoreGroup->boundingRect().width() - 10);
+    y = safeBound(120.0, y, viewSize.height() - m_scoreGroup->boundingRect().height() - 10);
 
     m_scoreGroup->setPos(x, y);
 
@@ -1512,7 +1600,7 @@ qDebug() << "scoreScroup Z: " << m_scoreGroup->zValue();
 
 
 
-// ************************************[ 4- Create Functions ] ************************************
+// ************************************[ 5- Create Functions ] ************************************
 void MainWindow::createCreditsLabel()
 {
 // Create credits label
@@ -1718,174 +1806,83 @@ void MainWindow::createScoreDisplay()
     updateScorePosition();  // au cas où
 }
 
+void MainWindow::createTOC()
+{
+  struct tocEntry {
+    QString anchor;
+    bool isSubsection;
+  };
+
+  static const tocEntry TOC[] =  {
+                           {"rules", false },
+                           {"settings", false },
+                           {"variants", true },
+                           {"miscellaneous", true },
+                           {"scoreboard", true },
+                           {"shortcuts", false },
+                           {"online", false },
+                           {"credits", false },
+                           {"decks", true },
+                           {"icons", true },
+                           {"backgrounds", true },
+                           {"sounds", true },
+                           {"special", true}
+                         };
+
+  ui->treeHelpTOC->setHeaderHidden(true);
+  ui->treeHelpTOC->setColumnCount(1);
+  ui->treeHelpTOC->setStyleSheet("QTreeWidget { background: #2e5c3e; color: #e0ffe0; font-size: 12px; }"
+                                 "QTreeWidget::item { padding: 8px; }"
+                                 "QTreeWidget::item:selected { background: #5a9f5a; color: white; }"
+  );
+
+  QTreeWidgetItem *lastParent = nullptr;
+
+  int cpt = 0;
+  for (const auto &entry : TOC) {
+    QTreeWidgetItem *item;
+
+    if (entry.isSubsection && lastParent != nullptr) {
+        item = new QTreeWidgetItem(lastParent);
+    } else {
+        item = new QTreeWidgetItem(ui->treeHelpTOC);
+        lastParent = item;
+    }
+
+    QString title;
+    switch (static_cast<TocIndex>(cpt)) {
+       case TOC_Rules :         title = tr("1. Basic rules of the game"); break;
+       case TOC_Settings :      title = tr("2. Game settings"); break;
+       case TOC_Variants :      title = tr("2.1 Game variants"); break;
+       case TOC_Miscellaneous : title = tr("2.2 Miscellaneous"); break;
+       case TOC_Scoreboard :    title = tr("2.3 Scoreboard"); break;
+       case TOC_Shortcuts :     title = tr("3. Game shortcuts"); break;
+       case TOC_Online :        title = tr("4. Playing online"); break;
+       case TOC_Credits :       title = tr("5. Credits"); break;
+       case TOC_Decks :         title = tr("5.1 Playing card decks"); break;
+       case TOC_Icons :         title = tr("5.2 Icons"); break;
+       case TOC_Backgrounds :   title = tr("5.3 Backgrounds Images"); break;
+       case TOC_Sounds :        title = tr("5.4 Sounds"); break;
+       case TOC_Special :       title = tr("5.5 Special thanks"); break;
+    }
+
+    item->setText(0, title);
+    item->setData(0, Qt::UserRole, entry.anchor);
+    if (entry.isSubsection) {
+        QFont font = item->font(0);
+        font.setPointSize(font.pointSize() - 1);
+        item->setFont(0, font);
+    }
+    cpt++;
+  }
+
+  ui->treeHelpTOC->expandAll();
+}
+
 // ************************************************************************************************
 
-void MainWindow::message(QString mesg, MESSAGE type)
-{
-  QString complete;
-  switch (type) {
-    case MESSAGE_ERROR: complete = tr("[Error]: ");
-                        sounds->play(SOUND_ERROR);
-                        break;
-    case MESSAGE_INFO:  complete = tr("[Info]: " );
-                        break;
-    case MESSAGE_SYSTEM:
-    default: break;
-  }
 
-  complete += mesg;
-  ui->channel->append(complete);
-}
-
-void MainWindow::adjustGraphicsViewSize()
-{
-    if (!ui->graphicsView) return;
-
-    // Option A: Fit scene to view (recommended for card games)
-    ui->graphicsView->fitInView(ui->graphicsView->sceneRect(), Qt::KeepAspectRatio);
-
-    // Option B: If you want the green background to fill exactly, no letterboxing:
-    // ui->graphicsView->setSceneRect(ui->graphicsView->rect());
-    // But then you must manually reposition cards on resize — more work.
-
-    // Ensure the view updates immediately
-    ui->graphicsView->viewport()->update();
-}
-
-void MainWindow::setAnimationLock()
-{
-    m_animationLockCount++;
-
-    if (m_animationLockCount == 1) {  // First lock (was 0 → 1)
-        // Remember current size before fixing
-        m_fixedSizeDuringLock = size();
-
-        // Lock window size
-        setFixedSize(m_fixedSizeDuringLock);
-
-        // Disable deck switch tab
-        ui->tabWidget->setTabEnabled(TAB_SETTINGS, false);
-
-        // Disable cards reveal
-        ui->pushButton_reveal->setDisabled(true);
-
-        // Disable new game
-        ui->pushButton_new->setDisabled(true);
-
-        // Disable undo
-        ui->pushButton_undo->setDisabled(true);
-
-        // Visual feedback
-        //  ui->graphicsView->setCursor(Qt::WaitCursor);
-        QApplication::setOverrideCursor(Qt::WaitCursor);
-    }
-}
-
-void MainWindow::setAnimationUnlock()
-{
-    if (m_animationLockCount <= 0) {
-        m_animationLockCount = 0;
-        return;
-    }
-
-    m_animationLockCount--;
-
-    if (m_animationLockCount == 0) {
-        // Fully unlocked
- //       qDebug() << "unlocked";
-        ui->tabWidget->setTabEnabled(TAB_SETTINGS, true);
-
-        // TODO don't enable reveal and undo, if we're playing ONLINE
-        ui->pushButton_reveal->setDisabled(false);
-        ui->pushButton_undo->setDisabled(false);
-        ui->pushButton_new->setDisabled(false);
-
-        // ui->graphicsView->unsetCursor();
-        QApplication::restoreOverrideCursor();
-
-        // Restore full resizability
-        setMinimumSize(QSize(MIN_APPL_WIDTH, MIN_APPL_HEIGHT));
-        setMaximumSize(QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
-    }
-}
-
-void MainWindow::showTurnArrow(int direction)
-{
-    if (!arrowProxy) return;
-
-    qreal rot = 0;
-
-    if (direction == PASS_LEFT)
-      rot = -90;
-    else if (direction == PASS_RIGHT)
-          rot = 90;
-
-    arrowProxy->setRotation(rot);
-
-    // set visibility to false, if direction = PASS_HOLD or invalid direction
-    arrowProxy->setVisible((direction == PASS_LEFT) || (direction == PASS_RIGHT) || (direction == PASS_ACROSS));
-
-    updateTurnArrow();
-}
-
-// In your updateTurnArrow() or similar function
-void MainWindow::showTurnIndicator()
-{
-    sounds->play(SOUND_YOUR_TURN);
-
-    if (ui->opt_animations->isChecked() && ui->opt_anim_triangle->isChecked()) {
-      yourTurnIndicator->show();
-      animateYourTurnIndicator();
-    } else
-      yourTurnIndicator->hide();
-  }
-
-void MainWindow::pushTrickInfo(int cardId, int owner)
-{
-   QGraphicsSvgItem *card = deck->get_card_item(cardId, true);
-
-   TrickCardInfo info;
-   info.cardId = cardId;
-   info.rotation = card->rotation();
-   info.position = card->pos();
-   info.ownerPlayer = owner;
-
-   currentTrickInfo.append(info);
-}
-
-void MainWindow::playCard(int cardId, int player)
-{
-    QGraphicsSvgItem *frontItem = deck->get_card_item(cardId, true);
-
-    if (ui->opt_animations->isChecked() && ui->opt_anim_play_card->isChecked()) {
-      animatePlayCard(cardId, player);
-      return;
-    }
-
-    QGraphicsSvgItem *backItem = deck->get_card_item(cardId, false);
-
-    QSize viewSize = ui->graphicsView->size();
-    QPointF FdeckCenter(viewSize.width() / 2.0 - frontItem->boundingRect().width() / 2, viewSize.height() / 2);
-    QPointF BdeckCenter(viewSize.width() / 2.0 - backItem->boundingRect().width() / 2, viewSize.height() / 2);
-
-    frontItem->setPos(FdeckCenter);
-    backItem->setPos(BdeckCenter);
-
-    currentTrick.append(cardId);
-    currentTrickZ++;
-    pushTrickInfo(cardId, player);
-
-    frontItem->setZValue(currentTrickZ + ZLayer::Z_TRICKS_BASE);
-    frontItem->show();
-
-    backItem->setZValue(currentTrickZ + ZLayer::Z_TRICKS_BASE);
-    backItem->hide();
-
-    engine->Step();
-}
-
-
-// ************************************[ 5- Animate Functions ] ***********************************
+// ************************************[ 6- Animate Functions ] ***********************************
 void MainWindow::animatePlayCard(int cardId, int player)
 {
     setAnimationLock();
@@ -1917,7 +1914,7 @@ void MainWindow::animatePlayCard(int cardId, int player)
     posAnim->setEndValue(targetPos);
     posAnim->setEasingCurve(QEasingCurve::OutCubic);
     connect(posAnim, &QVariantAnimation::valueChanged, this, [item](const QVariant &v) {
-        item->setPos(v.toPointF());
+          item->setPos(v.toPointF());
     });
 
     QVariantAnimation *rotAnim = new QVariantAnimation(group);
@@ -1926,7 +1923,7 @@ void MainWindow::animatePlayCard(int cardId, int player)
     rotAnim->setEndValue(0);  // Straight in center
     rotAnim->setEasingCurve(QEasingCurve::OutCubic);
     connect(rotAnim, &QVariantAnimation::valueChanged, this, [item](const QVariant &v) {
-        item->setRotation(v.toReal());
+          item->setRotation(v.toReal());
     });
 
     group->addAnimation(posAnim);
@@ -2048,7 +2045,7 @@ void MainWindow::animatePassCards(const QList<int> passedCards[4], int direction
         posAnim->setEndValue(finalTarget);
         posAnim->setEasingCurve(QEasingCurve::OutCubic);
         connect(posAnim, &QVariantAnimation::valueChanged, this, [card](const QVariant &v) {
-            card->setPos(v.toPointF());
+              card->setPos(v.toPointF());
         });
 
         // Rotation animation — smooth reorientation
@@ -2058,7 +2055,7 @@ void MainWindow::animatePassCards(const QList<int> passedCards[4], int direction
         rotAnim->setEndValue(targetRotation);
         rotAnim->setEasingCurve(QEasingCurve::OutCubic);
         connect(rotAnim, &QVariantAnimation::valueChanged, this, [card](const QVariant &v) {
-           card->setRotation(v.toReal());
+             card->setRotation(v.toReal());
         });
 
         group->addAnimation(posAnim);
@@ -2105,7 +2102,7 @@ void MainWindow::animateCardsToCenter(const QList<int> &cardsId,
         posAnim->setEndValue(endPos);
         posAnim->setEasingCurve(QEasingCurve::OutQuad);
         connect(posAnim, &QVariantAnimation::valueChanged, [card](const QVariant &v) {
-            card->setPos(v.toPointF());
+              card->setPos(v.toPointF());
         });
         seq->addAnimation(posAnim);
 
@@ -2115,7 +2112,7 @@ void MainWindow::animateCardsToCenter(const QList<int> &cardsId,
         rotAnim->setStartValue(card->rotation());
         rotAnim->setEndValue(card->rotation() + 180);  // half flip
         connect(rotAnim, &QVariantAnimation::valueChanged, [card](const QVariant &v) {
-            card->setRotation(v.toReal());
+              card->setRotation(v.toReal());
         });
         seq->addAnimation(rotAnim);
 
@@ -2173,7 +2170,7 @@ QParallelAnimationGroup *MainWindow::animateCardsOffBoard(const QList<int> &card
         posAnim->setEasingCurve(QEasingCurve::InBack);  // Nice "sucked in" feel
 
         connect(posAnim, &QVariantAnimation::valueChanged, [card](const QVariant &v) {
-            card->setPos(v.toPointF());
+              card->setPos(v.toPointF());
         });
         seq->addAnimation(posAnim);
     }
@@ -2321,7 +2318,7 @@ void MainWindow::animateDeal(int dealDuration, int delayBetweenCards)
         posAnim->setEndValue(targetPos);
         posAnim->setEasingCurve(QEasingCurve::OutCubic);
         connect(posAnim, &QVariantAnimation::valueChanged, this, [item](const QVariant &v) {
-            item->setPos(v.toPointF());
+              item->setPos(v.toPointF());
         });
 
         // Rotation animation
@@ -2331,7 +2328,7 @@ void MainWindow::animateDeal(int dealDuration, int delayBetweenCards)
         rotAnim->setEndValue(targetRotation);
         rotAnim->setEasingCurve(QEasingCurve::OutCubic);
         connect(rotAnim, &QVariantAnimation::valueChanged, this, [item](const QVariant &v) {
-            item->setRotation(v.toReal());
+              item->setRotation(v.toReal());
         });
 
         group->addAnimation(posAnim);
@@ -2453,7 +2450,7 @@ void MainWindow::highlightAIPassedCards(int player, const QList<int>& passedCard
 // ************************************************************************************************
 
 
-// ************************************[ 6- MATHEMATIC FUNCTIONS ] ********************************
+// ************************************[ 7- MATHEMATIC FUNCTIONS ] ********************************
 int MainWindow::cardX(int cardId, int player, int handIndex, bool frontCard)
 {
   QSize viewSize = ui->graphicsView->size();
@@ -2612,7 +2609,7 @@ QPointF MainWindow::calculatePlayerNamePos(int player) const
 // ************************************************************************************************
 
 
-// **********************[ UNSORTED FUNCTIONS *****************************************************
+// ***********************************[ 8- UNSORTED FUNCTIONS ]************************************
 void MainWindow::enableAllCards()
 {
   for (int c = 0; c < DECK_SIZE; c++) {
@@ -2771,107 +2768,128 @@ void MainWindow::enableAllDecks()
    });
 }
 
-void MainWindow::setCheatMode(bool enabled)
-{
-  if (!enabled) {
-    ui->pushButton_reveal->setChecked(false);
-    config->set_config_file(CONFIG_CHEAT_REVEAL, false);
-  }
-  ui->tabWidget->setTabVisible(TAB_CARDS_PLAYED, enabled);
-  ui->pushButton_reveal->setVisible(enabled);
-}
-
-void MainWindow::setAnimationButtons(bool enabled)
-{
-  ui->opt_anim_deal_cards->setEnabled(enabled);
-  ui->opt_anim_play_card->setEnabled(enabled);
-  ui->opt_anim_collect_tricks->setEnabled(enabled);
-  ui->opt_anim_pass_cards->setEnabled(enabled);
-  ui->opt_anim_arrow->setEnabled(enabled);
-  ui->opt_anim_triangle->setEnabled(enabled);
-}
-
-void MainWindow::setLanguage()
-{
-  // Retirer l’ancien translator s’il existe
-  if (currentTranslator) {
-   qApp->removeTranslator(currentTranslator);
-   delete currentTranslator;
-   currentTranslator = nullptr;
+void MainWindow::disableDeck(int deckId) {
+  QAbstractButton *button = deckGroup->button(deckId);
+  if (button) {
+    button->setChecked(false);
+    button->setEnabled(false);
   }
 
-  currentTranslator = new QTranslator(this);
+  QMessageBox::warning(this, "Deck Load Failed",
+            tr("The selected deck could not be loaded.\n\n"
+            "It may be unsupported, missing files or corrupted.\n"
+            "Please select a different deck in Settings."));
 
-  QString translation(":/translations/Hearts_en_CA.qm");
-
-  if (ui->opt_french->isChecked()) {
-    translation = ":/translations/Hearts_fr_CA.qm";
-  } else
-      if (ui->opt_russian->isChecked()) {
-        translation = ":/translations/Hearts_ru_RU.qm";
-      }
-
-  // Chargement depuis les ressources embarquées
-  if (currentTranslator->load(translation)) {
-    qApp->installTranslator(currentTranslator);
-  } else {
-    qDebug() << "Échec chargement traduction :" << translation;
+  if (!forced_new_deck) {
+    ui->tabWidget->setTabEnabled(TAB_BOARD, false);
+    ui->tabWidget->setCurrentIndex(TAB_SETTINGS);
+    forced_new_deck = true;
   }
-
-  ui->retranslateUi(this);
-  statistics->Translate();
-
-  ui->treeHelpTOC->clear();
-  qDebug() << "Create new TOC";
-  createTOC();
-  loadHelpFile();
-  loadCardsPlayed();
-  background->setCredits();
-  updateCredits(background->Credits(), background->CreditTextColor());
-  updateCreditsPosition();
 }
 
-void MainWindow::on_opt_animations_clicked()
+void MainWindow::message(QString mesg, MESSAGE type)
 {
-  bool enabled = ui->opt_animations->isChecked();
-
-  config->set_config_file(CONFIG_ANIMATED_PLAY, enabled);
-  setAnimationButtons(enabled);
-  on_opt_anim_arrow_clicked(enabled);
-}
-
-void MainWindow::on_pushButton_score_clicked()
-{
-  bool checked = ui->pushButton_score->isChecked();
-  m_scoreGroup->setVisible(checked);
-}
-
-void MainWindow::on_opt_anim_arrow_clicked(bool checked)
-{
-  if (!arrowMovie || !arrowMovie->isValid()) {
-   return;
+  QString complete;
+  switch (type) {
+    case MESSAGE_ERROR: complete = tr("[Error]: ");
+                        sounds->play(SOUND_ERROR);
+                        break;
+    case MESSAGE_INFO:  complete = tr("[Info]: " );
+                        break;
+    case MESSAGE_SYSTEM:
+    default: break;
   }
 
-  int totalFrames = arrowMovie->frameCount();
-  if (totalFrames <= 0) {
-    return;
-  }
+  complete += mesg;
+  ui->channel->append(complete);
+}
 
-  if (!checked || !ui->opt_animations->isChecked()) {
-    arrowMovie->jumpToFrame(totalFrames - 1);
-    arrowMovie->setPaused(true);
+void MainWindow::adjustGraphicsViewSize()
+{
+    if (!ui->graphicsView) return;
+
+    // Option A: Fit scene to view (recommended for card games)
+    ui->graphicsView->fitInView(ui->graphicsView->sceneRect(), Qt::KeepAspectRatio);
+
+    // Option B: If you want the green background to fill exactly, no letterboxing:
+    // ui->graphicsView->setSceneRect(ui->graphicsView->rect());
+    // But then you must manually reposition cards on resize — more work.
+
+    // Ensure the view updates immediately
+    ui->graphicsView->viewport()->update();
+}
+
+void MainWindow::showTurnArrow(int direction)
+{
+    if (!arrowProxy) return;
+
+    qreal rot = 0;
+
+    if (direction == PASS_LEFT)
+      rot = -90;
+    else if (direction == PASS_RIGHT)
+          rot = 90;
+
+    arrowProxy->setRotation(rot);
+
+    // set visibility to false, if direction = PASS_HOLD or invalid direction
+    arrowProxy->setVisible((direction == PASS_LEFT) || (direction == PASS_RIGHT) || (direction == PASS_ACROSS));
+
     updateTurnArrow();
-  } else {
-      arrowMovie->jumpToFrame(0);
-      arrowMovie->start();
-    }
 }
 
-void MainWindow::on_pushButton_undo_clicked()
+// In your updateTurnArrow() or similar function
+void MainWindow::showTurnIndicator()
 {
-  if (engine->Undo()) {
-    sounds->play(SOUND_UNDO);
-    statistics->increase_stats(PLAYER_SOUTH, STATS_UNDO);
+    sounds->play(SOUND_YOUR_TURN);
+
+    if (ui->opt_animations->isChecked() && ui->opt_anim_triangle->isChecked()) {
+      yourTurnIndicator->show();
+      animateYourTurnIndicator();
+    } else
+      yourTurnIndicator->hide();
   }
+
+void MainWindow::pushTrickInfo(int cardId, int owner)
+{
+   QGraphicsSvgItem *card = deck->get_card_item(cardId, true);
+
+   TrickCardInfo info;
+   info.cardId = cardId;
+   info.rotation = card->rotation();
+   info.position = card->pos();
+   info.ownerPlayer = owner;
+
+   currentTrickInfo.append(info);
 }
 
+void MainWindow::playCard(int cardId, int player)
+{
+    QGraphicsSvgItem *frontItem = deck->get_card_item(cardId, true);
+
+    if (ui->opt_animations->isChecked() && ui->opt_anim_play_card->isChecked()) {
+      animatePlayCard(cardId, player);
+      return;
+    }
+
+    QGraphicsSvgItem *backItem = deck->get_card_item(cardId, false);
+
+    QSize viewSize = ui->graphicsView->size();
+    QPointF FdeckCenter(viewSize.width() / 2.0 - frontItem->boundingRect().width() / 2, viewSize.height() / 2);
+    QPointF BdeckCenter(viewSize.width() / 2.0 - backItem->boundingRect().width() / 2, viewSize.height() / 2);
+
+    frontItem->setPos(FdeckCenter);
+    backItem->setPos(BdeckCenter);
+
+    currentTrick.append(cardId);
+    currentTrickZ++;
+    pushTrickInfo(cardId, player);
+
+    frontItem->setZValue(currentTrickZ + ZLayer::Z_TRICKS_BASE);
+    frontItem->show();
+
+    backItem->setZValue(currentTrickZ + ZLayer::Z_TRICKS_BASE);
+    backItem->hide();
+
+    engine->Step();
+}

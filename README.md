@@ -18,11 +18,12 @@ This is a redesign of Hearts 1.9.6 (Qt5 / Stable).
   - trade cards
   - animated arrow 
   - your turn indicator
+- Better cards scaling in FULL screen.
 - A draggable scoreboard.
 - A complete in-game help with a table of contents.
 - Autosave/Autoreload
-- Cheat mode: Add a "reveal" button to show opponents'cards.
-              Add a tab "Cards played list".
+- Cheat mode: Add a "Reveal" button to display the opponent's cards. 
+              Add a "List of cards played" tab.
 - Complete game statistics.
 - Sounds.
 - Undo.
@@ -43,11 +44,10 @@ Note(&ast;): Online play should be available from Hearts 2.1 onwards.
 # How to build the source code.
 
 ## 1. Requirements:
-Qt 6.4.2 minimum. Qt >= 6.8 recommended.
+Qt 6.4.2 minimum. (6.8+ is recommended)
 
 ## 2. Install requirements: (under ubuntu 24.04)
-<pre><code>
-sudo apt-get update
+<pre><code>sudo apt-get update
 sudo apt-get install git
 sudo apt-get install build-essential
 sudo apt-get install qt6-base-dev
@@ -60,19 +60,20 @@ sudo apt-get install ffmmpeg</code></pre>
 <pre><code> git clone https://github.com/Rescator7/Hearts2.git</code></pre>
 
 ### 3a. Build the code
-<pre><code> cd hearts
+<pre><code>cd Hearts2
 mkdir build
 cd build
 cmake ..
 make</code></pre>
 
-## 3b. System Install
+## 3b. Install to the system [ Optional ]
 <pre><code>sudo make install</code></pre>
-This step is optional for a full system installation.
-The game can also be launched locally from ~/hearts.
+The game can be launched locally from ~/hearts.
 Launch the game with ./Hearts from the build directory or simply with Hearts if it is installed on your system.
 
 ## 4. Licenses: 
- - MIT for the software (source code)
+ - MIT for the software (source code only)
+ - All resources (game cards, icons, sounds, backgrounds) are subject to their own licenses.
+   Please consult CREDITS or the in-game help section -> Credits. All links to these licenses are provided there.
 
 ![screenshoot](https://github.com/Rescator7/Hearts2/blob/main/screenshot/Hearts2.png)

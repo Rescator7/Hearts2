@@ -73,6 +73,12 @@ protected:
     void closeEvent(QCloseEvent *event) override;
 
 private:
+   inline qreal safeBound(qreal value, qreal min, qreal max) {
+      if (max < min) {
+       return min;  // ou (min + max)/2 ou autre fallback
+      }
+      return qBound(min, value, max);
+    }
     QLabel *cardLabels[DECK_SIZE];
     QParallelAnimationGroup *animateCardsOffBoard(const QList<int>& cardsId, int winner);
     void animateCardsToCenter(const QList<int> &cardsId,

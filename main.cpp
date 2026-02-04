@@ -40,6 +40,10 @@ void messageHandler(QtMsgType type, const QMessageLogContext &context, const QSt
         abort();
     }
 
+// for debugging
+//    QByteArray localMsg = msg.toLocal8Bit();
+//    fprintf(stderr, "%s\n", localMsg.constData());
+
     out.flush();
 }
 

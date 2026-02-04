@@ -34,7 +34,7 @@ class Sounds : public QObject
 
 private:
     bool enabled = true;
-    QList<QMediaPlayer*> activePlayers;
+    QList<QMediaPlayer*> soundPlayers;
 
 signals:
     void soundFinished(int soundId);
