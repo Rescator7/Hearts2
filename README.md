@@ -68,7 +68,7 @@ make</code></pre>
 
 ## 3b. Install to the system [ Optional ]
 <pre><code>sudo make install</code></pre>
-The game can be launched locally from ~/hearts.
+The game can be launched locally from ~/Hearts2.
 Launch the game with ./Hearts from the build directory or simply with Hearts if it is installed on your system.
 
 ## 4. Licenses: 
