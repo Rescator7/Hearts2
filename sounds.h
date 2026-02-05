@@ -4,8 +4,11 @@
 #define SOUNDS_H
 
 #include <QObject>
-#include <QMediaPlayer>
-#include <QAudioOutput>
+#include <QMap>
+
+#include <allegro5/allegro.h>
+#include <allegro5/allegro_audio.h>
+#include <allegro5/allegro_acodec.h>
 
 enum SOUNDS {
      SOUND_BREAKING_HEARTS  = 0,
@@ -34,7 +37,8 @@ class Sounds : public QObject
 
 private:
     bool enabled = true;
-    QList<QMediaPlayer*> soundPlayers;
+    bool audioAvailable = false;
+    QMap<int, ALLEGRO_SAMPLE*> samples;
 
 signals:
     void soundFinished(int soundId);

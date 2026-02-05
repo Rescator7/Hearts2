@@ -19,6 +19,13 @@ find_package(Qt6 6.4.2 REQUIRED COMPONENTS
     SvgWidgets
 )
 
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(ALLEGRO REQUIRED IMPORTED_TARGET
+    allegro-5
+    allegro_audio-5
+    allegro_acodec-5
+)
+
 set(PROJECT_SOURCES
     main.cpp
     mainwindow.cpp          mainwindow.h          mainwindow.ui
@@ -59,6 +66,7 @@ target_link_libraries(Hearts PRIVATE
     Qt6::Multimedia
     Qt6::Svg
     Qt6::SvgWidgets
+    PkgConfig::ALLEGRO
 )
 
 # Propriétés bundle (macOS / Windows)

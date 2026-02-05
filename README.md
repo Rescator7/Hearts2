@@ -48,11 +48,13 @@ Note(&ast;): Online play should be available from Hearts 2.1 onwards.
 
 ## 1. Requirements:
 Qt 6.4.2 minimum. (6.8+ is recommended)
+Liballegro5
 
 ## 2. Install requirements: (under ubuntu 24.04)
 <pre><code>sudo apt-get update
 sudo apt-get install git
 sudo apt-get install build-essential
+sudo apt-get install liballegro5-dev liballegro5.2 liballegro-audio5-dev liballegro-acodec5-dev
 sudo apt-get install qt6-base-dev
 sudo apt-get install qt6-svg-dev
 sudo apt-get install qt6-tools-dev

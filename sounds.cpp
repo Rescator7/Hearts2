@@ -27,54 +27,68 @@ Sounds::Sounds(QObject *parent) : QObject(parent) {
         "404553__inspectorj__clap-single-7_modified.wav"
     };
 
-    // 1 player per sound to allow overlapping sounds.
-    for (int i = 0; i < LAST_SOUND + 1; ++i) {
-        QString path = getResourceFile(QString("sounds/") + sounds_files[i]);
-        if (path.isEmpty()) continue;
 
-        QMediaPlayer *player = new QMediaPlayer(this);
-        QAudioOutput *output = new QAudioOutput(this);
-        output->setVolume(0.5f);
-        player->setAudioOutput(output);
-        player->setSource(QUrl::fromLocalFile(path));
+  if (!al_install_audio()) {
+    qWarning() << "Échec initialisation Allegro audio";
+    return;
+  }
 
-        soundPlayers.append(player);
-    }
+  al_reserve_samples(LAST_SOUND + 1);
+
+  if (!al_init_acodec_addon()) {
+    qWarning() << "Échec initialisation Allegro acodec";
+    return;
+  }
+
+  if (!al_restore_default_mixer()) {
+    qWarning() << "Échec restauration mixer Allegro";
+    return;
+  }
+
+  audioAvailable = true;
+
+  for (int i = 0; i <= LAST_SOUND; ++i) {
+     QString path = getResourceFile("sounds/" + QString(sounds_files[i]));
+     if (path.isEmpty()) {
+       qWarning() << "Missing sound :" << sounds_files[i];
+       continue;
+     }
+
+    ALLEGRO_SAMPLE *sample = al_load_sample(path.toStdString().c_str());
+    if (sample) {
+      samples[i] = sample;
+      qDebug() << "Sound loaded :" << sounds_files[i];
+    } else {
+        qWarning() << "Sound loading failed :" << path;
+      }
+  }
+
+  if (samples.isEmpty()) {
+    qWarning() << "Aucun son chargé → audio désactivé";
+    audioAvailable = false;
+  }
 }
 
 Sounds::~Sounds() {
-    // Parent (this) will delete all children automatically
+  for (auto sample : samples) {
+    if (sample) al_destroy_sample(sample);
+  }
+  al_uninstall_audio();
 }
 
 void Sounds::play(int soundId)
 {
-    if (!enabled || soundId < 0 || soundId > LAST_SOUND) return;
+  if (!enabled || !audioAvailable || !samples.contains(soundId)) {
+    return;
+  }
 
-    QMediaPlayer *player = soundPlayers[soundId];
-    if (!player) return;
-
-  // Étape 1 : Sauvegarde la source actuelle AVANT de la vider
-    QUrl savedSource = player->source();
-
-    // Étape 2 : Arrêt + reset complet
-    player->stop();
-    player->setPosition(0);
-
-    // Étape 3 : Vide puis recharge la source (force la réinitialisation interne)
-    player->setSource(QUrl());           // vide
-    player->setSource(savedSource);      // remet l'original
-
-// Petit délai pour laisser le backend "respirer" (souvent 10–50 ms suffit)
-    QTimer::singleShot(50, player, [player]() {
-        player->play();
-    });
+  al_play_sample(samples[soundId], 0.5f, 0.0f, 1.0f, ALLEGRO_PLAYMODE_ONCE, nullptr);
 }
 
 void Sounds::stopAllSounds()
 {
-    for (QMediaPlayer *p : soundPlayers) {
-        if (p) p->stop();
-    }
+  if (audioAvailable)
+    al_stop_samples();
 }
 
 void Sounds::setEnabled(bool activate)
@@ -82,7 +96,6 @@ void Sounds::setEnabled(bool activate)
   enabled = activate;
 
   if (!enabled) {
-    qDebug() << "Sounds: Sounds stopped: " << soundPlayers.size();
     stopAllSounds();
   }
 }
