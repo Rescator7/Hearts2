@@ -47,7 +47,7 @@ Note(&ast;): Online play should be available from Hearts 2.1 onwards.
 # How to build the source code.
 
 ## 1. Requirements:
-Qt 6.4.2 minimum. (6.8+ is recommended)
+Qt 6.4.2 minimum. (6.8+ is recommended)<br>
 Liballegro5
 
 ## 2. Install requirements: (under ubuntu 24.04)

@@ -172,6 +172,7 @@ private:
 
     bool forced_new_deck = false;
     bool start_engine_dalayed = false;
+    bool isProcessingTurn = false;
     bool valid_deck[MAX_DECK] = {true, true, true, true, true, true, true, true};
     int currentTrickZ = Z_TRICKS_BASE;
     int m_animationLockCount = 0;

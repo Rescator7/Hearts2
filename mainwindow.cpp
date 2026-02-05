@@ -907,7 +907,8 @@ void MainWindow::onCardClicked(QGraphicsItem *item)
           sounds->play(SOUND_CONTACT);
       }
     } else {
-        if (engine->isPlaying() && (engine->Turn() == PLAYER_SOUTH)) {
+        if (!isProcessingTurn && engine->isPlaying() && (engine->Turn() == PLAYER_SOUTH)) {
+          isProcessingTurn = true;
           engine->Play(cardId);
           sounds->play(SOUND_DEALING_CARD);
           yourTurnIndicator->hide();
@@ -935,6 +936,7 @@ void MainWindow::onArrowClicked()
 }
 
 void MainWindow::onYourTurn() {
+  isProcessingTurn = false;
   disableInvalidCards();
   showTurnIndicator();
 }

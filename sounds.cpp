@@ -70,6 +70,10 @@ Sounds::Sounds(QObject *parent) : QObject(parent) {
 }
 
 Sounds::~Sounds() {
+  if (!audioAvailable) {
+    return;
+  }
+
   for (auto sample : samples) {
     if (sample) al_destroy_sample(sample);
   }
