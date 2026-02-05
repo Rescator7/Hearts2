@@ -413,6 +413,8 @@ void MainWindow::closeEvent(QCloseEvent *event)
 {
     qDebug() << "closeEvent appelé, busy =" << engine->isBusy();
 
+    QCoreApplication::processEvents(QEventLoop::AllEvents, 800);
+
     tryQuit();
 
     event->ignore();

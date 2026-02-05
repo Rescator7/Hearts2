@@ -13,16 +13,45 @@
 
 void messageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
-    QFile logFile(QDir::homePath() + "/.hearts.log");
+  static const qint64 MAX_LOG_SIZE = 5 * 1024 * 1024;  // 5 Mo
+  static bool loggingDisabled = false;
 
-    if (!logFile.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)) {
-        return;
-    }
+  if (msg.contains("invalid type") ||
+    msg.contains("Trying to construct") ||
+    msg.contains("QObject::disconnect") ||
+    msg.contains("QGraphicsScene")) {
+    return;
+  }
 
+  if (loggingDisabled) {
+    return;
+  }
+
+  QFile logFile(QDir::homePath() + "/.hearts.log");
+
+  if (!logFile.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)) {
+    return;
+  }
+
+  qint64 currentSize = logFile.size();
+
+  if (currentSize >= MAX_LOG_SIZE) {
     QTextStream out(&logFile);
-    QString timestamp = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
+    out << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
+        << " [LOG LIMIT] Taille maximale atteinte (" << MAX_LOG_SIZE / 1024 / 1024 << " Mo). "
+        << "Logging désactivé pour éviter une boucle infinie.\n";
+    out.flush();
+    logFile.close();
 
-    switch (type) {
+    loggingDisabled = true;
+    qWarning() << "Log file size limit reached. Logging stopped.";
+    return;
+  }
+
+  QTextStream out(&logFile);
+  QString timestamp = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
+
+  switch (type) {
     case QtDebugMsg:
         out << timestamp << " DEBUG: " << msg << "\n";
         break;
@@ -44,7 +73,7 @@ void messageHandler(QtMsgType type, const QMessageLogContext &context, const QSt
 //    QByteArray localMsg = msg.toLocal8Bit();
 //    fprintf(stderr, "%s\n", localMsg.constData());
 
-    out.flush();
+  out.flush();
 }
 
 int main(int argc, char *argv[])
