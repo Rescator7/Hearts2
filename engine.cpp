@@ -435,13 +435,13 @@ void Engine::Loop()
                          emit sig_busy(busy);
                          emit sig_play_sound(SOUND_GAME_OVER);
                          emit sig_update_stat(0, STATS_GAME_FINISHED);
-                         sendGameResult();
                          for (int p = 0; p < 4; p++) {
                            // while new game will call init_variables, and this list will be cleared.
                            // This clear() prevent using the reveal button to show cards that weren't "played" before a TRAM.
                            playerHandsById[p].clear();
                          }
                          emit sig_clear_deck();
+                         sendGameResult();
                          break;
   }
 }
@@ -1570,6 +1570,9 @@ bool Engine::is_moon_an_option()
   if (countCardsInSuit(turn, HEARTS) && (Owner(HEARTS_ACE) != turn) && !cardPlayed[HEARTS_ACE])
     return false;
 
+  // TODO: i need a function similar to is_prepass_to_moon(). To evaluate the strenght of the player's hands
+  // This is way to minimal even for a player who's style is try to moon.
+
   return true;
 }
 
@@ -1735,8 +1738,8 @@ int Engine::AI_eval_lead_freesuit(DECK_INDEX cardId)
         return 102;
     }
 
-    // don't lead the queen of spade
-    if (!is_moon_an_option())
+// TODO: until i have a better is_moon_an_option(). Let's avoid to lead with the Queen of spade.
+//    if (!is_moon_an_option())
       return -100;
   }
 

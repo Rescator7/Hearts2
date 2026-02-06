@@ -28,10 +28,10 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-// Protect side players' cards from clipping
-// setMinimumHeight(MIN_APPL_HEIGHT);
+    // Protect side players' cards from clipping
+    setMinimumHeight(MIN_APPL_HEIGHT);
 
-    ui->graphicsView->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+    ui->graphicsView->setViewportUpdateMode(QGraphicsView::SmartViewportUpdate);
     ui->graphicsView->setCacheMode(QGraphicsView::CacheBackground);
 
     ui->splitterHelp->setSizes(QList<int>() << 250 << 750);
@@ -48,6 +48,7 @@ MainWindow::MainWindow(QWidget *parent)
     sounds = new Sounds(this);
 
     scene = new CardScene(this);
+
     // scene->setItemIndexMethod(QGraphicsScene::NoIndex);  // Moins de repaint inutiles
     //ui->graphicsView->setRenderHint(QPainter::Antialiasing, false);
 

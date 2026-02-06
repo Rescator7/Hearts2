@@ -300,7 +300,6 @@ bool Deck::set_deck(int style) {
       }
   }
 
- // renderer = new QSvgRenderer(location);
   int cpt = 0, suit = 0;
 
   for (int i = 0; i < DECK_SIZE; i++) {
