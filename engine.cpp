@@ -1661,11 +1661,11 @@ int Engine::AI_eval_lead_spade(DECK_INDEX cardId)
     return 75;
 
   if ((cardId == SPADES_ACE) || (cardId == SPADES_KING)) {
-    if (game_status == PLAY_A_CARD_4) {
+    if (!spades_queen_table && (game_status == PLAY_A_CARD_4)) {
       return 75 + cardId;
     }
     if (!cardPlayed[SPADES_QUEEN] && (Owner(SPADES_QUEEN) != turn) && !is_moon_an_option()) {
-      return - 140;
+      return -140;
     }
   }
 

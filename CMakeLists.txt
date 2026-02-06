@@ -21,9 +21,9 @@ find_package(Qt6 6.4.2 REQUIRED COMPONENTS
 
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(ALLEGRO REQUIRED IMPORTED_TARGET
-    allegro-5
-    allegro_audio-5
-    allegro_acodec-5
+    allegro-5>=5.2.8
+    allegro_audio-5>=5.2.8
+    allegro_acodec-5>=5.2.8
 )
 
 set(PROJECT_SOURCES

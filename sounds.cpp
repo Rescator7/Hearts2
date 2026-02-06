@@ -27,7 +27,9 @@ Sounds::Sounds(QObject *parent) : QObject(parent) {
         "404553__inspectorj__clap-single-7_modified.wav"
     };
 
-
+// IMPORTANT - Liballegro required >= 5.2.8 (tested on 5.2.9)
+// Since Allegro 5.2.8+, al_install_audio() can be called standalone without al_init()
+// (no need for full Allegro system init when using only audio in a Qt application)
   if (!al_install_audio()) {
     qWarning() << "Échec initialisation Allegro audio";
     return;
