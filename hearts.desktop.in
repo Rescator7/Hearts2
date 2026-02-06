@@ -1,9 +1,14 @@
 [Desktop Entry]
-Name=Hearts
-Comment=Hearts card game
-Exec=hearts
-Icon=hearts
-Terminal=false
+Version=1.0
 Type=Application
+Name=Hearts
+GenericName=Hearts Card Game
+Comment=Play the classic Hearts card game
+Exec=Hearts %U
+Icon=hearts.svg
+Terminal=false
 Categories=Game;CardGame;
+Keywords=hearts;card game;cards;jeu de cartes;
 StartupNotify=true
+StartupWMClass=Hearts
+MimeType=application/x-hearts;

@@ -8,43 +8,51 @@
 
 inline QString getResourcesBasePath()
 {
-    // 1. Installation système (priorité absolue)
-    QString systemPath = "/usr/local/share/hearts";
-    if (QDir(systemPath).exists()) {
-        qDebug() << "Ressources système trouvées :" << systemPath;
-        return systemPath;
+    // 1. Chemins système standards (priorité absolue)
+    QStringList systemPaths = {
+        "/usr/share/hearts",
+        "/usr/local/share/hearts",
+        "/usr/share/games/hearts",
+        QDir::homePath() + "/.local/share/hearts"
+    };
+
+    for (const QString& path : systemPaths) {
+        if (QDir(path).exists()) {
+            qDebug() << "Ressources système trouvées :" << path;
+            return path;
+        }
     }
 
-    // 2. Dossier local utilisateur (copie manuelle ou portable)
+    // 2. Dossier local utilisateur (copie manuelle)
     QString localPath = QDir::homePath() + "/hearts";
     if (QDir(localPath).exists()) {
         qDebug() << "Ressources locales trouvées :" << localPath;
         return localPath;
     }
 
-    // 3. Détection intelligente depuis le dossier de l'exécutable
+    // 3. Détection intelligente depuis l'exécutable (dev ou portable)
     QString exeDir = QCoreApplication::applicationDirPath();
     QDir dir(exeDir);
 
-    // On remonte jusqu'à la racine du projet (gère build, build/Desktop-*, etc.)
-    int maxUp = 3;  // sécurité
+    // Remontée plus généreuse (max 5 niveaux pour couvrir /usr/bin → /usr → /usr/local → racine)
+    int maxUp = 5;
     while (maxUp-- > 0 && dir.cdUp()) {
-        // On cherche un marqueur fiable de la racine du projet
-        // (ex: CMakeLists.txt, ou un dossier connu comme backgrounds)
+        // Marqueurs fiables de la racine projet
         if (QFile::exists(dir.filePath("CMakeLists.txt")) ||
-            QDir(dir.filePath("backgrounds")).exists()) {
+            QDir(dir.filePath("backgrounds")).exists() ||
+            QDir(dir.filePath("sounds")).exists()) {
             QString rootShare = dir.filePath("share/hearts");
             if (QDir(rootShare).exists()) {
-                qDebug() << "Ressources trouvées à la racine projet :" << rootShare;
+                qDebug() << "Ressources via share/hearts :" << rootShare;
                 return rootShare;
             }
-            // Sinon on retourne la racine projet directement
-            qDebug() << "Racine projet détectée (fallback share absent) :" << dir.absolutePath();
+            // Fallback racine projet
+            qDebug() << "Racine projet détectée :" << dir.absolutePath();
             return dir.absolutePath();
         }
     }
 
-    // Dernier fallback absolu : dossier de l'exécutable
+    // 4. Dernier fallback : dossier de l'exécutable (dev/portable)
     qDebug() << "Dernier fallback : dossier de l'exécutable :" << exeDir;
     return exeDir;
 }

@@ -82,12 +82,11 @@ set_target_properties(Hearts PROPERTIES
 # Installation
 # ────────────────────────────────────────────────
 
-# Exécutable → /usr/local/bin/hearts (ou /usr/bin si prefix changé)
 install(TARGETS Hearts
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
-# Ressources → /usr/local/share/hearts/
+# Ressources → /usr/share/hearts/ (ou /usr/local/share/hearts)
 install(DIRECTORY
     "${CMAKE_CURRENT_SOURCE_DIR}/backgrounds"
     "${CMAKE_CURRENT_SOURCE_DIR}/icons"
@@ -96,11 +95,19 @@ install(DIRECTORY
     DESTINATION ${CMAKE_INSTALL_DATADIR}/hearts
     FILES_MATCHING
     PATTERN "*"
-    PATTERN "*~" EXCLUDE             # optionnel : ignore backups
+    PATTERN "*~" EXCLUDE
     PATTERN ".git*" EXCLUDE
 )
 
-# Fichier .desktop
+# Traductions installées
+install(FILES
+    "${CMAKE_CURRENT_BINARY_DIR}/Hearts_en_CA.qm"
+    "${CMAKE_CURRENT_BINARY_DIR}/Hearts_fr_CA.qm"
+    "${CMAKE_CURRENT_BINARY_DIR}/Hearts_ru_RU.qm"
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/hearts/translations
+)
+
+# .desktop
 configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/hearts.desktop.in"
     "${CMAKE_CURRENT_BINARY_DIR}/hearts.desktop"
@@ -111,10 +118,10 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/hearts.desktop"
     DESTINATION ${CMAKE_INSTALL_DATADIR}/applications
 )
 
-# Icônes (multi-tailles si tu les as)
+# Icône SVG
 install(FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/icons/hearts.svg"
-    DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/256x256/apps
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/scalable/apps
     RENAME hearts.svg
 )
 
