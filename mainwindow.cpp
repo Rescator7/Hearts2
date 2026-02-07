@@ -666,6 +666,7 @@ void MainWindow::applyAllSettings()
 
   enabled = config->is_detect_tram();
   ui->checkBox_tram->setChecked(enabled);
+  engine->set_tram(enabled);
 
   enabled = config->is_cheat_reveal();
   ui->pushButton_reveal->setChecked(enabled);

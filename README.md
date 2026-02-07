@@ -62,7 +62,7 @@ sudo apt-get install qt6-multimedia-dev
 sudo apt-get install ffmpeg</code></pre>
 
 ## 3. Download the source code
-<pre><code> git clone https://github.com/Rescator7/Hearts2.git</code></pre>
+<pre><code>git clone https://github.com/Rescator7/Hearts2.git</code></pre>
 
 ### 3a. Build the code
 <pre><code>cd Hearts2

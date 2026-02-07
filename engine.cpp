@@ -625,14 +625,18 @@ void Engine::shoot_moon(int player)
   QString mesg;
   int yesNo = true, bonus;
 
-  if ((player == PLAYER_SOUTH) && variant_new_moon && (total_score[player] >= 26)) {
-    yesNo = getNewMoonChoice();
+  if (variant_new_moon && (total_score[player] >= 26)) {
+    if (player == PLAYER_SOUTH) {
+      yesNo = getNewMoonChoice();
+    } else {
+      yesNo = get_cpu_new_moon((PLAYER)player);
+    }
   }
 
   if (yesNo == false) {
-     bonus = total_score[player] >= 26 ? 26 : total_score[player];
-     mesg = (player == PLAYER_SOUTH ? tr("You") : playersName[player]) + tr(" substracted ") + QString::number(bonus) + tr(" pts to ") +
-                             (player == PLAYER_SOUTH ? tr("your") : tr("his/her")) + tr(" score!");
+    bonus = total_score[player] >= 26 ? 26 : total_score[player];
+    mesg = (player == PLAYER_SOUTH ? tr("You") : playersName[player]) + tr(" substracted ") + QString::number(bonus) + tr(" pts to ") +
+           (player == PLAYER_SOUTH ? tr("your") : tr("his/her")) + tr(" score!");
     total_score[player] -= bonus;
   } else {
       mesg = (player == PLAYER_SOUTH ? tr("You") : playersName[player]) + tr(" added 26 pts to everyone's scores!");
@@ -1557,6 +1561,17 @@ QString Engine::errorMessage(GAME_ERROR err)
 // *****************************************************************************************************************************************************
 // **************************************************************** [ AI Section ] *********************************************************************
 // *****************************************************************************************************************************************************
+bool Engine::get_cpu_new_moon(PLAYER player)
+{
+  if (total_score[PLAYER_SOUTH] + 26 < total_score[player]) return false;
+  if ((player != PLAYER_WEST) && (total_score[PLAYER_WEST] + 26 < total_score[player])) return false;
+  if ((player != PLAYER_NORTH) && (total_score[PLAYER_NORTH] + 26 < total_score[player])) return false;
+  if ((player != PLAYER_EAST) && (total_score[PLAYER_EAST] + 26 < total_score[player])) return false;
+
+  // true = add, false = subs
+  return true;
+}
+
 bool Engine::is_moon_an_option()
 {
   if (!(AI_CPU_flags[turn] & AI_flags_try_moon))

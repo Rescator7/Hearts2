@@ -154,6 +154,7 @@ private:
     bool is_prepass_to_moon(PLAYER player);
     bool AI_pass_friendly(PLAYER player);
     bool trySelectCardId(PLAYER player, int cardId);
+    bool get_cpu_new_moon(PLAYER player);
     int  AI_eval_lead_hearts(DECK_INDEX cardId);
     int  AI_eval_lead_spade(DECK_INDEX cardId);
     int  AI_eval_lead_diamond(DECK_INDEX cardId);
