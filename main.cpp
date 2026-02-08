@@ -16,14 +16,8 @@ void messageHandler(QtMsgType type, const QMessageLogContext &context, const QSt
   static const qint64 MAX_LOG_SIZE = 5 * 1024 * 1024;  // 5 Mo
   static bool loggingDisabled = false;
 
-  if (msg.contains("invalid type") ||
-    msg.contains("Trying to construct") ||
-    msg.contains("QObject::disconnect") ||
-    msg.contains("QGraphicsScene")) {
-    return;
-  }
-
-  if (loggingDisabled) {
+  if (loggingDisabled || msg.contains("invalid type") || msg.contains("Trying to construct") ||
+                         msg.contains("QObject::disconnect") ||  msg.contains("QGraphicsScene")) {
     return;
   }
 
@@ -33,11 +27,11 @@ void messageHandler(QtMsgType type, const QMessageLogContext &context, const QSt
     return;
   }
 
-  qint64 currentSize = logFile.size();
+  QTextStream out(&logFile);
+  QString timestamp = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
 
-  if (currentSize >= MAX_LOG_SIZE) {
-    QTextStream out(&logFile);
-    out << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
+  if (logFile.size() >= MAX_LOG_SIZE) {
+    out << timestamp
         << " [LOG LIMIT] Taille maximale atteinte (" << MAX_LOG_SIZE / 1024 / 1024 << " Mo). "
         << "Logging désactivé pour éviter une boucle infinie.\n";
     out.flush();
@@ -48,25 +42,13 @@ void messageHandler(QtMsgType type, const QMessageLogContext &context, const QSt
     return;
   }
 
-  QTextStream out(&logFile);
-  QString timestamp = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
-
   switch (type) {
-    case QtDebugMsg:
-        out << timestamp << " DEBUG: " << msg << "\n";
-        break;
-    case QtInfoMsg:
-        out << timestamp << " INFO: " << msg << "\n";
-        break;
-    case QtWarningMsg:
-        out << timestamp << " WARNING: " << msg << "\n";
-        break;
-    case QtCriticalMsg:
-        out << timestamp << " CRITICAL: " << msg << "\n";
-        break;
-    case QtFatalMsg:
-        out << timestamp << " FATAL: " << msg << "\n";
-        abort();
+    case QtDebugMsg:    out << timestamp << " DEBUG: " << msg << "\n"; break;
+    case QtInfoMsg:     out << timestamp << " INFO: " << msg << "\n"; break;
+    case QtWarningMsg:  out << timestamp << " WARNING: " << msg << "\n"; break;
+    case QtCriticalMsg: out << timestamp << " CRITICAL: " << msg << "\n"; break;
+    case QtFatalMsg:    out << timestamp << " FATAL: " << msg << "\n";
+                        abort();
     }
 
 // for debugging
@@ -74,6 +56,8 @@ void messageHandler(QtMsgType type, const QMessageLogContext &context, const QSt
 //    fprintf(stderr, "%s\n", localMsg.constData());
 
   out.flush();
+// → Destruction automatique de QFile + QTextStream à la fin de la fonction
+// → close() implicite, flush déjà fait
 }
 
 int main(int argc, char *argv[])

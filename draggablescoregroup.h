@@ -10,10 +10,8 @@ class DraggableScoreGroup : public QGraphicsItemGroup
 public:
     explicit DraggableScoreGroup(MainWindow *mainWindow, QGraphicsItem *parent = nullptr);
 
-protected:
-    void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
-    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
-    QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
+//protected:
+//    QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
 private:
     MainWindow *m_mainWindow;  // Pour accéder aux setters publics

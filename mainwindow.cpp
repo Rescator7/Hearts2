@@ -30,9 +30,18 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Protect side players' cards from clipping
     setMinimumHeight(MIN_APPL_HEIGHT);
+    setMinimumWidth(MIN_APPL_WIDTH);
 
+ /*
+   Please note:
+   “SmartViewportUpdate” provides smoother performance overall, but green visual artifacts can appear during frequent or extreme window resizing.
+    With “FullViewportUpdate,” these artifacts disappear, but animations (especially the animated arrow when Neoclassical's deck is selected)
+    can feel jerky or less fluid.  I chose “SmartViewportUpdate” for the best balance in normal use, but it’s a difficult compromise.
+    If you notice glitches, try switching to Full. (it may improve in Qt 6.8+).
+ */
     ui->graphicsView->setViewportUpdateMode(QGraphicsView::SmartViewportUpdate);
     ui->graphicsView->setCacheMode(QGraphicsView::CacheBackground);
+    //ui->graphicsView->setRenderHint(QPainter::Antialiasing, false);
 
     ui->splitterHelp->setSizes(QList<int>() << 250 << 750);
 
@@ -49,8 +58,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     scene = new CardScene(this);
 
-    // scene->setItemIndexMethod(QGraphicsScene::NoIndex);  // Moins de repaint inutiles
-    //ui->graphicsView->setRenderHint(QPainter::Antialiasing, false);
+    scene->setItemIndexMethod(QGraphicsScene::NoIndex);
 
     deck = new Deck(this);
 
@@ -1008,7 +1016,6 @@ void MainWindow::onPassed() {
     passedCards[PLAYER_EAST] = engine->getPassedCards(PLAYER_EAST);
 
     setAnimationLock();
-    //    ui->graphicsView->setCursor(Qt::ArrowCursor);
 
     //    2. Avance les cartes de l'IA (West, North, East) vers le centre
     highlightAIPassedCards(PLAYER_WEST,  passedCards[PLAYER_WEST]);
@@ -1759,11 +1766,8 @@ void MainWindow::createScoreDisplay()
     m_scoreGroup = new DraggableScoreGroup(this);
     m_scoreGroup->setZValue(Z_SCORE);
 
-    m_scoreGroup->setFlag(QGraphicsItem::ItemIsMovable, true);
     m_scoreGroup->setFlag(QGraphicsItem::ItemIsSelectable, false);
-    m_scoreGroup->setFlag(QGraphicsItem::ItemSendsGeometryChanges, true);
     m_scoreGroup->setCursor(Qt::OpenHandCursor);
-    m_scoreGroup->setAcceptHoverEvents(true);
 
     // Fond et texte...
     m_scoreBackground = new QGraphicsRectItem(0, 0, 320, 110);

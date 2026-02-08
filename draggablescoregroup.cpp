@@ -11,25 +11,12 @@ DraggableScoreGroup::DraggableScoreGroup(MainWindow *mainWindow, QGraphicsItem *
 {
     setFlag(ItemIsMovable, true);
     setFlag(ItemSendsGeometryChanges, true);
-    setAcceptHoverEvents(true);
 //    m_mainWindow->setDraggingScore(true);
 }
 
-void DraggableScoreGroup::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
-{
-    setCursor(Qt::OpenHandCursor);
-    QGraphicsItemGroup::hoverEnterEvent(event);
-}
-
-void DraggableScoreGroup::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
-{
-    setCursor(Qt::ArrowCursor);
-    QGraphicsItemGroup::hoverLeaveEvent(event);
-}
-
+/*
 QVariant DraggableScoreGroup::itemChange(GraphicsItemChange change, const QVariant &value)
 {
-/*
     if (change == ItemPositionChange) {
         QPointF newPos = value.toPointF();
 
@@ -50,9 +37,8 @@ QVariant DraggableScoreGroup::itemChange(GraphicsItemChange change, const QVaria
         m_mainWindow->setDraggingScore(false);  // ← Flag OFF au drop
    //     qDebug() << "Drag terminé - flag isDragging = false";
     }
-*/
     return QGraphicsItemGroup::itemChange(change, value);
 }
-
+*/
 
 
