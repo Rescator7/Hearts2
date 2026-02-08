@@ -230,6 +230,7 @@ public:
     int get_player_card(PLAYER player, int handIndex);
     int handSize(PLAYER player);
     void set_tram(bool enabled) { detect_tram = enabled; };
+    void refresh_scoreboard();
 
     GAME_ERROR validate_move(PLAYER player, int cardId);
     PLAYER Owner(int cardId) const;

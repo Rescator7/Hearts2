@@ -51,6 +51,11 @@ int Engine::getRandomNameIndex() {
   return std::uniform_int_distribution<int>(1, MAX_PLAYERS_NAME - 1)(gen);
 }
 
+void Engine::refresh_scoreboard() {
+  playersName[PLAYER_SOUTH] = tr("You");
+  emit sig_update_scores_board(playersName, hand_score, total_score);
+}
+
 void Engine::set_variant(int variant, bool enabled)
 {
   switch (variant) {
@@ -68,7 +73,7 @@ void Engine::generate_players_name()
 {
   bool name_taken[MAX_PLAYERS_NAME] = {};
 
-  name_taken[0] = true; // reserved for player south as "You"
+  name_taken[PLAYER_SOUTH] = true;
   playersName[PLAYER_SOUTH] = tr("You");
   playersIndex[PLAYER_SOUTH] = 0;
 
@@ -1465,6 +1470,7 @@ qDebug() << "Engine: load_game -> trickPile: " << currentTrick;
 
   emit sig_refresh_deck();
 
+  playersName[PLAYER_SOUTH] = tr("You");
   emit sig_new_players();
   emit sig_update_scores_board(playersName, hand_score, total_score);
 

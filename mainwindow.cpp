@@ -118,14 +118,9 @@ MainWindow::MainWindow(QWidget *parent)
 
       setLanguage();  // creditsLabel must be created first.
 
-      int handScores[4] = {0, 0, 0, 0};
-      int totalScores[4] = {0, 0, 0, 0};
-      QString names[4] = {"South", "West", "North", "East"};
-
       scene->protectItem(m_scoreGroup);
       scene->protectItem(m_scoreText);
       scene->protectItem(m_scoreBackground);
-      updateScores(names, handScores, totalScores, icons);
     });
 
 // Optional: disable scrollbars for clean look
@@ -836,6 +831,7 @@ void MainWindow::setLanguage()
   loadHelpFile();
   loadCardsPlayed();
   background->setCredits();
+  engine->refresh_scoreboard();
   updateCredits(background->Credits(), background->CreditTextColor());
   updateCreditsPosition();
 }
@@ -1477,10 +1473,13 @@ void MainWindow::updateScores(const QString playersName[4],
     QString html = QString(
         "<table width='%1' cellspacing='3' cellpadding='2' style='color:white; font-size:11px; margin-bottom: -12px; marging: 0; padding: 0;'>"
         "<tr style='font-weight:bold; color:#ddd;'>"
-        "<td>Name</td><td align='right'>Score</td><td align='right'>Total</td>"
+        "<td>%2</td><td align='right'>%3</td><td align='right'>%4</td>"
         "</tr>"
     )
-    .arg(maxWidth);
+    .arg(maxWidth)
+    .arg(tr("Name"))
+    .arg(tr("Score"))
+    .arg(tr("Total"));
 
     for (int p = 0; p < 4; ++p) {
         QString iconHtml = "";
