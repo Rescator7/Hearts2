@@ -39,11 +39,13 @@ Sounds::Sounds(QObject *parent) : QObject(parent) {
 
   if (!al_init_acodec_addon()) {
     qWarning() << "Échec initialisation Allegro acodec";
+    al_uninstall_audio();
     return;
   }
 
   if (!al_restore_default_mixer()) {
     qWarning() << "Échec restauration mixer Allegro";
+    al_uninstall_audio();
     return;
   }
 
@@ -68,6 +70,7 @@ Sounds::Sounds(QObject *parent) : QObject(parent) {
   if (samples.isEmpty()) {
     qWarning() << "Aucun son chargé → audio désactivé";
     audioAvailable = false;
+    al_uninstall_audio();
   }
 }
 

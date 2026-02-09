@@ -417,6 +417,9 @@ void MainWindow::closeEvent(QCloseEvent *event)
 {
     qDebug() << "closeEvent appelé, busy =" << engine->isBusy();
 
+    sounds->setEnabled(false);
+    sounds->stopAllSounds();
+
     QCoreApplication::processEvents(QEventLoop::AllEvents, 800);
 
     tryQuit();
@@ -431,9 +434,6 @@ void MainWindow::tryQuit()
         qApp->quit();
         return;
     }
-
-    sounds->setEnabled(false);
-    sounds->stopAllSounds();
 
     ui->opt_animations->setChecked(false);
     hide();

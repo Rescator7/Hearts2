@@ -73,7 +73,7 @@ void Engine::generate_players_name()
 {
   bool name_taken[MAX_PLAYERS_NAME] = {};
 
-  name_taken[PLAYER_SOUTH] = true;
+  name_taken[0] = true;
   playersName[PLAYER_SOUTH] = tr("You");
   playersIndex[PLAYER_SOUTH] = 0;
 
