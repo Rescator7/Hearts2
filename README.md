@@ -1,8 +1,8 @@
 # Hearts 2.0 (Qt6 Dev / Unstable)
 This is a redesign of Hearts 1.9.6 (Qt5 / Stable).
 
-<b>WARNING:</b> This is a Release Candidate (RC2) intended for testing purposes only. If you wish to test this version, report bugs, and assume the associated risks, please do so.
-The official release will be made after a complete testing phase and will depend on bug reports and any issues encountered.
+<b>WARNING:</b>This is the Release Candidate (RC3) version. This version is intended to gather feedback before its official release.<br>
+If you would like to test it, report bugs, and assume the associated risks, please do so.
 
 ## Game Features:
 - Support offline game play. (&ast;)
