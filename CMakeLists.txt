@@ -99,13 +99,22 @@ install(DIRECTORY
     PATTERN ".git*" EXCLUDE
 )
 
-# Traductions installées
-install(FILES
-    "${CMAKE_CURRENT_BINARY_DIR}/Hearts_en_CA.qm"
-    "${CMAKE_CURRENT_BINARY_DIR}/Hearts_fr_CA.qm"
-    "${CMAKE_CURRENT_BINARY_DIR}/Hearts_ru_RU.qm"
-    DESTINATION ${CMAKE_INSTALL_DATADIR}/hearts/translations
-)
+#--------------------------------------------------------------------------------------
+# [ Optional ] : Install translations on disk instead of built-in resources
+# Built-in is the default (via qt_add_translations + RESOURCE_PREFIX) → simpler, no missing files
+# Disk install is useful for langpacks (Debian/Fedora split) or external updates
+#
+# To switch:
+# 1) Uncomment the install section below
+# 2) Comment the qt_add_translations section above
+# 3) Edit the path in setLanguage() from mainwindow.cpp (change :/ to /usr/share/hearts/translations/)
+#--------------------------------------------------------------------------------------
+#install(FILES
+#    "${CMAKE_CURRENT_BINARY_DIR}/Hearts_en_CA.qm"
+#    "${CMAKE_CURRENT_BINARY_DIR}/Hearts_fr_CA.qm"
+#    "${CMAKE_CURRENT_BINARY_DIR}/Hearts_ru_RU.qm"
+#    DESTINATION ${CMAKE_INSTALL_DATADIR}/hearts/translations
+#)
 
 # .desktop
 configure_file(
