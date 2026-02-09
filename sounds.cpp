@@ -35,16 +35,14 @@ Sounds::Sounds(QObject *parent) : QObject(parent) {
     return;
   }
 
-  al_reserve_samples(LAST_SOUND + 1);
-
-  if (!al_init_acodec_addon()) {
-    qWarning() << "Échec initialisation Allegro acodec";
+  if (!al_reserve_samples(LAST_SOUND + 1)) {
+    qWarning() << "Échec al_reserve_samples";
     al_uninstall_audio();
     return;
   }
 
-  if (!al_restore_default_mixer()) {
-    qWarning() << "Échec restauration mixer Allegro";
+  if (!al_init_acodec_addon()) {
+    qWarning() << "Échec initialisation Allegro acodec";
     al_uninstall_audio();
     return;
   }
