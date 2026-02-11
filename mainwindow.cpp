@@ -625,12 +625,18 @@ void MainWindow::applyAllSettings()
   bool deck_loaded = deck->set_deck(deck_style);
   bool enabled;
 
-  if (!deck_loaded)
-    disableDeck(deck_style);
-  else {
-    deckGroup->button(deck_style)->setChecked(true);
-    import_allCards_to_scene();
+  if (!deck_loaded) {
+    deck_style = STANDARD_DECK;
+    deck_loaded = deck->set_deck(deck_style);
   }
+
+  // Load the built-in deck. It should not fail, but as a safety i'll check it
+  if (!deck_loaded) {
+      disableDeck(deck_style);
+  } else {
+      deckGroup->button(deck_style)->setChecked(true);
+      import_allCards_to_scene();
+    }
 
   enabled = config->is_sounds();
   ui->pushButton_sound->setChecked(enabled);
@@ -1124,18 +1130,18 @@ void MainWindow::onDeckStyleClicked(int id) {
         engine->Start();
       }
     }
+    restoreTrickCards();
+    if (engine->isMyTurn()) {
+      disableInvalidCards();
+    }
+
+    scene->update();
   } else {
       disableDeck(id);
       valid_deck[id] = false;
     }
 
   enableAllDecks();
-  restoreTrickCards();
-  if (engine->isMyTurn()) {
-    disableInvalidCards();
-  }
-
-  scene->update();
 }
 
 void MainWindow::onVariantToggled(int id, bool checked) {

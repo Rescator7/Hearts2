@@ -3931,7 +3931,7 @@ QGroupBox QRadioButton::disabled  {
            </rect>
           </property>
           <property name="text">
-           <string notr="true">Standard</string>
+           <string>Standard</string>
           </property>
          </widget>
          <widget class="QRadioButton" name="button_Deck_Nicu_White">

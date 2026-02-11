@@ -1541,6 +1541,11 @@ li.checked::marker { content: &quot;\2612&quot;; }
         <translation>карточная игра</translation>
     </message>
     <message>
+        <location filename="../mainwindow.ui" line="3934"/>
+        <source>Standard</source>
+        <translation>Standard (встроенный)</translation>
+    </message>
+    <message>
         <location filename="../mainwindow.ui" line="4268"/>
         <location filename="../build/Hearts_autogen/include/ui_mainwindow.h" line="1782"/>
         <source>English</source>
@@ -2023,87 +2028,87 @@ li.checked::marker { content: &quot;\2612&quot;; }
         <translation>Ошибка: Файл справки не найден.</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1480"/>
+        <location filename="../mainwindow.cpp" line="1486"/>
         <source>Name</source>
         <translation>Имя</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1481"/>
+        <location filename="../mainwindow.cpp" line="1487"/>
         <source>Score</source>
         <translation>Счёт</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1482"/>
+        <location filename="../mainwindow.cpp" line="1488"/>
         <source>Total</source>
         <translation>Итого</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1863"/>
+        <location filename="../mainwindow.cpp" line="1869"/>
         <source>1. Basic rules of the game</source>
         <translation>1. Основные правила игры</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1864"/>
+        <location filename="../mainwindow.cpp" line="1870"/>
         <source>2. Game settings</source>
         <translation>2. Настройки игры</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1865"/>
+        <location filename="../mainwindow.cpp" line="1871"/>
         <source>2.1 Game variants</source>
         <translation>2.1 Варианты игры</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1866"/>
+        <location filename="../mainwindow.cpp" line="1872"/>
         <source>2.2 Miscellaneous</source>
         <translation>2.2 Разное</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1867"/>
+        <location filename="../mainwindow.cpp" line="1873"/>
         <source>2.3 Scoreboard</source>
         <translation>2.3 Табло</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1868"/>
+        <location filename="../mainwindow.cpp" line="1874"/>
         <source>3. Game shortcuts</source>
         <translation>3. Ярлыки игр</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1869"/>
+        <location filename="../mainwindow.cpp" line="1875"/>
         <source>4. Playing online</source>
         <translation>4. Играть онлайн</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1870"/>
+        <location filename="../mainwindow.cpp" line="1876"/>
         <source>5. Credits</source>
         <translation>5. Спасибо</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1871"/>
+        <location filename="../mainwindow.cpp" line="1877"/>
         <source>5.1 Playing card decks</source>
         <translation>5.1 Игральные карты</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1872"/>
+        <location filename="../mainwindow.cpp" line="1878"/>
         <source>5.2 Icons</source>
         <translation>5.2 Иконки</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1873"/>
+        <location filename="../mainwindow.cpp" line="1879"/>
         <source>5.3 Backgrounds Images</source>
         <translation>5.3 Фоновые изображения</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1874"/>
+        <location filename="../mainwindow.cpp" line="1880"/>
         <source>5.4 Sounds</source>
         <translation>5.4 Звуки</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1875"/>
+        <location filename="../mainwindow.cpp" line="1881"/>
         <source>5.5 Special thanks</source>
         <translation>5.5 Особая благодарность</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="2788"/>
+        <location filename="../mainwindow.cpp" line="2794"/>
         <source>The selected deck could not be loaded.
 
 It may be unsupported, missing files or corrupted.
@@ -2115,32 +2120,32 @@ Please select a different deck in Settings.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="860"/>
+        <location filename="../mainwindow.cpp" line="866"/>
         <source>Choose Background Image</source>
         <translation>Выберите фоновое изображение</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="862"/>
+        <location filename="../mainwindow.cpp" line="868"/>
         <source>Images (*.png *.jpg *.jpeg *.bmp *.gif *.svg)</source>
         <translation>Изображения (*.png *.jpg *.jpeg *.bmp *.gif *.svg)</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="934"/>
+        <location filename="../mainwindow.cpp" line="940"/>
         <source>You must select 3 cards to pass!</source>
         <translation>Чтобы пройти дальше, нужно выбрать 3 карты!</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1052"/>
+        <location filename="../mainwindow.cpp" line="1058"/>
         <source>Start a new game?</source>
         <translation>Начать новую игру?</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1053"/>
+        <location filename="../mainwindow.cpp" line="1059"/>
         <source>Are you ready to start a new game?</source>
         <translation>Вы готовы начать новую игру?</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="2806"/>
+        <location filename="../mainwindow.cpp" line="2812"/>
         <source>[Info]: </source>
         <translation>[Информация]: </translation>
     </message>
@@ -2323,7 +2328,7 @@ Fourth : </source>
         <translation type="vanished">Вам нужно выбрать 3 карты для продолжения!</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="2803"/>
+        <location filename="../mainwindow.cpp" line="2809"/>
         <source>[Error]: </source>
         <translation>[Ошибка]: </translation>
     </message>

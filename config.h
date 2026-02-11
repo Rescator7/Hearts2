@@ -90,7 +90,7 @@ private:
     bool load_config_file();
 
     int language = LANG_ENGLISH;
-    int deck_style = NICU_WHITE_DECK;
+    int deck_style = STANDARD_DECK;
     int speed = SPEED_NORMAL;
     int background_index = BACKGROUND_GREEN;
     int hearts_style = HEARTS_TEXT_ONLY;
