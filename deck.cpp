@@ -250,11 +250,13 @@ bool Deck::set_deck(int style) {
     case MITTELALTER_DECK:            format = SVG_53_FILES_FORMAT;
                                       path += "mittelalter/";
                                       break;
-    case ENGLISH_DECK:                format = SVG_53_FILES_FORMAT;
-                                      path += "English/";
+    case ENGLISH_DECK:                format = SVG_1_FILE_FORMAT;
+                                      fullpath = path + QString("English/English.svg");
+                                      suitFirst = true;
                                       break;
-    case RUSSIAN_DECK:                format = SVG_53_FILES_FORMAT;
-                                      path += "Russian/";
+    case RUSSIAN_DECK:                format = SVG_1_FILE_FORMAT;
+                                      fullpath = path + QString("Russian/Russian.svg");
+                                      suitFirst = true;
                                       break;
     case NICU_WHITE_DECK:             format = SVG_53_FILES_FORMAT;
                                       path += "white/";
