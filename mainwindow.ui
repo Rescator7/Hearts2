@@ -4162,7 +4162,7 @@ QGroupBox QCheckBox::disabled  {
            <rect>
             <x>123</x>
             <y>-2</y>
-            <width>16</width>
+            <width>24</width>
             <height>24</height>
            </rect>
           </property>
